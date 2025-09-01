@@ -1,0 +1,92 @@
+PS D:\code\go\wx-example\wx-example\k6> k6 run upload-file-shock-load-test-200-vu-wx.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: upload-file-shock-load-test-200-vu-wx.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 200 max VUs, 1m0s max duration (incl. graceful stop):
+              * default: 200 looping VUs for 30s (gracefulStop: 30s)
+
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......................: 69541   2313.138686/s
+    checks_succeeded...................: 100.00% 69541 out of 69541
+    checks_failed......................: 0.00%   0 out of 69541
+
+    ✓ status is 200
+
+    HTTP
+    http_req_duration.......................................................: avg=86.28ms min=0s med=83.57ms max=374.43ms p(90)=118.47ms p(95)=140.89ms
+      { expected_response:true }............................................: avg=86.28ms min=0s med=83.57ms max=374.43ms p(90)=118.47ms p(95)=140.89ms
+    http_req_failed.........................................................: 0.00% 0 out of 69541
+    http_reqs...............................................................: 69541 2313.138686/s
+
+    EXECUTION
+    iteration_duration......................................................: avg=86.37ms min=0s med=83.67ms max=374.44ms p(90)=118.63ms p(95)=141.02ms
+    iterations..............................................................: 69541 2313.138686/s
+    vus.....................................................................: 200   min=200        max=200     
+    vus_max.................................................................: 200   min=200        max=200     
+
+    NETWORK
+    data_received...........................................................: 11 MB 348 kB/s
+    data_sent...............................................................: 33 MB 1.1 MB/s
+
+
+
+                                                                                                               
+running (0m30.1s), 000/200 VUs, 69541 complete and 0 interrupted iterations                                    
+default ✓ [======================================] 200 VUs  30s
+PS D:\code\go\wx-example\wx-example\k6> k6 run upload-file-shock-load-test-200-vu-chi.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: upload-file-shock-load-test-200-vu-chi.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 200 max VUs, 1m0s max duration (incl. graceful stop):
+              * default: 200 looping VUs for 30s (gracefulStop: 30s)
+
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......................: 66006   2195.329603/s
+    checks_succeeded...................: 100.00% 66006 out of 66006
+    checks_failed......................: 0.00%   0 out of 66006
+
+    ✓ status is 200
+
+    HTTP
+    http_req_duration.......................................................: avg=90.9ms min=1.07ms med=88.02ms max=421.4ms  p(90)=120.67ms p(95)=140.31ms
+      { expected_response:true }............................................: avg=90.9ms min=1.07ms med=88.02ms max=421.4ms  p(90)=120.67ms p(95)=140.31ms
+    http_req_failed.........................................................: 0.00%  0 out of 66006
+    http_reqs...............................................................: 66006  2195.329603/s
+
+    EXECUTION
+    iteration_duration......................................................: avg=91ms   min=1.07ms med=88.1ms  max=421.41ms p(90)=120.75ms p(95)=140.49ms
+    iterations..............................................................: 66006  2195.329603/s
+    vus.....................................................................: 200    min=200        max=200    
+    vus_max.................................................................: 200    min=200        max=200    
+
+    NETWORK
+    data_received...........................................................: 9.9 MB 330 kB/s
+    data_sent...............................................................: 31 MB  1.0 MB/s
+
+
+
+                                                                                                               
+running (0m30.1s), 000/200 VUs, 66006 complete and 0 interrupted iterations                                    
+default ✓ [======================================] 200 VUs  30s  

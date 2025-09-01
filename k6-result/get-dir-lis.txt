@@ -1,0 +1,82 @@
+PS D:\code\go\wx-example\wx-example\k6> k6 run get-dir-lis-wx.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: get-dir-lis-wx.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 1000 max VUs, 3m0s max duration (incl. graceful stop):
+              * default: Up to 1000 looping VUs for 2m30s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+     ✓ status is 200
+
+     checks.........................: 100.00% ✓ 1049924     ✗ 0
+     data_received..................: 156 MB  1.0 MB/s
+     data_sent......................: 98 MB   651 kB/s
+     http_req_blocked...............: avg=3.11µs  p(95)=0s       p(99)=0s
+     http_req_connecting............: avg=856ns   p(95)=0s       p(99)=0s
+     http_req_duration..............: avg=50.01ms p(95)=313.52ms p(99)=469.08ms
+       { expected_response:true }...: avg=50.01ms p(95)=313.52ms p(99)=469.08ms
+     http_req_failed................: 0.00%   ✓ 0           ✗ 1049924
+     http_req_receiving.............: avg=31.29µs p(95)=213.1µs  p(99)=536.69µs
+     http_req_sending...............: avg=8.43µs  p(95)=0s       p(99)=513.59µs
+     http_req_tls_handshaking.......: avg=0s      p(95)=0s       p(99)=0s
+     http_req_waiting...............: avg=49.97ms p(95)=313.44ms p(99)=469ms
+     http_reqs......................: 1049924 6999.424006/s
+     iteration_duration.............: avg=50.07ms p(95)=313.57ms p(99)=469.2ms
+     iterations.....................: 1049924 6999.424006/s
+     vus............................: 2       min=2         max=999
+                                                                                                          
+running (2m30.0s), 0000/1000 VUs, 1049924 complete and 0 interrupted iterations                           
+default ✓ [======================================] 0000/1000 VUs  2m30s 
+
+
+PS D:\code\go\wx-example\wx-example\k6> k6 run get-dir-lis-chi.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: get-dir-lis-chi.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 1000 max VUs, 3m0s max duration (incl. graceful stop):
+              * default: Up to 1000 looping VUs for 2m30s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+     ✓ status is 200
+
+     checks.........................: 100.00% ✓ 766471     ✗ 0
+     data_received..................: 114 MB  761 kB/s
+     data_sent......................: 71 MB   475 kB/s
+     http_req_blocked...............: avg=4.13µs  p(95)=0s       p(99)=0s
+     http_req_connecting............: avg=1.71µs  p(95)=0s       p(99)=0s
+     http_req_duration..............: avg=68.42ms p(95)=278.01ms p(99)=428.14ms
+       { expected_response:true }...: avg=68.42ms p(95)=278.01ms p(99)=428.14ms
+     http_req_failed................: 0.00%   ✓ 0          ✗ 766471
+     http_req_receiving.............: avg=36.73µs p(95)=333.4µs  p(99)=549.29µs
+     http_req_sending...............: avg=8.96µs  p(95)=0s       p(99)=515.53µs
+     http_req_tls_handshaking.......: avg=0s      p(95)=0s       p(99)=0s
+     http_req_waiting...............: avg=68.38ms p(95)=277.93ms p(99)=427.98ms
+     http_reqs......................: 766471  5109.74364/s
+     iteration_duration.............: avg=68.49ms p(95)=278.12ms p(99)=428.18ms
+     iterations.....................: 766471  5109.74364/s
+     vus............................: 2       min=2        max=999
+                                                                                                          
+running (2m30.0s), 0000/1000 VUs, 766471 complete and 0 interrupted iterations                            
+default ✓ [======================================] 0000/1000 VUs  2m30s 
+
+| Metric                         | wx        | chi      | Nhận xét                                  |
+| ------------------------------ | --------- | -------- | ----------------------------------------- |
+| **Tổng request xử lý**         | 1,049,924 | 766,471  | 🚀 wx cao hơn \~37%                       |
+| **RPS (req/s)**                | 6999      | 5109     | 🚀 wx cao hơn \~37%                       |
+| **Thời gian trung bình (avg)** | 50.01ms   | 68.42ms  | wx nhanh hơn \~27%                        |
+| **p(95)**                      | 313.52ms  | 278.01ms | chi thấp hơn → ổn định hơn ở tail latency |
+| **p(99)**                      | 469.08ms  | 428.14ms | chi thấp hơn một chút                     |

@@ -1,13 +1,20 @@
 package models
 
-import "github.com/vn-go/xdb"
+import (
+	"time"
+
+	"github.com/vn-go/xdb"
+)
 
 type User struct {
 	xdb.Model[User]
-	ID           uint64 `db:"auto"`
-	UserId       string `db:"df:uuid();size:36"`
-	Username     string `db:"uk;size:50"`
-	HashPassword string `db:"size:200"`
+	ID           uint64    `db:"auto;pk"`
+	UserId       string    `db:"df:uuid();size:36;uk"`
+	Username     string    `db:"uk;size:50"`
+	HashPassword string    `db:"size:200"`
+	Email        string    `db:"size:50;uk"`
+	CreatedOn    time.Time `db:"df:now()"`
+	ModifiedOn   *time.Time
 }
 
 func init() {

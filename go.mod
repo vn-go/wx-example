@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/stretchr/testify v1.11.1
-	github.com/vn-go/wx v0.1.1
+	github.com/vn-go/wx v0.1.3
 )
 
 require (

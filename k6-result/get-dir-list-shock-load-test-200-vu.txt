@@ -1,0 +1,104 @@
+PS D:\code\go\wx-example\wx-example\k6> k6 run get-dir-list-shock-load-test-200-vu-wx.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+WARN[0000] There were unknown fields in the options exported in the script  error="json: unknown field \"executor\""
+     execution: local
+        script: get-dir-list-shock-load-test-200-vu-wx.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 200 max VUs, 1m0s max duration (incl. graceful stop):
+              * default: 200 looping VUs for 30s (gracefulStop: 30s)
+
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......................: 583038  19428.295453/s
+    checks_succeeded...................: 100.00% 583038 out of 583038
+    checks_failed......................: 0.00%   0 out of 583038
+
+    ✓ status is 200
+
+    HTTP
+    http_req_duration.......................................................: avg=10.25ms min=0s med=4.88ms max=723.55ms p(90)=11.51ms p(95)=60.13ms
+      { expected_response:true }............................................: avg=10.25ms min=0s med=4.88ms max=723.55ms p(90)=11.51ms p(95)=60.13ms
+    http_req_failed.........................................................: 0.00%  0 out of 58303 
+    http_reqs...............................................................: 583038 19428.295453/s 
+
+    EXECUTION
+    iteration_duration......................................................: avg=10.28ms min=0s med=4.91ms max=725.99ms p(90)=11.55ms p(95)=60.17ms
+    iterations..............................................................: 583038 19428.295453/s 
+    vus.....................................................................: 200    min=200        
+ max=200
+    vus_max.................................................................: 200    min=200        
+ max=200
+
+    NETWORK
+    data_received...........................................................: 87 MB  2.9 MB/s       
+    data_sent...............................................................: 57 MB  1.9 MB/s       
+
+
+
+                                                                                                    
+running (0m30.0s), 000/200 VUs, 583038 complete and 0 interrupted iterations                        
+default ✓ [======================================] 200 VUs  30s      
+
+PS D:\code\go\wx-example\wx-example\k6> k6 run get-dir-list-shock-load-test-200-vu-chi.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+WARN[0000] There were unknown fields in the options exported in the script  error="json: unknown field \"executor\""
+     execution: local
+        script: get-dir-list-shock-load-test-200-vu-chi.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 200 max VUs, 1m0s max duration (incl. graceful stop):
+              * default: 200 looping VUs for 30s (gracefulStop: 30s)
+
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......................: 251258  8369.652583/s
+    checks_succeeded...................: 100.00% 251258 out of 251258
+    checks_failed......................: 0.00%   0 out of 251258
+
+    ✓ status is 200
+
+    HTTP
+    http_req_duration.......................................................: avg=23.82ms min=0s med=23.61ms max=74.16ms p(90)=25.78ms p(95)=26.82ms
+      { expected_response:true }............................................: avg=23.82ms min=0s med=23.61ms max=74.16ms p(90)=25.78ms p(95)=26.82ms
+    http_req_failed.........................................................: 0.00%  0 out of 25125 
+    http_reqs...............................................................: 251258 8369.652583/s  
+
+    EXECUTION
+    iteration_duration......................................................: avg=23.87ms min=0s med=23.65ms max=74.16ms p(90)=25.83ms p(95)=26.89ms
+    iterations..............................................................: 251258 8369.652583/s  
+    vus.....................................................................: 200    min=200        
+ max=200
+    vus_max.................................................................: 200    min=200        
+ max=200
+
+    NETWORK
+    data_received...........................................................: 37 MB  1.2 MB/s       
+    data_sent...............................................................: 23 MB  778 kB/s       
+
+
+
+                                                                                                    
+running (0m30.0s), 000/200 VUs, 251258 complete and 0 interrupted iterations                        
+default ✓ [======================================] 200 VUs  30s  
+//----------------- Test--lan -2
+
+
+
+//----------------- Test--lan -2

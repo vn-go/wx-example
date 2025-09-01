@@ -10,6 +10,20 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/wxapi"
+        },
+        {
+            "name": "Launch wx-media",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/media/chi"
+        },
+        {
+            "name": "Launch chi-media",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/media/chi"
         }
     ]
 }
