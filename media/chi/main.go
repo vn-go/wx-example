@@ -48,7 +48,7 @@ func main() {
 	r.Get("/api/media/list", func(w http.ResponseWriter, r *http.Request) {
 		md := &media.Media{}
 		md.New()
-		files, err := md.ListAllFolderAndFiles()
+		files, err := md.ListAllFolderAndFiles("http://localhost:8081")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

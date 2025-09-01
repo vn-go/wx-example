@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
+	"sync"
 
 	"github.com/google/uuid"
 	"github.com/vn-go/wx"
@@ -17,13 +19,13 @@ import (
 type Media struct {
 	wx.Handler
 	RootDir string
+	DirName string
 }
 
 func (media *Media) New() error {
-	if media.RootDir == "" {
-		media.RootDir = "./../uploads"
-	}
+	media.RootDir = "./../uploads"
 
+	media.DirName = strings.TrimPrefix(media.RootDir, "./")
 	// Dùng MkdirAll để đảm bảo tạo cả cây thư mục nếu chưa có
 	err := os.MkdirAll(filepath.Clean(media.RootDir), 0755)
 	if err != nil {
@@ -35,17 +37,37 @@ func (media *Media) New() error {
 
 // The function will return all files and folder
 // in RootDir of Media
-func (media *Media) ListAllFolderAndFiles() ([]string, error) {
+func (media *Media) ListAllFolderAndFiles(prefixUrl string) ([]string, error) {
 	if media.RootDir == "" {
 		return nil, nil
 	}
+	uriOfViewFileHandler, err := wx.GetUriOfHandler[Media]("Files")
+	if err != nil {
+		return nil, err
+	}
 
 	var results []string
-	err := filepath.WalkDir(media.RootDir, func(path string, d fs.DirEntry, err error) error {
+	err = filepath.WalkDir(media.RootDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return err // nếu có lỗi khi duyệt thì return ngay
+			return err
 		}
-		results = append(results, path)
+
+		// Chuẩn hóa path
+		path = strings.ReplaceAll(path, "\\", "/")
+		path = strings.TrimPrefix(path, media.RootDir) // bỏ phần RootDir gốc đi
+		if strings.HasPrefix(path, "/") {
+			path = path[1:]
+		}
+
+		// Bỏ qua rootDir chính (không tính là file hay folder)
+		if path == "" {
+			return nil
+		}
+		path = strings.TrimPrefix(path, media.DirName+"/")
+		// Build URL
+		url := prefixUrl + "/api" + uriOfViewFileHandler + "/" + path
+
+		results = append(results, url)
 		return nil
 	})
 
@@ -54,8 +76,20 @@ func (media *Media) ListAllFolderAndFiles() ([]string, error) {
 	}
 	return results, nil
 }
+
+var onceGetUrlOfFileStreaming sync.Once
+
+func (media *Media) GetUrlOfFileStreaming() string {
+	var ret string
+	onceGetUrlOfFileStreaming.Do(func() {
+
+		ret = media.Handler().GetAbsRootUri()
+	})
+	return ret
+
+}
 func (media *Media) SaveFile(fileHeader multipart.FileHeader) (string, error) {
-	files, err := media.ListAllFolderAndFiles()
+	files, err := media.ListAllFolderAndFiles(media.GetUrlOfFileStreaming())
 	if err != nil {
 		return "", err
 	}
@@ -97,7 +131,7 @@ func (media *Media) SaveFile(fileHeader multipart.FileHeader) (string, error) {
 func (media *Media) List(h *struct {
 	wx.Handler `route:"method:get"`
 }) (any, error) {
-	return media.ListAllFolderAndFiles()
+	return media.ListAllFolderAndFiles(media.GetUrlOfFileStreaming())
 }
 
 func (media *Media) Upload(ctx *wx.Handler, file multipart.FileHeader) error {
@@ -224,4 +258,17 @@ func (media *Media) LineChart(ctx *struct {
 }) {
 
 	media.LatencyLineChartHandler(ctx.Handler().Res)
+}
+func (media *Media) Files(ctx *struct {
+	wx.Handler `route:"@/{*FilePath};method:get"`
+	FilePath   string
+}) error {
+	// uriOfViewFileHandler, err := wx.GetUriOfHandler[Media]("Files")
+	// if err != nil {
+	// 	return "", err
+	// }
+	// rootUrl := ctx.Handler().GetAbsRootUri() + uriOfViewFileHandler
+	filePath := media.RootDir + "/" + ctx.FilePath
+	return ctx.Handler().StreamingFile(filePath)
+	//return ctx.FilePath, nil
 }
