@@ -1,0 +1,10 @@
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkJoin2Model$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkJoin2Model/Join2Model-dx-2000-rows-16         	     429	   2703032 ns/op	  573435 B/op	   18046 allocs/op
+BenchmarkJoin2Model/Join2Model-gorm-2000-rows-16       	     296	   4108572 ns/op	  699830 B/op	   26084 allocs/op
+PASS
+ok  	dxgorm	3.119s

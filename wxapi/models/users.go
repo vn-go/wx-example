@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/vn-go/xdb"
+	
 )
 
 type User struct {

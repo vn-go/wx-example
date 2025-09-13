@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/vn-go/xdb"
+	
 )
 
 var dns string = "root:123456@tcp(127.0.0.1:3306)/a001"

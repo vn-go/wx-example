@@ -24,6 +24,14 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/media/chi"
+        },
+        //core\cmd\rabbimq\main.go
+        {
+            "name": "Launch rabbibmq",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/core/cmd/rabbimq"
         }
     ]
 }

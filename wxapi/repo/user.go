@@ -3,7 +3,7 @@ package repo
 import (
 	"cmp/wxapi/models"
 
-	"github.com/vn-go/xdb"
+	
 )
 
 type UserRepo interface {

@@ -1,0 +1,190 @@
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkDxFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkDxFindUser-16    	      80	  12594041 ns/op	13510790 B/op	  183717 allocs/op
+PASS
+ok  	dxgorm	1.930s
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkGormFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkGormFindUser-16    	      51	  27517349 ns/op	 4423967 B/op	  159277 allocs/op
+PASS
+ok  	dxgorm	2.209s
+
+
+//100 dong
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkDxFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkDxFindUser-16    	    2236	    555379 ns/op	  174966 B/op	    1854 allocs/op
+PASS
+ok  	dxgorm	1.348s
+
+
+
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkGormFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkGormFindUser-16    	    2437	    541157 ns/op	   39381 B/op	    1359 allocs/op
+PASS
+ok  	dxgorm	1.398s
+
+//---
+
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkDxFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkDxFindUser-16    	    2138	    488125 ns/op	  109168 B/op	    1539 allocs/op
+PASS
+ok  	dxgorm	1.144s
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkGormFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkGormFindUser-16    	    2289	    518520 ns/op	   39379 B/op	    1359 allocs/op
+PASS
+ok  	dxgorm	1.271s
+
+
+// chom 100 dong
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkDxFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkDxFindUser-16    	    2083	    644951 ns/op	  142318 B/op	    2638 allocs/op
+PASS
+ok  	dxgorm	1.462s
+
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkGormFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkGormFindUser-16    	    2149	    559445 ns/op	   39384 B/op	    1359 allocs/op
+PASS
+ok  	dxgorm	1.292s
+
+//100 BenchmarkDxFindUser
+
+// 100 user 
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkDxFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkDxFindUser-16    	    2320	    493356 ns/op	  115589 B/op	    1577 allocs/op
+PASS
+ok  	dxgorm	1.241s
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkDxFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkDxFindUser-16    	 2870216	       459.6 ns/op	     376 B/op	       9 allocs/op
+PASS
+ok  	dxgorm	1.801s
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkGormFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkGormFindUser-16    	    1906	    618200 ns/op	   39394 B/op	    1359 allocs/op
+PASS
+ok  	dxgorm	1.275s
+
+// fecth  100 dong
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkDxFindUser$ dxgorm
+
+goos: windows <-- goi fetchAllItemsOptimized
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkDxFindUser-16    	    2023	    700714 ns/op	  109910 B/op	    1579 allocs/op
+PASS
+ok  	dxgorm	2.429s
+
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkGormFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkGormFindUser-16    	    2048	    574300 ns/op	   39390 B/op	    1359 allocs/op
+PASS
+ok  	dxgorm	1.271s
+
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkDxFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkDxFindUser-16    	    2785	    478248 ns/op	  101855 B/op	    1538 allocs/op
+PASS
+ok  	dxgorm	1.436s
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkGormFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkGormFindUser-16    	    2194	    545402 ns/op	   39382 B/op	    1359 allocs/op
+PASS
+ok  	dxgorm	1.285s
+
+// da tim ra nguyen nhan va fix
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkDxFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkDxFindUser-16    	    2200	    541171 ns/op	   63665 B/op	     947 allocs/op
+PASS
+ok  	dxgorm	1.295s
+
+
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkGormFindUser$ dxgorm
+
+goos: windows
+goarch: amd64
+pkg: dxgorm
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkGormFindUser-16    	    2241	    594746 ns/op	   76902 B/op	    1365 allocs/op
+PASS
+ok  	dxgorm	1.414s
