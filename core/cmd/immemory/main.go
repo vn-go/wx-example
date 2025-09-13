@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
-	"core/messaging"
 	"log"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/vn-go/bx"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 	// 	DB:   0,
 	// })
 
-	bus := messaging.NewInMemoryBus()
+	bus := bx.Msg.NewInMemoryBus()
 
 	defer bus.Close()
 

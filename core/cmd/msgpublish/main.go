@@ -5,16 +5,17 @@ import (
 	"log"
 	"time"
 
-	"core/messaging" // thay bằng đường dẫn module thật
+	// thay bằng đường dẫn module thật
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/vn-go/bx"
 )
 
 func main() {
 	natsURL := "nats://localhost:4222"
 	topic := "abc"
-	bus, err := messaging.NewNatsBus(natsURL, "test")
+	bus, err := bx.Msg.NewNatsBus(natsURL, "test")
 	if err != nil {
 		log.Fatal(err)
 	}

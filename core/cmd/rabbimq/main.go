@@ -5,10 +5,11 @@ import (
 	"log"
 	"time"
 
-	"core/messaging" // thay bằng module của bạn
+	// thay bằng module của bạn
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/vn-go/bx"
 )
 
 func main() {
@@ -16,7 +17,7 @@ func main() {
 	amqpURL := "amqp://guest:guest@localhost:5672/"
 	topic := "tasks.foo"
 
-	bus, err := messaging.NewRabbitMQBus(amqpURL, "a", "b")
+	bus, err := bx.Msg.NewRabbitMQBus(amqpURL, "a", "b")
 	if err != nil {
 		log.Fatal(err)
 	}

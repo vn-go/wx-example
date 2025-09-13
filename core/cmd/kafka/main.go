@@ -2,17 +2,17 @@ package main
 
 import (
 	"context"
-	"core/messaging"
 	"log"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/vn-go/bx"
 )
 
 func main() {
 	ctx := context.Background()
 
-	bus, err := messaging.NewKafkaMessageBus([]string{"localhost:9092"})
+	bus, err := bx.Msg.NewKafkaMessageBus([]string{"localhost:9092"})
 	if err != nil {
 		log.Fatal(err)
 	}
