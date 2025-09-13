@@ -32,6 +32,22 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/core/cmd/rabbimq"
+        },
+        //core\cmd\rediscache\main.go
+        {
+            "name": "Launch redisc",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/core/cmd/rediscache"
+        },
+        //core\cmd\immemory\main.go
+        {
+            "name": "Launch memory",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/core/cmd/immemory"
         }
     ]
 }
