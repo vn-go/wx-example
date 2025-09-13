@@ -2,3 +2,9 @@ docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672  -e RABBITMQ_DEFAULT_U
 docker run -d --name redis-cache -p 6379:6379  -v /my/local/redis/data:/data  redis:7 redis-server --save 60 1 --loglevel warning
 
 //docker run -d --name redis-cache -p 6379:6379 redis:7
+
+docker rm -f $(docker ps -aq)
+docker volume rm $(docker volume ls -q)
+docker network rm $(docker network ls -q)
+docker rmi -f $(docker images -q)
+docker system prune -a --volumes -f

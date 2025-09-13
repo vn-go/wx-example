@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"core/config"
 	"core/models"
 	"testing"
 
@@ -11,7 +12,9 @@ import (
 var mysqlDsn = "root:123456@tcp(127.0.0.1:3306)/hrm"
 
 func TestUserRepo(t *testing.T) {
-	db, err := dx.Open("mysql", mysqlDsn)
+	cfg, err := config.LoadConfig("../config/config.yaml")
+	assert.NoError(t, err)
+	db, err := dx.Open(cfg.Database.Driver, cfg.Database.DSN)
 	assert.NoError(t, err)
 	repo := NewUserRepoSql(db, t.Context())
 	err = db.WithContext(t.Context()).Delete(&models.User{}, "username=?", "root").Error
@@ -22,8 +25,9 @@ func TestUserRepo(t *testing.T) {
 	assert.NoError(t, err)
 }
 func BenchmarkUserRepoCreateDefaultUser(b *testing.B) {
-	db, err := dx.Open("mysql", mysqlDsn)
+	cfg, err := config.LoadConfig("../config/config.yaml")
 	assert.NoError(b, err)
+	db, err := dx.Open(cfg.Database.Driver, cfg.Database.DSN)
 	err = db.Delete(&models.User{}, "username=?", "root").Error
 	assert.NoError(b, err)
 
