@@ -48,6 +48,14 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/core/cmd/immemory"
+        },
+        //core\cmd\kafka\main.go
+        {
+            "name": "Launch kafka",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/core/cmd/kafka"
         }
     ]
 }
