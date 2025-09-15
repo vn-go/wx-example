@@ -1,0 +1,51 @@
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkUserservice$ core
+
+goos: windows
+goarch: amd64
+pkg: core
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkUserservice-16    	      21	  57000924 ns/op	   11838 B/op	     126 allocs/op
+PASS
+ok  	core	1.740s
+----
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkCreateUser$ core/services
+
+goos: windows
+goarch: amd64
+pkg: core/services
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkCreateUser-16    	      21	  57436214 ns/op	   12108 B/op	      65 allocs/op
+PASS
+ok  	core/services	1.871s
+---
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkUserservice$ core
+
+goos: windows
+goarch: amd64
+pkg: core
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkUserservice-16    	      22	  52509000 ns/op	   11817 B/op	     126 allocs/op
+PASS
+ok  	core	1.668s
+---
+// dung DI
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkUserservice$ core
+
+goos: windows
+goarch: amd64
+pkg: core
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkUserservice-16    	      22	  50888650 ns/op	   11548 B/op	     123 allocs/op
+PASS
+ok  	core	1.551s
+---
+// kg dung DI
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkCreateUser$ core/services
+
+goos: windows
+goarch: amd64
+pkg: core/services
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkCreateUser-16    	      22	  51298095 ns/op	   11881 B/op	      64 allocs/op
+PASS
+ok  	core/services	1.751s

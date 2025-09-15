@@ -13,16 +13,17 @@ type userRepoSql struct {
 	context context.Context
 }
 
-func newUserRepoSql(db *dx.DB) userRepo {
+func newUserRepoSql(db *dx.DB, ctx context.Context) userRepo {
 	return &userRepoSql{
-		db: db,
+		db:      db,
+		context: ctx,
 	}
 }
-func (repo *userRepoSql) CreateUser(ctx context.Context, user *models.User) error {
-	return repo.db.WithContext(ctx).Insert(user)
+func (repo *userRepoSql) CreateUser(user *models.User) error {
+	return repo.db.WithContext(repo.context).Insert(user)
 }
 
-func (repo *userRepoSql) CreateDefaultUser(ctx context.Context, hashPassword string) error {
+func (repo *userRepoSql) CreateDefaultUser(hashPassword string) error {
 	_, err := internal.OnceCall[userRepoSql]("CreateDefaultUser", func() (*models.User, error) {
 		user, err := dx.NewThenSetDefaultValues(func() (*models.User, error) {
 			return &models.User{
@@ -35,7 +36,7 @@ func (repo *userRepoSql) CreateDefaultUser(ctx context.Context, hashPassword str
 			return nil, err
 		}
 
-		err = repo.CreateUser(ctx, user)
+		err = repo.CreateUser(user)
 		if err != nil {
 
 			if dxErr := dx.Errors.IsDbError(err); dxErr != nil {
