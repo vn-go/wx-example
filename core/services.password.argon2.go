@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/base64"
@@ -10,7 +11,9 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
-type argon2PasswordService struct{}
+type argon2PasswordService struct {
+	cache cacheService
+}
 
 // NewArgon2PasswordService creates and returns a new instance of argon2PasswordService.
 // func (p *passwordServiceType) Argon2() passwordService {
@@ -24,7 +27,7 @@ type argon2PasswordService struct{}
 // HashPassword generates a secure Argon2 hash for a given password.
 // The resulting string is a full hash, including salt and parameters,
 // encoded in a standard format.
-func (s *argon2PasswordService) HashPassword(pass string) (string, error) {
+func (s *argon2PasswordService) HashPassword(username, pass string) (string, error) {
 	salt := make([]byte, 16)
 	_, err := rand.Read(salt)
 	if err != nil {
@@ -38,8 +41,8 @@ func (s *argon2PasswordService) HashPassword(pass string) (string, error) {
 		parallelism = uint8(2)
 		keyLen      = uint32(32) // 32 bytes for the key
 	)
-
-	hash := argon2.IDKey([]byte(pass), salt, iterations, memory, parallelism, keyLen)
+	pwdHas := fmt.Sprintf("%s@%s", strings.ToLower(username), pass)
+	hash := argon2.IDKey([]byte(pwdHas), salt, iterations, memory, parallelism, keyLen)
 
 	// Format the hash string for storage.
 	// This format is a common Argon2 string representation.
@@ -55,11 +58,19 @@ func (s *argon2PasswordService) HashPassword(pass string) (string, error) {
 
 	return encodedHash, nil
 }
+func (s *argon2PasswordService) DeleteCacheByUsername(ctx context.Context, tenant, username string) error {
+	return s.cache.Delete(s, ctx, "ComparePassword/"+strings.ToLower(username+"/"+tenant))
+}
 
 // ComparePassword checks if a plain-text password matches a given Argon2 hash.
 // It parses the hash string to extract the salt and parameters, then
 // re-computes the hash and performs a constant-time comparison.
-func (s *argon2PasswordService) ComparePassword(pass string, hashPass string) (bool, error) {
+func (s *argon2PasswordService) ComparePassword(ctx context.Context, tenant, username, pass, hashPass string) (bool, error) {
+
+	ret := false
+	if err := s.cache.Get(s, ctx, "ComparePassword/"+strings.ToLower(username+"/"+tenant), &ret); err == nil {
+		return ret, nil
+	}
 	parts := strings.Split(hashPass, "$")
 	if len(parts) != 6 {
 		return false, fmt.Errorf("invalid hash string format: expected 6 parts, got %d", len(parts))
@@ -102,10 +113,10 @@ func (s *argon2PasswordService) ComparePassword(pass string, hashPass string) (b
 	if err != nil {
 		return false, fmt.Errorf("failed to decode hash: %w", err)
 	}
-
+	pwdHas := fmt.Sprintf("%s@%s", strings.ToLower(username), pass)
 	// Re-compute the hash with the extracted parameters.
 	recomputedHash := argon2.IDKey(
-		[]byte(pass),
+		[]byte(pwdHas),
 		decodedSalt,
 		iterations,
 		memory,
@@ -117,6 +128,8 @@ func (s *argon2PasswordService) ComparePassword(pass string, hashPass string) (b
 	if subtle.ConstantTimeCompare(recomputedHash, decodedHash) == 1 {
 		return true, nil
 	}
-
+	if err := s.cache.Set(s, ctx, "ComparePassword/"+strings.ToLower(username+"/"+tenant), true); err != nil {
+		return ret, nil
+	}
 	return false, nil
 }

@@ -23,6 +23,7 @@ type User struct {
 	IsActive        bool       `db:"default:true"`
 	LatestLoginFail *time.Time `db:"ix"`
 	LatestLogin     *time.Time `db:"ix"`
+	RoleCode        *string    `db:"size:50;ix"`
 }
 
 func init() {

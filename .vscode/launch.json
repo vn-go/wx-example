@@ -39,7 +39,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/core/cmd/rediscache"
+            "program": "${workspaceFolder}/wxapi"
         },
         //core\cmd\immemory\main.go
         {
@@ -56,6 +56,14 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/core/cmd/kafka"
+        },
+        //core\cmd\kafka\main.go
+        {
+            "name": "Api",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/wxapi"
         }
     ]
 }

@@ -1,9 +1,27 @@
 database:
-  driver1: "mysql"
-  dsn1: "root:123456@tcp(127.0.0.1:3306)/hrm"
-  driver: "postgres"
-  dsn: "postgres://postgres:123456@localhost:5432/hrm?sslmode=disable"
+  driver: "mysql"
+  dsn: "root:123456@tcp(127.0.0.1:3306)/hrm"
+  driver2: "postgres"
+  dsn2: "postgres://postgres:123456@localhost:5432/hrm?sslmode=disable"
+
 jwt:
-  default-share-sercret-key: dadasdsa.dasdsad3213.dad.323asd.a(dadsad)
+  default-sercret-key: dadasdsa.dasdsad3213.dad.323asd.a(dadsad)
+  hash-type : bcrypt #argon2
+  share-secret-len: 64
 cache:
-  type: ""
+  type: "app"
+  redis:
+    address: ""
+    password: ""
+  memcache:
+    server: ""
+  bager:
+    directory: "./bager"
+log:
+  path:   "./logs"
+  size: 10
+  backup: 3
+  age:  28
+  compress:  true
+cryptor:
+  key: "bsgsdgbdb*dhbsndss9hgdhshd(8dnna"

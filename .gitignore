@@ -1,2 +1,5 @@
 media/uploads
 core/cache/Badger
+
+core/Badger
+core/logs

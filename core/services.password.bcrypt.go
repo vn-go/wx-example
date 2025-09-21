@@ -1,12 +1,16 @@
 package core
 
 import (
+	"context"
 	"fmt"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
-type bcryptPasswordService struct{}
+type bcryptPasswordService struct {
+	cache cacheService
+}
 
 //var bcryptPassword = &bcryptPasswordService{}
 
@@ -19,9 +23,11 @@ type bcryptPasswordService struct{}
 
 // HashPassword tạo một hash bcrypt an toàn cho mật khẩu đã cho.
 // Chi phí (cost) mặc định của bcrypt là 10, bạn có thể điều chỉnh nó.
-func (s *bcryptPasswordService) HashPassword(pass string) (string, error) {
+func (s *bcryptPasswordService) HashPassword(username, pass string) (string, error) {
 	// bcrypt.DefaultCost là 10.
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
+	key := strings.ToLower(username) + "@" + pass
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(key), bcrypt.DefaultCost)
 	if err != nil {
 		return "", fmt.Errorf("failed to hash password: %w", err)
 	}
@@ -30,9 +36,15 @@ func (s *bcryptPasswordService) HashPassword(pass string) (string, error) {
 }
 
 // ComparePassword kiểm tra xem một mật khẩu dạng plain-text có khớp với hash bcrypt đã cho hay không.
-func (s *bcryptPasswordService) ComparePassword(pass string, hashPass string) (bool, error) {
+func (s *bcryptPasswordService) ComparePassword(ctx context.Context, tenant, username, pass string, hashPass string) (bool, error) {
+	key := strings.ToLower(username) + "@" + pass
+	ret := false
+	if err := s.cache.Get(s, ctx, "ComparePassword/"+strings.ToLower(username+"/"+tenant), &ret); err == nil {
+		return ret, nil
+	}
 	// So sánh mật khẩu plain-text với hash. Bcrypt sẽ tự động xử lý salt và các tham số khác.
-	err := bcrypt.CompareHashAndPassword([]byte(hashPass), []byte(pass))
+
+	err := bcrypt.CompareHashAndPassword([]byte(hashPass), []byte(key))
 	if err != nil {
 		// Nếu lỗi là ErrMismatchedHashAndPassword, tức là mật khẩu không khớp.
 		if err == bcrypt.ErrMismatchedHashAndPassword {
@@ -41,6 +53,24 @@ func (s *bcryptPasswordService) ComparePassword(pass string, hashPass string) (b
 		// Các lỗi khác là lỗi thực sự.
 		return false, fmt.Errorf("failed to compare password and hash: %w", err)
 	}
+	if err := s.cache.Set(s, ctx, "ComparePassword/"+strings.ToLower(username+"/"+tenant), true); err != nil {
+		return ret, nil
+	}
 
 	return true, nil
+}
+func (s *bcryptPasswordService) DeleteCacheByUsername(ctx context.Context, tenant, username string) error {
+	return s.cache.Delete(s, ctx, "ComparePassword/"+strings.ToLower(username+"/"+tenant))
+}
+
+type noEncryptPass struct {
+}
+
+func (n *noEncryptPass) HashPassword(pass string) (string, error) {
+	// bcrypt.DefaultCost là 10.
+	return pass, nil
+}
+func (n *noEncryptPass) ComparePassword(pass string, hashPass string) (bool, error) {
+	// bcrypt.DefaultCost là 10.
+	return pass == hashPass, nil
 }

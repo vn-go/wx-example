@@ -1,12 +1,17 @@
 package core
 
 import (
+	"context"
 	"core/models"
+
+	"github.com/vn-go/dx"
 )
 
 type userRepo interface {
 	// create defualt user
-	CreateDefaultUser(hasPassword string) error
+	CreateDefaultUser(db *dx.DB, ctx context.Context, hasPassword string) error
 	// create a new user
-	CreateUser(user *models.User) error
+	CreateUser(db *dx.DB, ctx context.Context, user *models.User) error
+	GetUserByUserId(db *dx.DB, ctx context.Context, userId string) (*models.User, error)
+	GetUserByName(db *dx.DB, ctx context.Context, username string) (*models.User, error)
 }

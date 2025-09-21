@@ -1,9 +1,0 @@
-database:
-  driver1: "mysql"
-  dsn1: "root:123456@tcp(127.0.0.1:3306)/hrm"
-  driver: "postgres"
-  dsn: "postgres://postgres:123456@localhost:5432/hrm?sslmode=disable"
-jwt:
-  default-share-sercret-key: dadasdsa.dasdsad3213.dad.323asd.a(dadsad)
-cache:
-  type: ""

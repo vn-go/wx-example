@@ -1,0 +1,65 @@
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkTestDI$ core
+
+goos: windows
+goarch: amd64
+pkg: core
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkTestDI/bx_DI-16         	   10600	    111583 ns/op	    4031 B/op	      59 allocs/op
+BenchmarkTestDI/fx_DI-16         	   10000	    118346 ns/op	    4028 B/op	      59 allocs/op
+PASS
+ok  	core	3.233s
+---
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkTestDI$ core
+
+goos: windows
+goarch: amd64
+pkg: core
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkTestDI/bx_DI-16         	   10287	    109998 ns/op	    4033 B/op	      59 allocs/op
+BenchmarkTestDI/fx_DI-16         	   10000	    119445 ns/op	    4030 B/op	      59 allocs/op
+PASS
+ok  	core	3.202s
+---
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkTestDI$ core
+
+goos: windows
+goarch: amd64
+pkg: core
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkTestDI/bx_DI-16         	   10286	    108644 ns/op	    4029 B/op	      59 allocs/op
+BenchmarkTestDI/fx_DI-16         	   10000	    111205 ns/op	    4029 B/op	      59 allocs/op
+PASS
+ok  	core	3.003s
+---
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkUserserviceParallel$ core
+
+goos: windows
+goarch: amd64
+pkg: core
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkUserserviceParallel/bx_DI_version_2-16         	100000000	        23.56 ns/op	      31 B/op	       0 allocs/op
+BenchmarkUserserviceParallel/fx_DI-16                   	503150560	         2.385 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUserserviceParallel/bx_DI_with_static_container-16         	 2834787	       412.0 ns/op	     792 B/op	      29 allocs/op
+PASS
+ok  	core	5.561s
+---
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkUserserviceParallel$ core
+
+goos: windows
+goarch: amd64
+pkg: core
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkUserserviceParallel/bx_DI_version_2-16         	55628438	        23.03 ns/op	      31 B/op	       0 allocs/op
+BenchmarkUserserviceParallel/fx_DI-16                   	550700467	         2.177 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUserserviceParallel/bx_DI_with_static_container-16         	 2864866	       422.1 ns/op	     792 B/op	      29 allocs/op
+PASS
+ok  	core	4.485s
+--
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkUserserviceParallel$ core
+
+goos: windows
+goarch: amd64
+pkg: core
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkUserserviceParallel/bx_DI_version_2-16         	1000000000	         0.1090 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUserserviceParallel/fx_DI-16                   	472025970	         2.613 ns/op	       0 B/op	       0 allocs/op
