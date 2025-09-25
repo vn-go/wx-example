@@ -6,7 +6,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
-	github.com/vn-go/bx v1.0.24
+	github.com/vn-go/bx v1.0.39
 	go.uber.org/fx v1.24.0
 	golang.org/x/crypto v0.41.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -20,7 +20,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/nats-io/nats.go v1.37.0
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
-	github.com/vn-go/dx v1.0.26
+	github.com/vn-go/dx v1.0.33
 )
 
 require (

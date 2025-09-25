@@ -44,5 +44,5 @@ broker:
     group: "api-hrm"
 tenant:
   IsMulti: true
-  DefaultAdminUser: "root"
+  DefaultAdminUser: "tenant-admin"
   DefaultAdminPassword: "uvsz%#"

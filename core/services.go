@@ -109,6 +109,8 @@ type servicesTypes struct {
 	AuthSvc   serviceAuth
 	Log       logService
 	Encrypt   encryptService
+	Broker    bx.Broker
+	JWTSvc    jwtService
 	//Pwd passwordService
 	//config configInfo
 }
@@ -123,8 +125,10 @@ var Services = (&bx.Wire[servicesTypes]{}).WireThenGet(
 	newUserRepoSql,
 	newUserServiceSql,
 	//newCacheServiceImpl,
-	newBadgerCache,
+	newCacheService,
 	newpasswordService,
 	newLogLumberjack,
 	newEncryptServiceImpl,
+	newBrokerService,
+	newValidatorService,
 )

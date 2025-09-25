@@ -3,7 +3,7 @@ package core
 import (
 	"context"
 	"core/models"
-	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -22,6 +22,7 @@ type OAuthResponse struct {
 
 type serviceAuth interface {
 	Login(tenant string, ctx context.Context, username, password string) (*OAuthResponse, error)
+	Verify(ctx context.Context, authorization string) (*models.User, error)
 }
 type serviceOAuth struct {
 	user        userRepo
@@ -29,6 +30,7 @@ type serviceOAuth struct {
 	passwordSvc passwordService
 	tenant      tenantService
 	jwtSvc      jwtService
+	db          *dx.DB
 }
 
 func (s *serviceOAuth) generateAccessToken(ctx context.Context, tenant string, user *models.User) (string, error) {
@@ -67,11 +69,19 @@ func (s *serviceOAuth) generateRefreshToken(ctx context.Context, tenant string, 
 	return ret, nil
 
 }
+
+type OAuthResponseCacheItem struct {
+	Tanent   string
+	Username string
+	Oauth    OAuthResponse
+}
+
 func (s *serviceOAuth) Login(tenant string, ctx context.Context, username, password string) (*OAuthResponse, error) {
-	key := fmt.Sprintf("%s:%s@%s(Login)", username, password, tenant)
+	//key := fmt.Sprintf("%s:%s@%s(Login)", username, password, tenant)
 	ret := &OAuthResponse{}
-	if err := s.cache.Get(s, ctx, key, ret); err == nil {
-		return ret, nil
+	cacheItem := &OAuthResponseCacheItem{}
+	if err := s.cache.GetObject(ctx, tenant, strings.ToLower(username), cacheItem); err == nil {
+		return &cacheItem.Oauth, nil
 	}
 	db, err := s.tenant.GetTenant(tenant) // get tenant db by tenant name
 	if err != nil {
@@ -101,10 +111,46 @@ func (s *serviceOAuth) Login(tenant string, ctx context.Context, username, passw
 			ExpiresIn:    30,
 			RefreshToken: refreshToken,
 		}
-		s.cache.Set(s, ctx, key, ret)
+		s.cache.AddObject(ctx, tenant, strings.ToLower(username), OAuthResponseCacheItem{
+			Tanent:   tenant,
+			Username: strings.ToLower(username),
+			Oauth:    *ret,
+		}, 4)
+
+		if err != nil {
+			return nil, err
+		}
 		return ret, nil
 	} else {
 		return nil, nil
+	}
+
+}
+func (s *serviceOAuth) Verify(ctx context.Context, authorization string) (user *models.User, err error) {
+	palyload, err := s.jwtSvc.DecodeJWTNoVerify(authorization)
+	if err != nil {
+		return nil, err
+	}
+	if palyload.Issuer == "admin" {
+		app, err := s.tenant.GetAppInfo(ctx)
+		if err != nil {
+			return nil, err
+		}
+		_, err = s.jwtSvc.VerifyJWTWithSecret(app.ShareSecret, authorization)
+		if err != nil {
+			return nil, err
+		}
+		return s.user.GetUserByUserId(s.db, ctx, palyload.Subject)
+	} else {
+		shareSecret, err := s.tenant.GetSecretKey(ctx, palyload.Issuer)
+		if err != nil {
+			return nil, err
+		}
+		_, err = s.jwtSvc.VerifyJWTWithSecret(shareSecret, authorization)
+		if err == nil {
+			return nil, err
+		}
+		return s.user.GetUserByUserId(s.db, ctx, palyload.Subject)
 	}
 
 }
@@ -113,12 +159,16 @@ func newServiceAuth(
 	cache cacheService,
 	passwordSvc passwordService,
 	tenant tenantService,
-	jwtSvc jwtService) serviceAuth {
+	jwtSvc jwtService,
+	db *dx.DB,
+
+) serviceAuth {
 	return &serviceOAuth{
 		user:        user,
 		cache:       cache,
 		passwordSvc: passwordSvc,
 		tenant:      tenant,
 		jwtSvc:      jwtSvc,
+		db:          db,
 	}
 }

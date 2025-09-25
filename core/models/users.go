@@ -20,12 +20,17 @@ type User struct {
 	CreatedOn  time.Time `db:"ix;default:now()"`
 	ModifiedOn *time.Time
 	//df means default value
-	IsActive        bool       `db:"default:true"`
-	LatestLoginFail *time.Time `db:"ix"`
-	LatestLogin     *time.Time `db:"ix"`
-	RoleCode        *string    `db:"size:50;ix"`
+	IsActive               bool       `db:"default:true"`
+	LatestLoginFail        *time.Time `db:"ix"`
+	LatestLogin            *time.Time `db:"ix"`
+	RoleCode               *string    `db:"size:50;ix"`
+	LastTimeChangePassword *time.Time
+	IsTenantAdmin          *bool
 }
 
+func (u *User) Table() string {
+	return "sys_users"
+}
 func init() {
 	//rehgister User
 	dx.AddModels(&User{})

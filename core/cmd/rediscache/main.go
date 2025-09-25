@@ -18,7 +18,7 @@ func main() {
 	// 	DB:   0,
 	// })
 
-	bus, err := bx.NewRedisMessageBus("localhost:6379", "abc")
+	bus, err := bx.Msg.NewRedisMessage("localhost:6379", "abc")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -3,21 +3,16 @@ package core
 import (
 	"context"
 	"fmt"
+
+	"github.com/vn-go/bx"
 )
 
 type passwordService interface {
 	HashPassword(username, password string) (string, error)
 	ComparePassword(ctx context.Context, tenant string, username, password, hashPass string) (bool, error)
-	DeleteCacheByUsername(ctx context.Context, tenant, username string) error
-}
-type passwordServiceType struct {
-	Bcrypt passwordService
-	Argon2 passwordService
-}
-type passwordServiceImpl struct {
 }
 
-func newpasswordService(cfg *configInfo, cache cacheService) (passwordService, error) {
+func newpasswordService(cfg *configInfo, cache cacheService, broker bx.Broker) (passwordService, error) {
 	if cfg.Jwt.HashPasswordType == "bcrypt" {
 		return &bcryptPasswordService{
 			cache: cache,

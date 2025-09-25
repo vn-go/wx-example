@@ -58,8 +58,11 @@ func (s *argon2PasswordService) HashPassword(username, pass string) (string, err
 
 	return encodedHash, nil
 }
-func (s *argon2PasswordService) DeleteCacheByUsername(ctx context.Context, tenant, username string) error {
-	return s.cache.Delete(s, ctx, "ComparePassword/"+strings.ToLower(username+"/"+tenant))
+
+type ComparePasswordCacheItem struct {
+	Tenant   string
+	Username string
+	Ok       bool
 }
 
 // ComparePassword checks if a plain-text password matches a given Argon2 hash.
@@ -68,8 +71,9 @@ func (s *argon2PasswordService) DeleteCacheByUsername(ctx context.Context, tenan
 func (s *argon2PasswordService) ComparePassword(ctx context.Context, tenant, username, pass, hashPass string) (bool, error) {
 
 	ret := false
-	if err := s.cache.Get(s, ctx, "ComparePassword/"+strings.ToLower(username+"/"+tenant), &ret); err == nil {
-		return ret, nil
+	cacheItem := &ComparePasswordCacheItem{}
+	if err := s.cache.GetObject(ctx, tenant, username, &cacheItem); err == nil {
+		return cacheItem.Ok, nil
 	}
 	parts := strings.Split(hashPass, "$")
 	if len(parts) != 6 {
@@ -128,8 +132,13 @@ func (s *argon2PasswordService) ComparePassword(ctx context.Context, tenant, use
 	if subtle.ConstantTimeCompare(recomputedHash, decodedHash) == 1 {
 		return true, nil
 	}
-	if err := s.cache.Set(s, ctx, "ComparePassword/"+strings.ToLower(username+"/"+tenant), true); err != nil {
+	if err := s.cache.AddObject(ctx, tenant, username, &ComparePasswordCacheItem{
+		Tenant:   tenant,
+		Username: strings.ToLower(username),
+		Ok:       true,
+	}, 4); err != nil {
 		return ret, nil
 	}
+
 	return false, nil
 }

@@ -12,15 +12,17 @@ import (
 type userRepoSql struct {
 }
 
-func newUserRepoSql() userRepo {
-	return &userRepoSql{}
-}
 func (repo *userRepoSql) CreateUser(db *dx.DB, ctx context.Context, user *models.User) error {
 	return db.WithContext(ctx).Insert(user)
 }
 func (repo *userRepoSql) GetUserByUserId(db *dx.DB, ctx context.Context, userId string) (*models.User, error) {
 	ret := &models.User{}
 	if err := db.WithContext(ctx).First(ret, "userId=?", userId); err != nil {
+		if dbErr := dx.Errors.IsDbError(err); dbErr != nil {
+			if dbErr.ErrorType == dx.Errors.NOTFOUND {
+				return nil, nil
+			}
+		}
 		return nil, err
 	}
 	return ret, nil
@@ -57,6 +59,9 @@ func (repo *userRepoSql) CreateDefaultUser(db *dx.DB, ctx context.Context, hashP
 				if dxErr.ErrorType != dx.Errors.DUPLICATE {
 					err = dxErr
 					return
+				} else {
+					err = nil
+
 				}
 			} else {
 
@@ -67,4 +72,10 @@ func (repo *userRepoSql) CreateDefaultUser(db *dx.DB, ctx context.Context, hashP
 	})
 
 	return err
+}
+func (repo *userRepoSql) DeleteUserByUserId(db *dx.DB, ctx context.Context, userId string) error {
+	return db.Delete(&models.User{}, "userId=?", userId).Error
+}
+func newUserRepoSql() userRepo {
+	return &userRepoSql{}
 }

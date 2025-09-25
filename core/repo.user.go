@@ -14,4 +14,5 @@ type userRepo interface {
 	CreateUser(db *dx.DB, ctx context.Context, user *models.User) error
 	GetUserByUserId(db *dx.DB, ctx context.Context, userId string) (*models.User, error)
 	GetUserByName(db *dx.DB, ctx context.Context, username string) (*models.User, error)
+	DeleteUserByUserId(db *dx.DB, ctx context.Context, userId string) error
 }

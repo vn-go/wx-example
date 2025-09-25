@@ -1,0 +1,31 @@
+# ---------- Build stage ----------
+FROM golang:1.25-alpine AS builder
+
+
+WORKDIR /app
+
+# Copy go.mod và go.sum trước để cache dependencies
+COPY ./wxapi/go.mod ./
+COPY ./wxapi/go.sum ./
+RUN go mod download
+
+# Copy toàn bộ source code
+COPY ./wxapi ./wxapi
+RUN go build -ldflags="-s -w" -o wxapi ./wxapi/main.go
+
+# Build binary
+#RUN go build -ldflags="-s -w" -o /app/wxapi ./wxapi/main.go
+
+# ---------- Runtime stage ----------
+FROM alpine:latest
+
+WORKDIR /app
+
+# Copy binary từ builder sang
+COPY --from=builder /app/wxapi .
+
+# Expose port (giả sử API chạy ở cổng 8080)
+EXPOSE 8080
+
+CMD ["./main"]
+#docker run -it --rm --name wxapi-shell wxapi:latest /bin/sh

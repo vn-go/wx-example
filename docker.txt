@@ -1,6 +1,6 @@
 docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672  -e RABBITMQ_DEFAULT_USER=guest  -e RABBITMQ_DEFAULT_PASS=guest rabbitmq:3-management
 docker run -d --name redis-cache -p 6379:6379  -v /my/local/redis/data:/data  redis:7 redis-server --save 60 1 --loglevel warning
-
+docker run -d --name memcached  -p 11211:11211  memcached:latest
 //docker run -d --name redis-cache -p 6379:6379 redis:7
 
 docker rm -f $(docker ps -aq)
@@ -8,3 +8,10 @@ docker volume rm $(docker volume ls -q)
 docker network rm $(docker network ls -q)
 docker rmi -f $(docker images -q)
 docker system prune -a --volumes -f
+
+docker run -d  --name redis   -p 6379:6379   redis:7-alpine   redis-server --appendonly yes --bind 0.0.0.0 --protected-mode no
+
+docker run -d --name nats-js  -p 4222:4222   -p 8222:8222  -p 6222:6222   nats:latest -js
+
+#docker build -f docker/Dockerfile -t wxapi:latest .
+docker build -f docker/waapi -t wxapi:latest .

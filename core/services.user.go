@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"core/models"
+	"strings"
 
 	"sync"
 	"time"
@@ -14,27 +15,29 @@ import (
 type userService interface {
 	CreateUser(tenant string, ctx context.Context, user *models.User) error
 	GetUserByUserId(tenant string, ctx context.Context, userId string) (*models.User, error)
-	SayHello() int
+	DeleteUserByUserId(tenant string, ctx context.Context, userId string) error
 }
 
 type userServiceSql struct {
 	userRepo userRepo
 	pwdSvc   passwordService
 	cache    cacheService
-	ctx      context.Context
-	tenant   tenantService
+
+	tenant tenantService
 }
 
 var userServiceSqlCreateUserDefault sync.Once
 
 func (userSvc *userServiceSql) CreateUser(tenant string, ctx context.Context, user *models.User) error {
 	var err error
+	var hashPass string
 	tenantDb, err := userSvc.tenant.GetTenant(tenant)
 	if err != nil {
 		return err
 	}
+
 	userServiceSqlCreateUserDefault.Do(func() {
-		hashPass, err := userSvc.pwdSvc.HashPassword("root", "123456")
+		hashPass, err = userSvc.pwdSvc.HashPassword("root", "123456")
 		if err != nil {
 			return
 		}
@@ -44,7 +47,7 @@ func (userSvc *userServiceSql) CreateUser(tenant string, ctx context.Context, us
 		return err
 	}
 
-	hashPass, err := bx.OnceCall[userServiceSql]("CreateUser/HashPassword/Root", func() (string, error) {
+	hashPass, err = bx.OnceCall[userServiceSql]("CreateUser/HashPassword/Root", func() (string, error) {
 		return userSvc.pwdSvc.HashPassword("root", "123456")
 
 	})
@@ -64,7 +67,7 @@ func (userSvc *userServiceSql) CreateUser(tenant string, ctx context.Context, us
 		return err
 	}
 
-	if err := userSvc.cache.Set(userSvc, ctx, user.UserId+"@user", user); err != nil {
+	if err := userSvc.cache.AddObject(ctx, tenant, user.UserId, user, 4); err != nil {
 		return err
 	}
 	user.HashPassword = ""
@@ -72,7 +75,7 @@ func (userSvc *userServiceSql) CreateUser(tenant string, ctx context.Context, us
 }
 func (userSvc *userServiceSql) GetUserByUserId(tenant string, ctx context.Context, userId string) (*models.User, error) {
 	var retUser *models.User
-	if err := userSvc.cache.Get(userSvc, ctx, userId+"@user", retUser); err == nil {
+	if err := userSvc.cache.GetObject(ctx, tenant, userId, retUser); err == nil {
 		return retUser, nil
 	}
 	tenantDb, err := userSvc.tenant.GetTenant(tenant)
@@ -84,20 +87,48 @@ func (userSvc *userServiceSql) GetUserByUserId(tenant string, ctx context.Contex
 		return nil, err
 	}
 	if retUser != nil {
-		if err := userSvc.cache.Set(userSvc, ctx, retUser.UserId+"@user", retUser); err != nil {
+		if err := userSvc.cache.AddObject(ctx, tenant, userId, retUser, 4); err != nil {
 			return nil, err
 		}
 	}
 	return retUser, nil
 }
-func (userSvc *userServiceSql) SayHello() int {
-	return 1 + 1
+func (userSvc *userServiceSql) DeleteUserByUserId(tenant string, ctx context.Context, userId string) error {
+	tenantDb, err := userSvc.tenant.GetTenant(tenant)
+	if err != nil {
+		return err
+	}
+	err = userSvc.userRepo.DeleteUserByUserId(tenantDb, ctx, userId)
+	if err != nil {
+		return err
+	}
+	user := &models.User{}
+	if err := userSvc.cache.GetObject(ctx, tenant, userId, user); err != nil {
+		return err
+	}
+
+	//delete auth cache item
+	cacheItem := &OAuthResponseCacheItem{}
+	if err := userSvc.cache.DeleteObject(ctx, tenant, strings.ToLower(user.Username), cacheItem); err == nil {
+		return err
+	}
+	//delete cache compare pass
+	if err := userSvc.cache.DeleteObject(ctx, tenant, strings.ToLower(user.Username), &ComparePasswordCacheItem{}); err != nil {
+		return err
+	}
+	// then delete cache usser
+	if err := userSvc.cache.DeleteObject(ctx, tenant, userId, &models.User{}); err != nil {
+		return err
+	}
+
+	return nil
 }
 func newUserServiceSql(
 	tenant tenantService,
 	cache cacheService,
 	userRepo userRepo,
 	passwordSvc passwordService,
+
 ) userService {
 	return &userServiceSql{
 		userRepo: userRepo,

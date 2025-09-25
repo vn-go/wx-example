@@ -20,16 +20,7 @@ func TestArgon2PasswordService(t *testing.T) {
 	assert.True(t, ok)
 
 }
-func BenchmarkArgon2PasswordService(t *testing.B) {
-	for i := 0; i < t.N; i++ {
-		argon := &argon2PasswordService{}
-		hash, _ := argon.HashPassword("admin", "qwert45677#$%%")
 
-		argon.ComparePassword(t.Context(), "hrm", "admin", "qwert45677#$%%", hash)
-
-	}
-
-}
 func BenchmarkCompare(t *testing.B) {
 	t.Run("Bcrypt", func(t *testing.B) {
 		Bcrypt := &bcryptPasswordService{}

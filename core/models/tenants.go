@@ -25,7 +25,24 @@ type RefreshToken struct {
 	Token  string `db:"size:36"`
 	UserId uint64 `db:"pk;size:36"`
 }
+type App struct {
+	Name              string    `db:"pk;size:255"`
+	ShareSecret       string    `db:"size:500"`
+	AdminUsername     string    `db:"size:100;default:''"`
+	AdminHashPassword string    `db:"pk;size:200;default:''"`
+	CreatedOn         time.Time `db:"ix;default:now()"`
+	ModifiedOn        *time.Time
+}
 
+func (r *RefreshToken) Table() string {
+	return "sys_refresh_tokens"
+}
+func (r *Tenant) Table() string {
+	return "sys_tenants"
+}
+func (r *App) Table() string {
+	return "sys_apps"
+}
 func init() {
-	dx.AddModels(&Tenant{}, &RefreshToken{})
+	dx.AddModels(&Tenant{}, &RefreshToken{}, &App{})
 }
