@@ -35,12 +35,20 @@ func (repo *userRepoSql) GetUserByName(db *dx.DB, ctx context.Context, username 
 	return ret, nil
 }
 
-var CreateDefaultUserOnce sync.Once
+type initCreateDefaultUser struct {
+	err  error
+	once sync.Once
+}
+
+var initCreateDefaultUserCache sync.Map
 
 func (repo *userRepoSql) CreateDefaultUser(db *dx.DB, ctx context.Context, hashPassword string) error {
-	var err error
-	CreateDefaultUserOnce.Do(func() {
+
+	a, _ := initCreateDefaultUserCache.LoadOrStore(db.DbName+"@"+db.DriverName, &initCreateDefaultUser{})
+	i := a.(*initCreateDefaultUser)
+	i.once.Do(func() {
 		var user *models.User
+		var err error
 		user, err = dx.NewThenSetDefaultValues(func() (*models.User, error) {
 			return &models.User{
 				Username:     "root",
@@ -49,6 +57,7 @@ func (repo *userRepoSql) CreateDefaultUser(db *dx.DB, ctx context.Context, hashP
 			}, nil
 		})
 		if err != nil {
+			i.err = err
 			return
 		}
 
@@ -60,18 +69,21 @@ func (repo *userRepoSql) CreateDefaultUser(db *dx.DB, ctx context.Context, hashP
 					err = dxErr
 					return
 				} else {
-					err = nil
+					return
 
 				}
 			} else {
-
+				i.err = err
 				return
 			}
+
 		}
 
 	})
-
-	return err
+	if i.err != nil {
+		initCreateDefaultUserCache.Delete(db.DbName + "@" + db.DriverName)
+	}
+	return i.err
 }
 func (repo *userRepoSql) DeleteUserByUserId(db *dx.DB, ctx context.Context, userId string) error {
 	return db.Delete(&models.User{}, "userId=?", userId).Error

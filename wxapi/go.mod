@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	core v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.11.1
-	github.com/vn-go/wx v0.1.10
+	github.com/vn-go/wx v0.1.12
 )
 
 require (
@@ -37,6 +37,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
+	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/flatbuffers v25.2.10+incompatible // indirect

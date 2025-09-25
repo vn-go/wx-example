@@ -41,7 +41,7 @@ type Tenant struct {
 	/*
 		Requires SystemUser claim
 	*/
-	User wx.Authenticate[SystemUser]
+	*wx.Authenticate[SystemUser]
 }
 
 /*
@@ -60,7 +60,7 @@ Initialize the Tenant controller.
 Sets up authentication with SystemUser claim.
 */
 func (t *Tenant) New() error {
-	t.User.Verify(func(h wx.Handler) (*SystemUser, error) {
+	t.Verify(func(h wx.Handler) (*SystemUser, error) {
 		// get header of auth from header
 		req := h().Req
 		authorization := req.Header["Authorization"]
