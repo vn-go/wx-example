@@ -41,7 +41,7 @@ type Tenant struct {
 	/*
 		Requires SystemUser claim
 	*/
-	*wx.Authenticate[SystemUser]
+	wx.Authenticate[SystemUser]
 }
 
 /*
