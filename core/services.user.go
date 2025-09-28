@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/vn-go/bx"
 )
 
 type userService interface {
 	CreateUser(tenant string, ctx context.Context, user *models.User) error
 	GetUserByUserId(tenant string, ctx context.Context, userId string) (*models.User, error)
 	DeleteUserByUserId(tenant string, ctx context.Context, userId string) error
+	AddUser(tenanet string, ctx context.Context, user *models.User) error
 }
 
 type userServiceSql struct {
@@ -36,26 +36,26 @@ func (userSvc *userServiceSql) CreateUser(tenant string, ctx context.Context, us
 		return err
 	}
 
-	userServiceSqlCreateUserDefault.Do(func() {
-		hashPass, err = userSvc.pwdSvc.HashPassword("root", "123456")
-		if err != nil {
-			return
-		}
-		err = userSvc.userRepo.CreateDefaultUser(tenantDb, ctx, hashPass)
-	})
-	if err != nil {
-		return err
-	}
+	// userServiceSqlCreateUserDefault.Do(func() {
+	// 	hashPass, err = userSvc.pwdSvc.HashPassword("root", "123456")
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// 	err = userSvc.userRepo.CreateDefaultUser(tenantDb, ctx, hashPass)
+	// })
+	// if err != nil {
+	// 	return err
+	// }
 
-	hashPass, err = bx.OnceCall[userServiceSql]("CreateUser/HashPassword/Root", func() (string, error) {
-		return userSvc.pwdSvc.HashPassword("root", "123456")
+	// hashPass, err = bx.OnceCall[userServiceSql]("CreateUser/HashPassword/Root", func() (string, error) {
+	// 	return userSvc.pwdSvc.HashPassword("root", "123456")
 
-	})
-	if err != nil {
-		return err
-	}
+	// })
+	// if err != nil {
+	// 	return err
+	// }
 
-	userSvc.userRepo.CreateDefaultUser(tenantDb, ctx, hashPass)
+	// userSvc.userRepo.CreateDefaultUser(tenantDb, ctx, hashPass)
 	user.UserId = uuid.NewString()
 	user.CreatedOn = time.Now().UTC()
 	hashPass, err = userSvc.pwdSvc.HashPassword(user.Username, user.HashPassword)
@@ -122,6 +122,9 @@ func (userSvc *userServiceSql) DeleteUserByUserId(tenant string, ctx context.Con
 	}
 
 	return nil
+}
+func (userSvc *userServiceSql) AddUser(tenanet string, ctx context.Context, user *models.User) error {
+	panic("implete me")
 }
 func newUserServiceSql(
 	tenant tenantService,

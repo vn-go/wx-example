@@ -27,12 +27,12 @@ type configInfo struct {
 		} `mapstructure:"memcache"`
 		Redis struct {
 			Address  string `mapstructure:"address"`
-			Password string `mapstructure."password"`
-			Db       int    `mapstructure."db"`
+			Password string `mapstructure:"password"`
+			Db       int    `mapstructure:"db"`
 		} `mapstructure:"redis"`
 		Badger struct {
-			Directory string `mapstructure:directory`
-		} `mapstructure:"bager"`
+			Directory string `mapstructure:"directory"`
+		} `mapstructure:"badger"`
 	} `mapstructure:"cache"`
 	Jwt struct {
 		Sercret          string `mapstructure:"default-sercret-key"`
@@ -74,6 +74,11 @@ type configInfo struct {
 		DefaultAdminUser     string `mapstructure:"DefaultAdminUser"`
 		DefaultAdminPassword string `mapstructure:"DefaultAdminPassword"`
 	} `mapstructure:"tenant"`
+	DefaultAuth struct {
+		Username string `mapstructure:"user"`
+		Password string `mapstructure:"pwd"`
+	} `mapstructure:"default-auth"`
+	Debug bool `mapstructure:"Debug"`
 }
 type configType struct {
 }

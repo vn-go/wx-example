@@ -42,7 +42,7 @@ type initCreateDefaultUser struct {
 
 var initCreateDefaultUserCache sync.Map
 
-func (repo *userRepoSql) CreateDefaultUser(db *dx.DB, ctx context.Context, hashPassword string) error {
+func (repo *userRepoSql) CreateDefaultUser(db *dx.DB, ctx context.Context, username, hashPassword string) error {
 
 	a, _ := initCreateDefaultUserCache.LoadOrStore(db.DbName+"@"+db.DriverName, &initCreateDefaultUser{})
 	i := a.(*initCreateDefaultUser)
@@ -51,11 +51,14 @@ func (repo *userRepoSql) CreateDefaultUser(db *dx.DB, ctx context.Context, hashP
 		var err error
 		user, err = dx.NewThenSetDefaultValues(func() (*models.User, error) {
 			return &models.User{
-				Username:     "root",
+				Username:     username,
 				HashPassword: hashPassword,
+				IsSysAdmin:   true,
 				//CreatedOn:    time.Now().UTC(),
 			}, nil
 		})
+		user.IsSysAdmin = true
+
 		if err != nil {
 			i.err = err
 			return

@@ -111,6 +111,7 @@ type servicesTypes struct {
 	Encrypt   encryptService
 	Broker    bx.Broker
 	JWTSvc    jwtService
+	RABCSvc   rabcService
 	//Pwd passwordService
 	//config configInfo
 }
@@ -131,4 +132,5 @@ var Services = (&bx.Wire[servicesTypes]{}).WireThenGet(
 	newEncryptServiceImpl,
 	newBrokerService,
 	newValidatorService,
+	NewRabcService,
 )

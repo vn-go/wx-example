@@ -15,7 +15,7 @@ func TestRepo(t *testing.T) {
 	assert.NoError(t, err)
 	err = db.WithContext(t.Context()).Delete(&models.User{}, "username=?", "root").Error
 	assert.NoError(t, err)
-	err = Repo.User(db).CreateDefaultUser(db, t.Context(), "123456")
+	err = Repo.User(db).CreateDefaultUser(db, t.Context(), "root", "123456")
 	assert.NoError(t, err)
 	err = db.WithContext(t.Context()).Delete(&models.User{}, "username=?", "root").Error
 	assert.NoError(t, err)
@@ -40,7 +40,7 @@ func BenchmarkRepo(t *testing.B) {
 		if err != nil {
 			t.Fail()
 		}
-		err = Repo.User(dbHr).CreateDefaultUser(dbHr, t.Context(), "123456")
+		err = Repo.User(dbHr).CreateDefaultUser(dbHr, t.Context(), "root", "123456")
 		if err != nil {
 			t.Fail()
 		}

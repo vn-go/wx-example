@@ -51,6 +51,9 @@ Create a tenant if it does not exist.
 func (t *Tenant) Create(h wx.Handler, data struct {
 	Name string `json:"name"`
 }) (any, error) {
+	if t.Authenticate.Data == nil {
+		panic("Errpr")
+	}
 	core.Services.TenantSvc.CreateTenant(h().Req.Context(), data.Name, data.Name)
 	return data, nil
 }
@@ -66,12 +69,13 @@ func (t *Tenant) New() error {
 		authorization := req.Header["Authorization"]
 
 		if len(authorization) == 0 {
-			return nil, wx.NewUnauthorizedError()
+			return nil, wx.Errors.NewUnauthorizedError()
 		}
 		//s := "xknKGvzDI-sZwlXwUo2_GVsY6ce94AC3I6qNnxnOtq655tOgbcRbRnK0fs_tEb-6yz-EtjBCC0qdeDg0xu6uiw"
-		user, err := core.Services.AuthSvc.Verify(req.Context(), authorization[0])
-		if err != nil || user == nil {
-			return nil, wx.NewUnauthorizedError()
+		user, tenant, err := core.Services.AuthSvc.Verify(req.Context(), authorization[0])
+		if err != nil || user == nil || tenant != "admin" {
+			//just accept at admin tenant, admin tenant is current db
+			return nil, wx.Errors.NewUnauthorizedError()
 		}
 
 		return &SystemUser{

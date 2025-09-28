@@ -10,13 +10,13 @@ jwt:
   hash-type : bcrypt #argon2
   share-secret-len: 64
 cache:
-  type: "redis" #"memcache" #"local"
+  type: "badger" #"memcache" #"local"
   redis:
     address: "localhost:6379"
     password: ""
   memcache:
     servers: "localhost:11211"
-  bager:
+  badger:
     directory: "./badger"
   prefix: "xasad"
 log:
@@ -43,6 +43,10 @@ broker:
     server: "nats://localhost:4222"
     group: "api-hrm"
 tenant:
-  IsMulti: true
+  IsMulti: false
   DefaultAdminUser: "tenant-admin"
   DefaultAdminPassword: "uvsz%#"
+default-auth:
+  user: "admin"
+  pwd: "/\\dmin123451212"
+Debug: false

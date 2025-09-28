@@ -65,6 +65,7 @@ type tenantService interface {
 	CreateDefaultAdminTenantAccount(ctx context.Context) error
 	Login(ctx context.Context, username, password string) (*OAuthResponse, error)
 	GetAppInfo(ctx context.Context) (app *models.App, err error)
+	CreateDefaultRootUser(tenant string, ctx context.Context) error
 }
 
 type tenantServiceSql struct {
@@ -82,12 +83,24 @@ Uses bx.OnceCall to cache the result and avoid repeated database queries.
 */
 func (s *tenantServiceSql) GetSecretKey(ctx context.Context, dbName string) (string, error) {
 	return bx.OnceCall[tenantServiceSql, string]("GetSecretKey/"+dbName, func() (string, error) {
-		tenantData := &models.Tenant{}
-		err := s.db.First(tenantData, "dbName=?", dbName)
-		if err != nil {
-			return "", err
+		if s.cfg.Tenant.IsMulti {
+			// if multi tenant get share secret from tanent db
+			tenantData := &models.Tenant{}
+			err := s.db.First(tenantData, "dbName=?", dbName)
+			if err != nil {
+				return "", err
+			}
+			return tenantData.ShareSecret, nil
+		} else {
+			// if not multi tenant get share secret from current db
+			tenantData := &models.Tenant{}
+			err := s.db.First(tenantData, "dbName=?", s.db.DbName)
+			if err != nil {
+				return "", err
+			}
+			return tenantData.ShareSecret, nil
 		}
-		return tenantData.ShareSecret, nil
+
 	})
 }
 
@@ -142,11 +155,11 @@ func (s *tenantServiceSql) CreateTenant(ctx context.Context, dbName, name string
 	if err != nil {
 		return err
 	}
-	hashPass, err := s.PwdSvc.HashPassword("root", "123456")
+	hashPass, err := s.PwdSvc.HashPassword(s.cfg.DefaultAuth.Username, s.cfg.DefaultAuth.Password)
 	if err != nil {
 		return err
 	}
-	err = s.usrRepo.CreateDefaultUser(dbTenant, ctx, hashPass)
+	err = s.usrRepo.CreateDefaultUser(dbTenant, ctx, s.cfg.DefaultAuth.Username, hashPass)
 	if err != nil {
 		return err
 	}
@@ -158,6 +171,9 @@ GetTenant opens (once) a new tenant database by its name.
 The database is cached in mapDbtenant for reuse.
 */
 func (s *tenantServiceSql) GetTenant(tenant string) (*dx.DB, error) {
+	if !s.cfg.Tenant.IsMulti {
+		return s.db, nil
+	}
 	return bx.OnceCall[tenantServiceSql, *dx.DB](tenant, func() (*dx.DB, error) {
 		tenantData := &models.Tenant{}
 		err := s.db.First(tenantData, "dbName=?", tenant)
@@ -299,6 +315,56 @@ func (s *tenantServiceSql) Login(ctx context.Context, username, password string)
 	}
 }
 
+type initCreateDefaultRootUser struct {
+	err  error
+	once sync.Once
+}
+
+var initCreateDefaultRootUserCache sync.Map
+
+func (s *tenantServiceSql) CreateDefaultRootUser(tenant string, ctx context.Context) error {
+	a, _ := initCreateDefaultRootUserCache.LoadOrStore(tenant, &initCreateDefaultRootUser{})
+	i := a.(*initCreateDefaultRootUser)
+	i.once.Do(func() {
+		hashPwd, err := s.PwdSvc.HashPassword(s.cfg.DefaultAuth.Username, s.cfg.DefaultAuth.Password)
+		if err != nil {
+			i.err = err
+			return
+		}
+		if s.cfg.Tenant.IsMulti {
+			db, err := s.GetTenant(tenant)
+			if err != nil {
+				i.err = err
+				return
+			}
+			err = s.usrRepo.CreateDefaultUser(db, ctx, s.cfg.DefaultAuth.Username, hashPwd)
+			if err != nil {
+				if dbErr := dx.Errors.IsDbError(err); dbErr != nil {
+					if dbErr.ErrorType == dx.Errors.DUPLICATE {
+						return
+					}
+				}
+				i.err = err
+				return
+			}
+		} else {
+			err = s.usrRepo.CreateDefaultUser(s.db, ctx, s.cfg.DefaultAuth.Username, hashPwd)
+			if err != nil {
+				if dbErr := dx.Errors.IsDbError(err); dbErr != nil {
+					if dbErr.ErrorType == dx.Errors.DUPLICATE {
+						return
+					}
+				}
+				i.err = err
+				return
+			}
+		}
+		return
+	})
+	return i.err
+
+}
+
 /*
 newTenantService is a constructor for tenantServiceSql.
 */
@@ -316,8 +382,13 @@ func newTenantService(
 		usrRepo: usrRepo,
 		cfg:     cfg,
 	}
-	if err := ret.CreateDefaultAdminTenantAccount(context.Background()); err != nil {
-		return nil, err
+	if cfg.Tenant.IsMulti {
+		if err := ret.CreateDefaultAdminTenantAccount(context.Background()); err != nil {
+			return nil, err
+		}
+	} else {
+		return ret, ret.CreateDefaultRootUser("", context.Background())
 	}
+
 	return ret, nil
 }

@@ -3,3 +3,5 @@ core/cache/Badger
 
 core/Badger
 core/logs
+wxapi/badger
+wxapi/logs

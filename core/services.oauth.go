@@ -22,7 +22,10 @@ type OAuthResponse struct {
 
 type serviceAuth interface {
 	Login(tenant string, ctx context.Context, username, password string) (*OAuthResponse, error)
-	Verify(ctx context.Context, authorization string) (*models.User, error)
+	//verify authorization header
+	//return
+	//user,tenant,error
+	Verify(ctx context.Context, authorization string) (*models.User, string, error)
 }
 type serviceOAuth struct {
 	user        userRepo
@@ -126,31 +129,33 @@ func (s *serviceOAuth) Login(tenant string, ctx context.Context, username, passw
 	}
 
 }
-func (s *serviceOAuth) Verify(ctx context.Context, authorization string) (user *models.User, err error) {
+func (s *serviceOAuth) Verify(ctx context.Context, authorization string) (user *models.User, tenant string, err error) {
 	palyload, err := s.jwtSvc.DecodeJWTNoVerify(authorization)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if palyload.Issuer == "admin" {
 		app, err := s.tenant.GetAppInfo(ctx)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 		_, err = s.jwtSvc.VerifyJWTWithSecret(app.ShareSecret, authorization)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		return s.user.GetUserByUserId(s.db, ctx, palyload.Subject)
+		user, err = s.user.GetUserByUserId(s.db, ctx, palyload.Subject)
+		return user, palyload.Issuer, err
 	} else {
 		shareSecret, err := s.tenant.GetSecretKey(ctx, palyload.Issuer)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 		_, err = s.jwtSvc.VerifyJWTWithSecret(shareSecret, authorization)
-		if err == nil {
-			return nil, err
+		if err != nil {
+			return nil, "", err
 		}
-		return s.user.GetUserByUserId(s.db, ctx, palyload.Subject)
+		user, err = s.user.GetUserByUserId(s.db, ctx, palyload.Subject)
+		return user, palyload.Issuer, err
 	}
 
 }

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
@@ -29,6 +30,7 @@ type jwtService interface {
 }
 type jwtServiceImpl struct {
 	SecretLen int
+	cache     cacheService
 }
 
 // GenerateSecret generates a random secret with length n bytes
@@ -81,6 +83,9 @@ func (jwtSvc *jwtServiceImpl) NewJWTWithSecret(secret, subject, Issuer, role, em
 // It returns decoded header and payload as map[string]interface{}.
 // Warning: DO NOT use this for authentication/authorization decisions in production.
 func (jwtSvc *jwtServiceImpl) DecodeJWTNoVerify(tokenOrHeader string) (payload *JWTClaims, err error) {
+	if err = jwtSvc.cache.GetObject(context.Background(), "", tokenOrHeader, payload); err == nil {
+		return
+	}
 	const bearerPrefix = "Bearer "
 
 	// Accept "Bearer <token>" or raw token
@@ -110,9 +115,16 @@ func (jwtSvc *jwtServiceImpl) DecodeJWTNoVerify(tokenOrHeader string) (payload *
 
 	// Decode payload
 	pb, err := decodePart(parts[1])
+	if err != nil {
+		return nil, err
+	}
 
 	if err := json.Unmarshal(pb, &payload); err != nil {
 		return nil, fmt.Errorf("unmarshal payload json: %w", err)
+	}
+	err = jwtSvc.cache.AddObject(context.Background(), "", tokenOrHeader, &(*payload), payload.ExpiresAt.Hour())
+	if err != nil {
+		return nil, err
 	}
 
 	return payload, nil
@@ -120,6 +132,10 @@ func (jwtSvc *jwtServiceImpl) DecodeJWTNoVerify(tokenOrHeader string) (payload *
 
 func (jwtSvc *jwtServiceImpl) VerifyJWTWithSecret(secret, authHeader string) (*JWTClaims, error) {
 	// Kiểm tra prefix Bearer
+	ret := &JWTClaims{}
+	if err := jwtSvc.cache.GetObject(context.Background(), "", secret+"://"+authHeader, ret); err == nil {
+		return ret, nil
+	}
 	const prefix = "Bearer "
 	if !strings.HasPrefix(authHeader, prefix) {
 		return nil, fmt.Errorf("invalid authorization header")
@@ -148,14 +164,18 @@ func (jwtSvc *jwtServiceImpl) VerifyJWTWithSecret(secret, authHeader string) (*J
 
 	// Trả về claims nếu hợp lệ
 	if claims, ok := token.Claims.(*JWTClaims); ok && token.Valid {
+		if err := jwtSvc.cache.AddObject(context.Background(), "", secret+"://"+authHeader, claims, 2); err != nil {
+			return nil, err
+		}
 		return claims, nil
 	}
 
 	return nil, fmt.Errorf("invalid token")
 }
 
-func newJwtService(cfg *configInfo) jwtService {
+func newJwtService(cfg *configInfo, cache cacheService) jwtService {
 	return &jwtServiceImpl{
 		SecretLen: cfg.Jwt.SecretLen,
+		cache:     cache,
 	}
 }

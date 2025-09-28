@@ -9,7 +9,7 @@ import (
 
 type userRepo interface {
 	// create defualt user
-	CreateDefaultUser(db *dx.DB, ctx context.Context, hasPassword string) error
+	CreateDefaultUser(db *dx.DB, ctx context.Context, username, hasPassword string) error
 	// create a new user
 	CreateUser(db *dx.DB, ctx context.Context, user *models.User) error
 	GetUserByUserId(db *dx.DB, ctx context.Context, userId string) (*models.User, error)

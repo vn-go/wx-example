@@ -1,7 +1,7 @@
 package main
 
 import (
-	"wxapi/controllers"
+	"core"
 	"wxapi/routes"
 
 	"github.com/vn-go/wx"
@@ -25,9 +25,10 @@ func (t *Hello) Create(h wx.Handler, data DataPost) (any, error) {
 	return struct{}{}, nil
 }
 func main() {
+	wx.Options.IsDebug = core.Services.Config.Debug
 	routes.InitRoute()
-	wx.Routes("/api", &controllers.Auth{}, &controllers.Tenant{})
-	wx.Routes("/api", &Hello{})
+
+	//wx.Routes("/api", &Hello{})
 	server := wx.NewHtttpServer("/api", "8080", "0.0.0.0")
 	swagger := wx.CreateSwagger(server, "/docs")
 	swagger.OAuth2Password("/api/auth/login")

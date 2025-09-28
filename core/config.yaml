@@ -9,6 +9,9 @@ jwt:
   default-sercret-key: dadasdsa.dasdsad3213.dad.323asd.a(dadsad)
   hash-type : bcrypt #argon2
   share-secret-len: 64
+default-auth:
+  user: "root"
+  pwd: "123456"
 cache:
   type: "memcache" #"local"
   redis:
@@ -16,7 +19,7 @@ cache:
     password: ""
   memcache:
     servers: "localhost:11211"
-  bager:
+  badger:
     directory: "./badger"
   prefix: "xasad"
 log:
