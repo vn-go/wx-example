@@ -49,7 +49,7 @@ Create a tenant if it does not exist.
 @h: specifies that this method is a Web API endpoint
 */
 func (t *Tenant) Create(h wx.Handler, data struct {
-	Name string `json:"name"`
+	Name string `json:"name" chec:"range:[5:50]"`
 }) (any, error) {
 	if t.Authenticate.Data == nil {
 		panic("Errpr")

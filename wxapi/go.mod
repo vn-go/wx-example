@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	core v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.11.1
-	github.com/vn-go/dx v1.0.34
+	github.com/vn-go/dx v1.0.35
 	github.com/vn-go/wx v0.1.23
 )
 
@@ -75,7 +75,7 @@ require (
 	github.com/spf13/viper v1.21.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
-	github.com/vn-go/bx v1.0.39 // indirect
+	github.com/vn-go/bx v1.0.40 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/github.com/Shopify/sarama/otelsarama v0.31.0 // indirect
 	go.opentelemetry.io/otel v1.37.0 // indirect
