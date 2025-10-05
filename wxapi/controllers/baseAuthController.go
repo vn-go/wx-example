@@ -24,10 +24,11 @@ func (base *BaseAuthController) New() error {
 			return nil, wx.Errors.NewUnauthorizedError()
 		}
 		return &core.UserClaims{
-			Username: user.Username,
-			UserId:   user.UserId,
-			ClaimId:  user.Id,
-			Tenant:   tenant,
+			Username:    user.Username,
+			UserId:      user.UserId,
+			ClaimId:     user.Id,
+			Tenant:      tenant,
+			IsUpperUser: user.IsSysAdmin,
 		}, nil
 	})
 	return nil

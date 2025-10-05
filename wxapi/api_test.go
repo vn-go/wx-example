@@ -354,3 +354,39 @@ func BenchmarkRoleCreate(t *testing.B) {
 	}
 
 }
+func TestGetListOfRole(t *testing.T) {
+	token, err := LoginAndGetAccessToken("admin", "/\\dmin123451212")
+	assert.NoError(t, err)
+	h, err := wx.MakeHandlerFromMethod[controllers.Accounts]("GetListOfRoles")
+	assert.NoError(t, err)
+	req, err := wx.Mock.JsonRequest(h.GetHttpMethod(), h.GetUriHandler(), core.Pager{
+		Index:   0,
+		Size:    100,
+		OrderBy: []string{"Id"},
+	})
+	req.Header.Add("authorization", "Bearer "+token)
+	assert.NoError(t, err)
+	res := wx.Mock.NewRes()
+	h.Handler().ServeHTTP(res, req)
+	assert.Equal(t, 200, res.Code)
+
+}
+func BenchmarkGetListOfRole(t *testing.B) {
+	token, err := LoginAndGetAccessToken("admin", "/\\dmin123451212")
+	assert.NoError(t, err)
+	h, err := wx.MakeHandlerFromMethod[controllers.Accounts]("GetListOfRoles")
+	assert.NoError(t, err)
+	for i := 0; i < t.N; i++ {
+		req, err := wx.Mock.JsonRequest(h.GetHttpMethod(), h.GetUriHandler(), core.Pager{
+			Index:   i,
+			Size:    1000,
+			OrderBy: []string{"Id desc"},
+		})
+		req.Header.Add("authorization", "Bearer "+token)
+		assert.NoError(t, err)
+		res := wx.Mock.NewRes()
+		h.Handler().ServeHTTP(res, req)
+		assert.Equal(t, 200, res.Code)
+	}
+
+}

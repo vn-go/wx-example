@@ -10,7 +10,7 @@ jwt:
   hash-type : bcrypt #argon2
   share-secret-len: 64
 cache:
-  type: "badger" #"memcache" #"local"
+  type: "local" #"memcache" #"local"
   redis:
     address: "localhost:6379"
     password: ""

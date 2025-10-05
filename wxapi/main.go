@@ -2,7 +2,12 @@ package main
 
 import (
 	"core"
+	"fmt"
+	"log"
+	"net/http"
 	"wxapi/routes"
+
+	_ "net/http/pprof"
 
 	"github.com/vn-go/wx"
 )
@@ -24,8 +29,26 @@ func (t *Hello) Create(h wx.Handler, data DataPost) (any, error) {
 	//core.Services.TenantSvc.CreateTenant(h().Req.Context(), data.Name, data.Name)
 	return struct{}{}, nil
 }
+
+func main2() {
+	go func() {
+		fmt.Println("pprof running at :6060")
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("OK"))
+	})
+	fmt.Println("server listening on :8080")
+	http.ListenAndServe(":8080", nil)
+}
+
 func main() {
+	go func() {
+		fmt.Println("pprof running at :6060")
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 	wx.Options.IsDebug = core.Services.Config.Debug
+	//wx.Options.UsePool = true
 	routes.InitRoute()
 
 	//wx.Routes("/api", &Hello{})

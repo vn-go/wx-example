@@ -11,8 +11,8 @@ import (
 )
 
 type Pager struct {
-	Index   int      `json:"index" check:"range:(0,)"`
-	Size    int      `json:"size" check:"range:(10,)"`
+	Index   int      `json:"index" check:"range:[0:)"`
+	Size    int      `json:"size" check:"range:[10:)"`
 	OrderBy []string `json:"orderBy"`
 }
 type AccountInfo struct {
@@ -29,12 +29,15 @@ type rabcService interface {
 	GetRoleByRoleId(ctx context.Context, user *UserClaims, roleId string) (*models.Role, error)
 	NewUser(ctx context.Context, creator *UserClaims, user *models.User) (*models.User, error)
 	GetListOfRoles(ctx context.Context, user *UserClaims, pager Pager) ([]models.Role, error)
+	//GetListOfRolesSQL(ctx context.Context, user *UserClaims, pager Pager) (string, error)
 	GetListOfAccounts(ctx context.Context, user *UserClaims, pager Pager) ([]AccountInfo, error)
+	ChangeUserPassword(ctx context.Context, user *UserClaims, username string, newPass string) error
 	//GetDb(user *UserClaims) (*dx.DB, error)
 }
 
 type rabcServiceImpl struct {
 	tanentSvc tenantService
+	pwdSvc    passwordService
 	cache     cacheService
 }
 
@@ -74,6 +77,23 @@ func (s *rabcServiceImpl) GetRoleByRoleId(ctx context.Context, user *UserClaims,
 	err = db.WithContext(ctx).First(role, "roleId=?", roleId)
 	return role, err
 }
+
+// func (s *rabcServiceImpl) GetListOfRolesSQL(ctx context.Context, user *UserClaims, pager Pager) (sql string, err error) {
+// 	var db *dx.DB
+
+// 	if db, err = s.tanentSvc.GetTenant(user.Tenant); err != nil {
+// 		return "", err
+// 	}
+// 	// roles = []models.Role{}
+
+// 	qr := db.WithContext(ctx).Limit(uint64(pager.Size)).Offset(uint64(pager.Index * pager.Size))
+// 	if len(pager.OrderBy) > 0 {
+// 		qr = qr.Order(strings.Join(pager.OrderBy, ","))
+// 	}
+// 	sqlP, err := qr..ToSql(db, reflect.TypeOf(models.Role{}))
+// 	return sqlP.Sql, err
+
+// }
 func (s *rabcServiceImpl) GetListOfRoles(ctx context.Context, user *UserClaims, pager Pager) (roles []models.Role, err error) {
 	var db *dx.DB
 
@@ -98,7 +118,11 @@ func (s *rabcServiceImpl) GetListOfAccounts(ctx context.Context, user *UserClaim
 	}
 	//dx.Options.ShowSql = true
 	qr := db.WithContext(ctx).From(&models.User{}).Joins("u left join role r on u.roleId=r.id").Select(
-		"u.userId UserId,u.username Username,r.code RoleCode,r.name RoleName,r.roleId RoleId",
+		`u.userId UserId,
+		u.username Username,
+		r.code RoleCode,
+		r.name RoleName,
+		r.roleId RoleId`,
 	)
 	qr.Limit(uint64(pager.Size))
 	qr.Offset(uint64(pager.Size * pager.Index))
@@ -107,12 +131,34 @@ func (s *rabcServiceImpl) GetListOfAccounts(ctx context.Context, user *UserClaim
 	return accs, err
 
 }
+func (s *rabcServiceImpl) ChangeUserPassword(ctx context.Context, user *UserClaims, username string, newPass string) (err error) {
+	var db *dx.DB
+
+	if db, err = s.tanentSvc.GetTenant(user.Tenant); err != nil {
+		return err
+	}
+	updateUser := &models.User{}
+	if err = db.First(updateUser, "username=?", username); err != nil {
+		return err
+	}
+	hashPassword, err := s.pwdSvc.HashPassword(username, newPass)
+	if err != nil {
+		return err
+	}
+	updateUser.HashPassword = hashPassword
+	r := db.Update(updateUser)
+	return r.Error
+
+}
 func NewRabcService(
 	tanentSvc tenantService,
 	cache cacheService,
+	pwdSvc passwordService,
+
 ) rabcService {
 	return &rabcServiceImpl{
 		tanentSvc: tanentSvc,
 		cache:     cache,
+		pwdSvc:    pwdSvc,
 	}
 }

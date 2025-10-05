@@ -7,10 +7,14 @@ import (
 )
 
 func InitRoute() {
+	controllers.GetListOfRoles()
 	err := wx.Routes("/api",
 		&controllers.Auth{},
 		&controllers.Tenant{},
-		&controllers.Accounts{})
+		&controllers.Accounts{},
+		&controllers.DataSource{},
+		&controllers.Pure{},
+	)
 	if err != nil {
 		panic(err)
 	}

@@ -22,6 +22,13 @@ type Media struct {
 	DirName string
 }
 
+var listOfFiles []string
+
+func LoadAllFile() {
+	media := &Media{}
+	media.New()
+	listOfFiles, _ = media.listAllFolderAndFiles("")
+}
 func (media *Media) New() error {
 	media.RootDir = "./../uploads"
 
@@ -37,7 +44,7 @@ func (media *Media) New() error {
 
 // The function will return all files and folder
 // in RootDir of Media
-func (media *Media) ListAllFolderAndFiles(prefixUrl string) ([]string, error) {
+func (media *Media) listAllFolderAndFiles(prefixUrl string) ([]string, error) {
 	if media.RootDir == "" {
 		return nil, nil
 	}
@@ -75,6 +82,10 @@ func (media *Media) ListAllFolderAndFiles(prefixUrl string) ([]string, error) {
 		return nil, err
 	}
 	return results, nil
+}
+func (media *Media) ListAllFolderAndFiles(prefixUrl string) ([]string, error) {
+
+	return listOfFiles, nil
 }
 
 var onceGetUrlOfFileStreaming sync.Once
