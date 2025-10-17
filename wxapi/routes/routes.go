@@ -8,7 +8,9 @@ import (
 
 func InitRoute() {
 	controllers.GetListOfRoles()
+	// acc all controllers to routes
 	err := wx.Routes("/api",
+
 		&controllers.Auth{},
 		&controllers.Tenant{},
 		&controllers.Accounts{},

@@ -7,14 +7,22 @@ import (
 	"github.com/vn-go/wx"
 )
 
+// DataSource 控制器 controller
 type DataSource struct {
-	BaseAuthController
+	BaseAuthController // require authentication for all actions
 }
 
+// Get datasource
 func (ds *DataSource) Get(h wx.Handler, data struct {
-	Name     string `json:"name" `
+	// Datasource name, (a certain datasource, has registed at backend)
+	Name string `json:"name" `
+	// Selector, fields to select, separated by comma, list all fields not allow empty or "*"
+	// support function: sum, avg, max, min, count, if(condition-1, trueValue-1, ...,condition-n, falseValue-n), concat(field1, field2,...)
+	// example: "id,name,age,sum(age),if(age>18, 'adult',age>13 and age<18, 'teenager', 'unkonwn')"
 	Selector string `json:"fields"`
-	Filter   string `json:"filter" check:"range:[0:300]"`
+	// filter condition
+	// Exampe: "id=1 and name='abc' and sum(salary)>10000"
+	Filter string `json:"filter" check:"range:[0:300]"`
 }) (any, error) {
 	//dx.Options.ShowSql = true
 

@@ -48,16 +48,21 @@ func main() {
 		log.Println(http.ListenAndServe("localhost:6060", nil))
 	}()
 	wx.Options.IsDebug = core.Services.Config.Debug
-	//wx.Options.UsePool = true
+
+	// load all controllerd
 	routes.InitRoute()
 
-	//wx.Routes("/api", &Hello{})
+	//new server api
 	server := wx.NewHtttpServer("/api", core.Services.Config.Bind.Port, core.Services.Config.Bind.Host)
 	server.Middleware(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-		next(w, r)
+		next(w, r) // set middleware if you need
 	})
+	//Create swager if you need
 	swagger := wx.CreateSwagger(server, "/docs")
+	// Show authenication login in swagger
 	swagger.OAuth2Password("/api/auth/login")
+	// Build swagger
 	swagger.Build()
+	// start server
 	server.Start()
 }

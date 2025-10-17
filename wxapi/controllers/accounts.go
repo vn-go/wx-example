@@ -9,8 +9,11 @@ import (
 	"github.com/vn-go/wx"
 )
 
+/*
+Account controller
+*/
 type Accounts struct {
-	BaseAuthController
+	BaseAuthController // this controller require authenticate for all  APIs
 }
 
 func (acc *Accounts) Me(h wx.Handler) any {

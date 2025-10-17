@@ -6,11 +6,15 @@ import (
 	"github.com/vn-go/wx"
 )
 
+// BaseAuthController 基础认证控制器
+// All other controllers should inherit from this controller if need authentication
 type BaseAuthController struct {
 	wx.Authenticate[core.UserClaims]
 }
 
+// Controller constructor (auto called by framework)
 func (base *BaseAuthController) New() error {
+	//setup authentication middleware
 	base.Authenticate.Verify(func(ctx wx.Handler) (*core.UserClaims, error) {
 		req := ctx().Req
 		authorization := req.Header["Authorization"]
