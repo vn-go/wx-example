@@ -1,8 +1,13 @@
 POST /api/data-source/get HTTP/1.1
 Host: localhost:8080
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhOTQ3YWQzYy1lNzQ3LTQ3YzctODc4ZS02YWIyMjlmNjQyNjIiLCJleHAiOjE3NTkzMzY0NTIsImlhdCI6MTc1OTMyMjA1Miwicm9sZSI6IiIsImVtYWlsIjoiIn0.EOHesb8n9y6bb7WAGITdq7q5Iq6JNswMu8TTyJXjCJM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZjQ0NDY5NS0wMTA0LTRjZjktODg3ZC0xZDJjZGZmN2Q1OWQiLCJleHAiOjE3NjA0NjQ4ODAsImlhdCI6MTc2MDQ1MDQ4MCwicm9sZSI6IiIsImVtYWlsIjoiIn0.h6gdRtTi73_8iiqG7JZbZ683EotiT3NcXSrRM9kTGlk
 User-Agent: sqlmap
-Accept: */*
 
-{"name": "user","where": "id>1 and id<100000","fields": "INJECT_HERE"}
+Accept: */*
+{
+   "name": "role",
+  "fields": "count(id) total ,code,id",
+  "filter": "left(code,3)='X-0' and id<2500 and total=1"
+}
+

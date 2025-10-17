@@ -1,0 +1,123 @@
+PS D:\code\go\wx-example\wx-example\k6\accounts> k6 run get-list-of-roles-dot-net.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: get-list-of-roles-dot-net.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 200 max VUs, 1m0s max duration (incl. graceful stop):
+              * default: 200 looping VUs for 30s (gracefulStop: 30s)
+
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......................: 36713   1221.189464/s
+    checks_succeeded...................: 100.00% 36713 out of 36713
+    checks_failed......................: 0.00%   0 out of 36713
+
+    ✓ status is 200
+
+    HTTP
+    http_req_duration.......................................................: avg=162.68ms min=11.54ms med=153.94ms max=2s    p(90)=189.42ms p(95)=204.39ms
+      { expected_response:true }............................................: avg=162.68ms min=11.54ms med=153.94ms max=2s    p(90)=189.42ms p(95)=204.39ms
+    http_req_failed.........................................................: 0.00%  0 out of 36713
+    http_reqs...............................................................: 36713  1221.189464/s
+
+    EXECUTION
+    iteration_duration......................................................: avg=163.53ms min=11.54ms med=154.45ms max=2.02s p(90)=190.55ms p(95)=206.31ms
+    iterations..............................................................: 36713  1221.189464/s
+    vus.....................................................................: 200    min=200        max=200  
+    vus_max.................................................................: 200    min=200        max=200  
+
+    NETWORK
+    data_received...........................................................: 2.8 GB 93 MB/s
+    data_sent...............................................................: 3.4 MB 112 kB/s
+
+
+
+                                                                                                             
+running (0m30.1s), 000/200 VUs, 36713 complete and 0 interrupted iterations                                  
+default ✓ [======================================] 200 VUs  30s
+---
+PS D:\code\go\wx-example\wx-example\k6\accounts> k6 run get-list-of-roles.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: get-list-of-roles.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 200 max VUs, 1m0s max duration (incl. graceful stop):
+              * default: 200 looping VUs for 30s (gracefulStop: 30s)
+
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......................: 182953  6090.445247/s
+    checks_succeeded...................: 100.00% 182953 out of 182953
+    checks_failed......................: 0.00%   0 out of 182953
+
+    ✓ status is 200
+
+    HTTP
+    http_req_duration.......................................................: avg=32.66ms min=1.49ms med=30.61ms max=186.73ms p(90)=51.6ms  p(95)=59.08ms
+      { expected_response:true }............................................: avg=32.66ms min=1.49ms med=30.61ms max=186.73ms p(90)=51.6ms  p(95)=59.08ms
+    http_req_failed.........................................................: 0.00%  0 out of 182953  
+    http_reqs...............................................................: 182953 6090.445247/s    
+
+    EXECUTION
+    iteration_duration......................................................: avg=32.78ms min=1.99ms med=30.87ms max=186.72ms p(90)=51.63ms p(95)=59.14ms
+    iterations..............................................................: 182953 6090.445247/s    
+    vus.....................................................................: 200    min=200         max=200
+    vus_max.................................................................: 200    min=200         max=200
+
+    NETWORK
+    data_received...........................................................: 14 GB  469 MB/s
+    data_sent...............................................................: 80 MB  2.7 MB/s
+
+
+
+
+running (0m30.0s), 000/200 VUs, 182953 complete and 0 interrupted iterations
+default ✓ [======================================] 200 VUs  30s
+-----
+(pprof) top10
+Showing nodes accounting for 213.02s, 70.91% of 300.40s total
+Dropped 1071 nodes (cum <= 1.50s)
+Showing top 10 nodes out of 203
+      flat  flat%   sum%        cum   cum%
+    93.03s 30.97% 30.97%     93.03s 30.97%  runtime.stdcall2
+    44.07s 14.67% 45.64%     46.02s 15.32%  runtime.cgocall
+    37.90s 12.62% 58.26%     37.95s 12.63%  runtime.stdcall0
+    12.55s  4.18% 62.43%     25.21s  8.39%  github.com/json-iterator/go.(*Stream).WriteString
+     5.70s  1.90% 64.33%      5.71s  1.90%  runtime.stdcall1
+     5.40s  1.80% 66.13%      7.31s  2.43%  runtime.findObject
+     4.29s  1.43% 67.56%      4.29s  1.43%  runtime.procyield
+     3.94s  1.31% 68.87%      3.94s  1.31%  runtime.(*mspan).base (inline)
+     3.52s  1.17% 70.04%     14.34s  4.77%  runtime.scanobject
+     2.62s  0.87% 70.91%      2.76s  0.92%  runtime.(*gcBits).bitp (inline)
+(pprof)
+---
+PS D:\code\go\wx-example\wx-example\k6\accounts> dotnet-trace report ./hrm_cpu_profile.nettrace topN -n 10
+Top 10 Functions (Exclusive)                                                  Inclusive           Exclusive
+1.  PortableThreadPool+IOCompletionPoller.Poll()                              40%                 40%
+2.  Monitor.Wait(class System.Object,int32)                                   20%                 20%
+3.  il!Interop+Kernel32.ReadFile(int,unsigned int8*,int32,int32&,int)         20%                 20%
+4.  WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class W    20%                 20%
+5.  Task.SpinThenBlockingWait(int32,value class System.Threading.Cancellat    20%                 0%
+6.  Task.InternalWaitCore(int32,value class System.Threading.CancellationT    20%                 0%
+7.  Task.InternalWait(int32,value class System.Threading.CancellationToken    20%                 0%
+8.  TaskAwaiter.HandleNonSuccessAndDebuggerNotification(class System.Threa    20%                 0%
+9.  Int32].GetResult()                                                        20%                 0%
+10. il!Program.<Main>()                                                       20%                 0%

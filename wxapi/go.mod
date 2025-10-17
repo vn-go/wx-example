@@ -5,8 +5,8 @@ go 1.25.0
 require (
 	core v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.11.1
-	github.com/vn-go/dx v1.0.57
-	github.com/vn-go/wx v0.2.3
+	github.com/vn-go/dx v1.0.79
+	github.com/vn-go/wx v0.2.4
 )
 
 require (
@@ -14,6 +14,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/sijms/go-ora/v2 v2.9.0 // indirect
 )
 
 require (
@@ -80,7 +81,7 @@ require (
 	github.com/spf13/viper v1.21.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
-	github.com/vn-go/bx v1.0.40 // indirect
+	github.com/vn-go/bx v1.0.40
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/github.com/Shopify/sarama/otelsarama v0.31.0 // indirect
 	go.opentelemetry.io/otel v1.37.0 // indirect

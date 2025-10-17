@@ -13,7 +13,7 @@ import http from 'k6/http';
 export const options = {
   //executor: 'constant-vus',
   vus: 200,
-  duration: '30s',
+  duration: '60s',
 
 };
 let token = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhOTQ3YWQzYy1lNzQ3LTQ3YzctODc4ZS02YWIyMjlmNjQyNjIiLCJleHAiOjE3NTk2NDU2MzUsImlhdCI6MTc1OTYzMTIzNSwicm9sZSI6IiIsImVtYWlsIjoiIn0.aFm-8oQ8Gdc7eA0xpMcr9sr3Z5s010yHLqrMFwsLl08`

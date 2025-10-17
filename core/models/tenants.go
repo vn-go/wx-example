@@ -23,7 +23,7 @@ type Tenant struct {
 }
 type RefreshToken struct {
 	Token  string `db:"size:36" json:"-"`
-	UserId uint64 `db:"pk;size:36" json:"-"`
+	UserId string `db:"pk;size:36" json:"-"`
 }
 type App struct {
 	Name              string     `db:"pk;size:255"  json:"name"`

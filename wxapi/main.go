@@ -52,7 +52,10 @@ func main() {
 	routes.InitRoute()
 
 	//wx.Routes("/api", &Hello{})
-	server := wx.NewHtttpServer("/api", "8080", "0.0.0.0")
+	server := wx.NewHtttpServer("/api", core.Services.Config.Bind.Port, core.Services.Config.Bind.Host)
+	server.Middleware(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+		next(w, r)
+	})
 	swagger := wx.CreateSwagger(server, "/docs")
 	swagger.OAuth2Password("/api/auth/login")
 	swagger.Build()

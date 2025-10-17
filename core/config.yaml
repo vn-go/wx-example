@@ -1,9 +1,9 @@
 app: "api"
 database:
-  driver: "mysql"
-  dsn: "root:123456@tcp(127.0.0.1:3306)/hrm"
-  driver2: "postgres"
-  dsn2: "postgres://postgres:123456@localhost:5432/hrm?sslmode=disable"
+  driver1: "mysql"
+  dsn1: "root:123456@tcp(127.0.0.1:3306)/hrm"
+  driver: "postgres"
+  dsn: "postgres://postgres:123456@localhost:5432/hrm?sslmode=disable"
 
 jwt:
   default-sercret-key: dadasdsa.dasdsad3213.dad.323asd.a(dadsad)
@@ -49,3 +49,4 @@ tenant:
   IsMulti: true
   DefaultAdminUser: "root"
   DefaultAdminPassword: "uvsz%#"
+

@@ -93,12 +93,12 @@ func (s *tenantServiceSql) GetSecretKey(ctx context.Context, dbName string) (str
 			return tenantData.ShareSecret, nil
 		} else {
 			// if not multi tenant get share secret from current db
-			tenantData := &models.Tenant{}
-			err := s.db.First(tenantData, "dbName=?", s.db.DbName)
+			appData := &models.App{}
+			err := s.db.First(appData, "name=?", s.cfg.AppName)
 			if err != nil {
 				return "", err
 			}
-			return tenantData.ShareSecret, nil
+			return appData.ShareSecret, nil
 		}
 
 	})
@@ -172,6 +172,9 @@ The database is cached in mapDbtenant for reuse.
 */
 func (s *tenantServiceSql) GetTenant(tenant string) (*dx.DB, error) {
 	if !s.cfg.Tenant.IsMulti {
+		if err := s.CreateDefaultAdminTenantAccount(context.Background()); err != nil {
+			return nil, err
+		}
 		return s.db, nil
 	}
 	return bx.OnceCall[tenantServiceSql, *dx.DB](tenant, func() (*dx.DB, error) {

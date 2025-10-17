@@ -63,6 +63,11 @@ func (s *rabcServiceImpl) NewUser(ctx context.Context, creator *UserClaims, user
 	if db, err = s.tanentSvc.GetTenant(creator.Tenant); err != nil {
 		return nil, err
 	}
+	hashPass, err := s.pwdSvc.HashPassword(user.Username, user.HashPassword)
+	if err != nil {
+		return nil, err
+	}
+	user.HashPassword = hashPass
 	err = db.WithContext(ctx).Insert(user)
 	return user, err
 }

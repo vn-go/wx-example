@@ -78,7 +78,11 @@ type configInfo struct {
 		Username string `mapstructure:"user"`
 		Password string `mapstructure:"pwd"`
 	} `mapstructure:"default-auth"`
-	Debug bool `mapstructure:"Debug"`
+	Debug bool `mapstructure:"debug"`
+	Bind  struct {
+		Host string `mapstructure:"host"`
+		Port string `mapstructure:"port"`
+	} `mapstructure:"bind"`
 }
 type configType struct {
 }

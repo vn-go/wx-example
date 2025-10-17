@@ -187,6 +187,8 @@ github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/sagikazarmark/locafero v0.11.0 h1:1iurJgmM9G3PA/I+wWYIOw/5SyBtxapeHDcg+AAIFXc=
 github.com/sagikazarmark/locafero v0.11.0/go.mod h1:nVIGvgyzw595SUSUE6tvCp3YYTeHs15MvlmU87WwIik=
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
+github.com/sijms/go-ora/v2 v2.9.0 h1:+iQbUeTeCOFMb5BsOMgUhV8KWyrv9yjKpcK4x7+MFrg=
+github.com/sijms/go-ora/v2 v2.9.0/go.mod h1:QgFInVi3ZWyqAiJwzBQA+nbKYKH77tdp1PYoCqhR2dU=
 github.com/sirupsen/logrus v1.8.1/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=
 github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 h1:+jumHNA0Wrelhe64i8F6HNlS8pkoyMv5sreGx2Ry5Rw=
 github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8/go.mod h1:3n1Cwaq1E1/1lhQhtRK2ts/ZwZEhjcQeJQ1RuC6Q/8U=
@@ -218,12 +220,10 @@ github.com/vmihailenco/msgpack v4.0.4+incompatible h1:dSLoQfGFAo3F6OoNhwUmLwVgaU
 github.com/vmihailenco/msgpack v4.0.4+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=
 github.com/vn-go/bx v1.0.40 h1:qOQ9WnjJd+sgudSGaYr7LS2nU0JBhq7w+4XbYCA7Mgw=
 github.com/vn-go/bx v1.0.40/go.mod h1:UH1ucAGTErfVta1Wvc4sb78n29zfiw2pIcBfSqOBQew=
-github.com/vn-go/dx v1.0.57 h1:fDG24GbJWEIoHcBKVu0olmDegWUrheCIwjwmme3UDxQ=
-github.com/vn-go/dx v1.0.57/go.mod h1:Awn9Cz5usRE8eYfLBVZ72OBPiRwpC1XJ3Ft120VlAIw=
-github.com/vn-go/wx v0.1.31 h1:RZkOl9BuTdWF+XDkGfMMO355F/xDI7en4KHP9Ce9YFc=
-github.com/vn-go/wx v0.1.31/go.mod h1:2Q3IFOT4GcDGQLiTbII8OvkK863fpLia+UnF1szgQc8=
-github.com/vn-go/wx v0.2.3 h1:ovBE+9TVYCmHI8cjxRSj12TB4FB9rw13vx9pgY0qt8Q=
-github.com/vn-go/wx v0.2.3/go.mod h1:3eOkNXJJyfjs5tv64K6IMZ9E6Hd7FI5F022FbsJY2TY=
+github.com/vn-go/dx v1.0.79 h1:KT2XpOqIHNPHh1oVLhEt/kDNxsNVncA/vk4Zc7YkZ9s=
+github.com/vn-go/dx v1.0.79/go.mod h1:RWU9ktA0+jkniDeeJxcuZuSVQrE+EFldEkxVv6Fgqqw=
+github.com/vn-go/wx v0.2.4 h1:gcCR2Ctbew1nuismIh3leHEqoJWcSQNPdzHfP8bEJ6U=
+github.com/vn-go/wx v0.2.4/go.mod h1:3eOkNXJJyfjs5tv64K6IMZ9E6Hd7FI5F022FbsJY2TY=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=
 github.com/xdg-go/scram v1.1.0/go.mod h1:1WAq6h33pAW+iRreB34OORO2Nf7qel3VV3fjBj+hCSs=
 github.com/xdg-go/stringprep v1.0.2/go.mod h1:8F9zXuvzgwmyT5DUm4GUfZGDdT3W+LCvS6+da4O5kxM=

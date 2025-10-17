@@ -52,12 +52,12 @@ func (s *serviceOAuth) generateRefreshToken(ctx context.Context, tenant string, 
 	ret := uuid.NewString()
 	err = db.WithContext(ctx).Insert(&models.RefreshToken{
 		Token:  ret,
-		UserId: user.Id,
+		UserId: user.UserId,
 	})
 	if err != nil {
 		if dbErr := dx.Errors.IsDbError(err); dbErr != nil {
 			if dbErr.ErrorType == dx.Errors.DUPLICATE {
-				err := db.WithContext(ctx).Model(&models.RefreshToken{}).Where("userId=?", user.Id).Update(map[string]interface{}{
+				err := db.WithContext(ctx).Model(&models.RefreshToken{}).Where("userId=?", user.UserId).Update(map[string]interface{}{
 					"token": ret,
 				}).Error
 				if err != nil {

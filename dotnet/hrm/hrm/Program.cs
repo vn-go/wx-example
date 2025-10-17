@@ -3,7 +3,7 @@ using hrm.Data;
 using hrm.Models;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-
+using System.Collections;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -36,17 +36,24 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+
 // --- Endpoint mới: Lấy Danh sách Role ---
 app.MapGet("/api/roles", async (HrmDbContext db) =>
 {
     try
     {
-        // Sử dụng EF Core để truy vấn toàn bộ dữ liệu từ bảng sys_roles
-        // .ToListAsync() đảm bảo EF Core thực thi truy vấn một cách bất đồng bộ
-        var roles = await db.SysRoles.ToListAsync();
+        // 1. Kiểm tra cache
+        if (Cache.Roles != null)
+        {
+            return Results.Ok(Cache.Roles);
+        }
 
-        // Trả về danh sách roles
-        return Results.Ok(roles);
+        // 2. Truy vấn DB và Caching
+        var rolesFromDb = await db.SysRoles.ToListAsync();
+        Cache.Roles = rolesFromDb; // Gán vào biến static trong lớp Cache
+
+        return Results.Ok(rolesFromDb);
     }
     catch (Exception ex)
     {

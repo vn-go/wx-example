@@ -15,3 +15,4 @@ docker run -d --name nats-js  -p 4222:4222   -p 8222:8222  -p 6222:6222   nats:l
 
 #docker build -f docker/Dockerfile -t wxapi:latest .
 docker build -f docker/waapi -t wxapi:latest .
+docker run -d --name oracle-free  -p 1521:1521 -p 5500:5500  -e ORACLE_PWD=123456   container-registry.oracle.com/database/free:latest

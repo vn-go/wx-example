@@ -13,7 +13,7 @@ import http from 'k6/http';
 export const options = {
   //executor: 'constant-vus',
   vus: 200,
-  duration: '30s',
+  duration: '60s',
 
 };
 let token = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhOTQ3YWQzYy1lNzQ3LTQ3YzctODc4ZS02YWIyMjlmNjQyNjIiLCJleHAiOjE3NTk2MDI4MDcsImlhdCI6MTc1OTU4ODQwNywicm9sZSI6IiIsImVtYWlsIjoiIn0.NZtq2cYjlCr4ugVSE8UKCnF1FnxtamTdjbAcZcunRP0`
@@ -128,4 +128,19 @@ PS D:\code\go\wx-example\wx-example\k6\accounts> k6 run get-list-of-roles.js
 
 running (0m30.1s), 000/200 VUs, 96466 complete and 0 interrupted iterations
 default ✓ [======================================] 200 VUs  30s
+*/
+/*
+
+dotnet tool install -g dotnet-trace
+Get-Process dotnet, hrm | Select-Object -First 1 Id
+----
+$env:PATH += ";C:\Users\MSI CYBORG\.dotnet\tools"
+k6 run get-list-of-roles-dot-net.js
+dotnet-trace collect -p 25940 --duration 00:00:30 --profiler speedscope --output ./hrm_cpu_profile.json
+dotnet-trace collect -p 25940 --duration 00:00:30 -c cpu-sampling -o ./hrm_cpu_profile.nettrace
+
+dotnet-trace report ./hrm_cpu_profile.nettrace topN -n 10
+
+
+
 */

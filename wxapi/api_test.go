@@ -354,6 +354,35 @@ func BenchmarkRoleCreate(t *testing.B) {
 	}
 
 }
+
+/*
+-- Postgres---
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkRoleCreate$ wxapi
+
+2025/10/09 17:53:55 loading config ./config.yaml
+2025/10/09 17:53:55 loading config ./config.yaml,in 0
+new db
+goos: windows
+goarch: amd64
+pkg: wxapi
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkRoleCreate-16    	    1692	    667037 ns/op	   19473 B/op	     296 allocs/op
+PASS
+ok  	wxapi	2.164s
+-- Mysql---
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkRoleCreate$ wxapi
+
+2025/10/09 17:59:59 loading config ./config.yaml
+2025/10/09 17:59:59 loading config ./config.yaml,in 8
+new db
+goos: windows
+goarch: amd64
+pkg: wxapi
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkRoleCreate-16    	     487	   3325550 ns/op	   17621 B/op	     263 allocs/op
+PASS
+ok  	wxapi	2.475s
+*/
 func TestGetListOfRole(t *testing.T) {
 	token, err := LoginAndGetAccessToken("admin", "/\\dmin123451212")
 	assert.NoError(t, err)
@@ -379,7 +408,7 @@ func BenchmarkGetListOfRole(t *testing.B) {
 	for i := 0; i < t.N; i++ {
 		req, err := wx.Mock.JsonRequest(h.GetHttpMethod(), h.GetUriHandler(), core.Pager{
 			Index:   i,
-			Size:    1000,
+			Size:    500,
 			OrderBy: []string{"Id desc"},
 		})
 		req.Header.Add("authorization", "Bearer "+token)
@@ -390,3 +419,34 @@ func BenchmarkGetListOfRole(t *testing.B) {
 	}
 
 }
+
+/*
+Test load 500 dong tren bang sys_roles
+sort theo id gaim dan
+-- mysql--
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkGetListOfRole$ wxapi
+
+2025/10/09 18:15:22 loading config ./config.yaml
+2025/10/09 18:15:22 loading config ./config.yaml,in 0
+new db
+goos: windows
+goarch: amd64
+pkg: wxapi
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkGetListOfRole-16    	    1216	    879359 ns/op	   39711 B/op	     494 allocs/op
+PASS
+ok  	wxapi	2.416s
+---pg---
+Running tool: C:\Golang\bin\go.exe test -benchmem -run=^$ -bench ^BenchmarkGetListOfRole$ wxapi
+
+2025/10/09 18:16:21 loading config ./config.yaml
+2025/10/09 18:16:21 loading config ./config.yaml,in 0
+new db
+goos: windows
+goarch: amd64
+pkg: wxapi
+cpu: 12th Gen Intel(R) Core(TM) i7-12650H
+BenchmarkGetListOfRole-16    	    2048	    551336 ns/op	   27147 B/op	     354 allocs/op
+PASS
+ok  	wxapi	3.389s
+*/

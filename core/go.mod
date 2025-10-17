@@ -12,7 +12,10 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
-require github.com/golang-sql/sqlexp v0.1.0 // indirect
+require (
+	github.com/golang-sql/sqlexp v0.1.0 // indirect
+	github.com/sijms/go-ora/v2 v2.9.0 // indirect
+)
 
 require (
 	github.com/ThreeDotsLabs/watermill v1.5.1
@@ -22,7 +25,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/nats-io/nats.go v1.37.0
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
-	github.com/vn-go/dx v1.0.57
+	github.com/vn-go/dx v1.0.79
 )
 
 require (
