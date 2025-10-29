@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	core v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.11.1
-	github.com/vn-go/dx v1.0.79
+	github.com/vn-go/dx v1.0.80
 	github.com/vn-go/wx v0.2.4
 )
 

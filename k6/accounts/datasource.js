@@ -11,11 +11,11 @@ import http from 'k6/http';
 
 export const options = {
     //executor: 'constant-vus',
-    vus: 200,
+    vus: 10,
     duration: '60s',
 
 };
-let token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhOTQ3YWQzYy1lNzQ3LTQ3YzctODc4ZS02YWIyMjlmNjQyNjIiLCJleHAiOjE3NTk2NTU0NzMsImlhdCI6MTc1OTY0MTA3Mywicm9sZSI6IiIsImVtYWlsIjoiIn0.RwP9vbM-BQrdoLjyL-2HYYAbJ7K0I-AKksFgPiB6BrA'
+let token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NmVjYTUxYy05MjdjLTRkMTMtYjRmNi1iYTVlNTc0NWMxNTAiLCJleHAiOjE3NjA3MjIzMTQsImlhdCI6MTc2MDcwNzkxNCwicm9sZSI6IiIsImVtYWlsIjoiIn0.jIxUnXmfsw2-6sklgFWhwOiZoraZznJTV0eT4TOmUwA'
 export default function () {
 
     // let url = 'http://localhost:8080/api/accounts/get-list-of-roles';
@@ -23,17 +23,18 @@ export default function () {
     //let url = 'http://localhost:8080/api/pure/get'
     //let url = 'http://localhost:8080/hello'
     //let url = 'http://localhost:8080/api/hz/check'
-    let url = "http://localhost:8080/api/data-source/get"
+    //let url = "http://localhost:8080/api/data-source/get"
     //let url = "http://localhost:8080/api/accounts/get-list-of-roles"
+    let url = "https://bcb9f8917298.ngrok-free.app/api/data-source/get"
     let headers = {
         'Authorization': token,
         'Content-Type': 'application/json',
     };
 
     let res = http.post(url, JSON.stringify({
-        "name": "role",
-        "fields": "left(code,2) C,count(id) total,day(createdOn) d",
-        "filter": "total>0"
+        "name": "user",
+        "fields": "",
+        "filter": ""
     }), { headers: headers });
     //let res = http.post(url)
     check(res, {

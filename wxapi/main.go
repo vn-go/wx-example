@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 	"wxapi/routes"
 
 	_ "net/http/pprof"
@@ -55,7 +56,10 @@ func main() {
 	//new server api
 	server := wx.NewHtttpServer("/api", core.Services.Config.Bind.Port, core.Services.Config.Bind.Host)
 	server.Middleware(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+		t := time.Now()
 		next(w, r) // set middleware if you need
+		w.Header().Set("X-Process-Time", fmt.Sprintf("%.2fms", float64(time.Since(t).Nanoseconds())/1e6))
+		//fmt.Println("time elapsed:", time.Since(t))
 	})
 	//Create swager if you need
 	swagger := wx.CreateSwagger(server, "/docs")

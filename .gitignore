@@ -6,3 +6,5 @@ core/logs
 wxapi/badger
 wxapi/logs
 dotnet/hrm/hrm/bin
+host
+wxui/app/node_modules
