@@ -61,6 +61,7 @@ func main() {
 		w.Header().Set("X-Process-Time", fmt.Sprintf("%.2fms", float64(time.Since(t).Nanoseconds())/1e6))
 		//fmt.Println("time elapsed:", time.Since(t))
 	})
+	server.Middleware(wx.MiddlWares.Cors)
 	//Create swager if you need
 	swagger := wx.CreateSwagger(server, "/docs")
 	// Show authenication login in swagger

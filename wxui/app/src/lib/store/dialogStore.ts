@@ -1,0 +1,29 @@
+import { writable } from 'svelte/store';
+
+export const dialogComponent = writable<any>(null);
+export const dialogProps = writable<any>({});
+export const dialogVisible = writable(false);
+
+// Tạo object map các component
+//const modules = import.meta.glob('../components/ui/*.svelte');
+const modules = import.meta.glob('@components/ui/*.svelte');
+export async function showDialog(name: string, props = {}) {
+    debugger;
+    const key = `/src/lib/components/ui/${name}.svelte` //`../components/ui/${name}.svelte`;
+    const loader = modules[key];
+    if (!loader) throw new Error(`Component ${name} not found`);
+
+    const mod = (await loader()) as { default: any };
+    console.log('✅ Loaded dialog component:', mod);
+
+    dialogComponent.set(mod.default); // Set component ở đây
+    dialogProps.set(props);
+    dialogVisible.set(true);
+
+}
+
+export function closeDialog() {
+    dialogVisible.set(false);
+    dialogComponent.set(null);
+    dialogProps.set({});
+}

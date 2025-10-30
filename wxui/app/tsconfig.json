@@ -20,6 +20,12 @@
 			],
 			"@routes/*": [
 				"src/routes/*"
+			],
+			"@store/*": [
+				"src/lib/store/*"
+			],
+			"@utils/*": [
+				"src/lib/utils/*"
 			]
 		}
 	}
