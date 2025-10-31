@@ -16,9 +16,9 @@
 	// import { showDialog } from '@store/dialogStore';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
-	import Footer from './Footer.svelte';
 	import Header from './Header.svelte';
-	import Sidebar from './Sidebar.svelte';
+	// import Sidebar from './Sidebar.svelte';
+	import SidebarOverlay from './SidebarOverlay.svelte';
 	// store popup login mà bạn có
 	onMount(() => {
 		console.log('✅ App just mounted or browser reloaded');
@@ -37,7 +37,7 @@
 	<DialogWrapper component={$dialogComponent} props={$dialogProps} on:close={closeDialog} />
 {/if}
 
-<div class="flex h-screen bg-gray-50 text-gray-900">
+<!-- <div class="flex h-screen bg-gray-50 text-gray-900">
 	<Sidebar />
 	<div class="flex flex-col flex-1">
 		<Header />
@@ -46,5 +46,14 @@
 			<slot />
 		</main>
 		<Footer />
+	</div>
+</div> -->
+<div class="flex h-screen bg-gray-200 text-gray-900">
+	<SidebarOverlay />
+	<div class="flex flex-col flex-1">
+		<Header />
+		<main class="flex-1 p-6">
+			<slot />
+		</main>
 	</div>
 </div>

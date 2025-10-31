@@ -8,4 +8,4 @@ setx GOPATH D:\go
 setx GOCACHE D:\go-cache
 
 setx GOPATH D:\go
-setx GOCACHE D:\go-cache
+setx GOCACHE D:\go-cachego clean -cache -modcache -testcache

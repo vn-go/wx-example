@@ -1,7 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import path from 'path';
 import { defineConfig } from 'vitest/config';
-
+import { resolveAlias } from "./vite.resolve"; // import alias ở đây
 export default defineConfig({
 	plugins: [sveltekit()],
 	test: {
@@ -34,12 +33,6 @@ export default defineConfig({
 		]
 	},
 	resolve: {
-		alias: {
-			'@components': path.resolve('./src/lib/components'),
-			'@lib': path.resolve('./src/lib'),
-			'@routes': path.resolve('./src/routes'),
-			'@store': path.resolve('./src/lib/store'),
-			'@utils': path.resolve('./src/lib/utils'),
-		}
+		alias: resolveAlias,
 	}
 });
