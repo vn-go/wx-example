@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"core/models"
+	"fmt"
 	"strings"
 	"time"
 
@@ -121,6 +122,36 @@ func (s *rabcServiceImpl) GetListOfAccounts(ctx context.Context, user *UserClaim
 	if db, err = s.tanentSvc.GetTenant(user.Tenant); err != nil {
 		return nil, err
 	}
+	if len(pager.OrderBy) == 0 {
+		pager.OrderBy = []string{"u.username desc"}
+	}
+
+	//dx.Options.ShowSql = true
+	// qr := db.WithContext(ctx).From(&models.User{}).Joins("u left join role r on u.roleId=r.id").Select(
+	// 	`u.userId UserId,
+	// 	u.username Username,
+	// 	r.code RoleCode,
+	// 	r.name RoleName,
+	// 	r.roleId RoleId`,
+	// ).Order(strings.Join(pager.OrderBy, ","))
+	// qr.Limit(uint64(pager.Size))
+	// qr.Offset(uint64(pager.Size * pager.Index))
+	accs = []AccountInfo{}
+	err = db.DslQuery(&accs, "user(username,userId,email),role(code,name,description),from(left(user.roleId=role.id)),take(?),skip(?),sort(username asc)", pager.Size, pager.Size*pager.Index)
+	// err = qr.Find(&accs)
+	fmt.Println(err)
+	return accs, err
+
+}
+func (s *rabcServiceImpl) GetListOfAccountsOld(ctx context.Context, user *UserClaims, pager Pager) (accs []AccountInfo, err error) {
+	var db *dx.DB
+
+	if db, err = s.tanentSvc.GetTenant(user.Tenant); err != nil {
+		return nil, err
+	}
+	if len(pager.OrderBy) == 0 {
+		pager.OrderBy = []string{"u.username desc"}
+	}
 	//dx.Options.ShowSql = true
 	qr := db.WithContext(ctx).From(&models.User{}).Joins("u left join role r on u.roleId=r.id").Select(
 		`u.userId UserId,
@@ -128,7 +159,7 @@ func (s *rabcServiceImpl) GetListOfAccounts(ctx context.Context, user *UserClaim
 		r.code RoleCode,
 		r.name RoleName,
 		r.roleId RoleId`,
-	)
+	).Order(strings.Join(pager.OrderBy, ","))
 	qr.Limit(uint64(pager.Size))
 	qr.Offset(uint64(pager.Size * pager.Index))
 	accs = []AccountInfo{}

@@ -1,4 +1,5 @@
 <script>
+	import Users from '@views/system/user.svelte';
 </script>
 
-<div>llllll</div>
+<Users />

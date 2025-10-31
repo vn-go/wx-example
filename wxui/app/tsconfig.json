@@ -26,6 +26,9 @@
 			],
 			"@utils/*": [
 				"src/lib/utils/*"
+			],
+			"@views/*": [
+				"src/views/*"
 			]
 		}
 	}

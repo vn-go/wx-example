@@ -50,9 +50,9 @@
 </div> -->
 <div class="flex h-screen bg-gray-200 text-gray-900">
 	<SidebarOverlay />
-	<div class="flex flex-col flex-1">
+	<div class="flex flex-col flex-1 h-screen">
 		<Header />
-		<main class="flex-1 p-6">
+		<main class="flex-1 overflow-auto p-1">
 			<slot />
 		</main>
 	</div>

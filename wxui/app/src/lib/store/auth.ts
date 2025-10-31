@@ -14,7 +14,7 @@
 // }
 // src/stores/auth.ts
 import { browser } from '$app/environment'; // nếu dùng SvelteKit
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 // nếu là Svelte standalone (không SvelteKit), bạn dùng typeof window !== 'undefined'
 
 export const accessToken = writable<string | null>(null);
@@ -38,7 +38,9 @@ accessToken.subscribe((value) => {
 export function setAccessToken(token: string | null) {
     accessToken.set(token);
 }
-
+export function getAccessToken() {
+    return get(accessToken);
+}
 export function clearAccessToken() {
     accessToken.set(null);
 }
