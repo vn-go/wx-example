@@ -64,6 +64,13 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/wxapi"
+        },
+        {
+            "name": "Hell oWorld",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/helloworld"
         }
     ]
 }

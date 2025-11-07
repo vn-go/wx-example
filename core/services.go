@@ -113,6 +113,7 @@ type servicesTypes struct {
 	JWTSvc    jwtService
 	RABCSvc   rabcService
 	DataSvc   dataService
+	Dataset   datasetService
 	//Pwd passwordService
 	//config configInfo
 }
@@ -135,4 +136,5 @@ var Services = (&bx.Wire[servicesTypes]{}).WireThenGet(
 	newValidatorService,
 	NewRabcService,
 	newDataService,
+	NewDatasetServiceSql,
 )

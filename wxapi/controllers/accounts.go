@@ -83,8 +83,10 @@ func (acc *Accounts) GetListOfRoles(h wx.Handler, pager core.Pager) (any, error)
 //		return core.Services.RABCSvc.GetListOfRolesSQL(h().Req.Context(), acc.Authenticate.Data, pager)
 //	}
 func (acc *Accounts) GetListOfAccounts(h wx.Handler, pager core.Pager) (any, error) {
+	
 
-	return core.Services.RABCSvc.GetListOfAccounts(h().Req.Context(), acc.Authenticate.Data, pager)
+	ret, err := core.Services.RABCSvc.GetListOfAccounts(h().Req.Context(), acc.Authenticate.Data, pager)
+	return ret, err
 }
 func (acc *Accounts) ChangeUserPassword(h wx.Handler, data struct {
 	Username    string `json:"username" check:"range(3:50)"`

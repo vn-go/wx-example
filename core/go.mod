@@ -25,7 +25,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/nats-io/nats.go v1.37.0
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
-	github.com/vn-go/dx v1.0.80
+	github.com/vn-go/dx v1.0.84
 )
 
 require (

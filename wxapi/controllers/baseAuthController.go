@@ -16,16 +16,29 @@ type BaseAuthController struct {
 func (base *BaseAuthController) New() error {
 	//setup authentication middleware
 	base.Authenticate.Verify(func(ctx wx.Handler) (*core.UserClaims, error) {
-		req := ctx().Req
+		ctxHandler := ctx()
+		req := ctxHandler.Req
+
 		authorization := req.Header["Authorization"]
 
 		if len(authorization) == 0 {
 			return nil, wx.Errors.NewUnauthorizedError()
 		}
-		//s := "xknKGvzDI-sZwlXwUo2_GVsY6ce94AC3I6qNnxnOtq655tOgbcRbRnK0fs_tEb-6yz-EtjBCC0qdeDg0xu6uiw"
+
 		user, tenant, err := core.Services.AuthSvc.Verify(req.Context(), authorization[0])
 		if err != nil || user == nil {
 			return nil, wx.Errors.NewUnauthorizedError()
+		}
+		viewPath := ""
+		if req.Header["View-Path"] != nil {
+			viewPath = req.Header["View-Path"][0]
+		}
+		ok, err := core.Services.AuthSvc.Authorize(req.Context(), tenant, user, viewPath, ctxHandler.ApiPath)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			return nil, wx.Errors.NewForbidenError("Access denied")
 		}
 		return &core.UserClaims{
 			Username:    user.Username,
@@ -33,6 +46,7 @@ func (base *BaseAuthController) New() error {
 			ClaimId:     user.Id,
 			Tenant:      tenant,
 			IsUpperUser: user.IsSysAdmin,
+			ViewPath:    viewPath,
 		}, nil
 	})
 	return nil

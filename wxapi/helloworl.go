@@ -52,7 +52,7 @@ func mainHello() {
 		panic(err)
 	}
 	// create server
-	server := wx.NewHtttpServer("/api", "8080", "localhost")
+	server := wx.NewHttpServer("/api", "8080", "localhost")
 	// init swagger
 	swagger := wx.CreateSwagger(server, "/docs")
 	// Show authenication login in swagger

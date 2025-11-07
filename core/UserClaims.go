@@ -7,4 +7,6 @@ type UserClaims struct {
 	RoleId      uint64
 	Tenant      string
 	IsUpperUser bool
+	// Viewpath is a key of web ui view send request
+	ViewPath string
 }

@@ -26,16 +26,32 @@ type serviceAuth interface {
 	//return
 	//user,tenant,error
 	Verify(ctx context.Context, authorization string) (*models.User, string, error)
+	DeleteUserCache(ctx context.Context, tenant, username string) error
+	//check can user can use api in viewPath at tenant
+	Authorize(context context.Context, tenant string, user *models.User, viewPath, apiPath string) (bool, error)
 }
+
 type serviceOAuth struct {
 	user        userRepo
 	cache       cacheService
 	passwordSvc passwordService
 	tenant      tenantService
 	jwtSvc      jwtService
+	rabcSvc     rabcService
 	db          *dx.DB
 }
 
+func (s *serviceOAuth) Authorize(context context.Context, tenant string, user *models.User, viewPath string, apiPath string) (bool, error) {
+	//check if user is admin
+	if user.IsSysAdmin {
+		err := s.rabcSvc.ResgisterView(context, tenant, viewPath, apiPath, user.Username)
+		if err != nil {
+			return false, err
+		}
+		return true, nil
+	}
+	panic("unimplemented")
+}
 func (s *serviceOAuth) generateAccessToken(ctx context.Context, tenant string, user *models.User) (string, error) {
 	key, err := s.tenant.GetSecretKey(ctx, tenant)
 	if err != nil {
@@ -129,8 +145,31 @@ func (s *serviceOAuth) Login(tenant string, ctx context.Context, username, passw
 	}
 
 }
+func (s *serviceOAuth) DeleteUserCache(ctx context.Context, tenant, username string) error {
+	var userVerify cacheUserVerify
+	if err := s.cache.GetObject(ctx, tenant, username, &userVerify); err == nil {
+		err = s.cache.DeleteObject(ctx, tenant, username, nil)
+		if err != nil {
+			return err
+		}
+		err = s.jwtSvc.DeleteVerifyJWTWithSecretCache(userVerify.Secret, userVerify.AuthHeader)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+
+}
+
+type cacheUserVerify struct {
+	User               models.User
+	Secret, AuthHeader string
+}
+
 func (s *serviceOAuth) Verify(ctx context.Context, authorization string) (user *models.User, tenant string, err error) {
+
 	palyload, err := s.jwtSvc.DecodeJWTNoVerify(authorization)
+
 	if err != nil {
 		return nil, "", err
 	}
@@ -142,9 +181,29 @@ func (s *serviceOAuth) Verify(ctx context.Context, authorization string) (user *
 		_, err = s.jwtSvc.VerifyJWTWithSecret(app.ShareSecret, authorization)
 		if err != nil {
 			return nil, "", err
+
 		}
-		user, err = s.user.GetUserByUserId(s.db, ctx, palyload.Subject)
-		return user, palyload.Issuer, err
+		var userVerify cacheUserVerify
+		if err := s.cache.GetObject(ctx, palyload.Issuer, palyload.Subject, &userVerify); err != nil {
+			userFind, err := s.user.GetUserByUserId(s.db, ctx, palyload.Subject)
+			if err != nil {
+				return nil, "", err
+			}
+			userVerify = cacheUserVerify{
+				User:       *userFind,
+				Secret:     app.ShareSecret,
+				AuthHeader: authorization,
+			}
+
+			hoursLeft := int(time.Until(palyload.ExpiresAt.Time).Hours())
+			err = s.cache.AddObject(ctx, palyload.Issuer, palyload.Subject, userVerify, hoursLeft)
+			if err != nil {
+				return nil, "", err
+			}
+
+		}
+
+		return &userVerify.User, palyload.Issuer, err
 	} else {
 		shareSecret, err := s.tenant.GetSecretKey(ctx, palyload.Issuer)
 		if err != nil {
@@ -154,8 +213,28 @@ func (s *serviceOAuth) Verify(ctx context.Context, authorization string) (user *
 		if err != nil {
 			return nil, "", err
 		}
-		user, err = s.user.GetUserByUserId(s.db, ctx, palyload.Subject)
-		return user, palyload.Issuer, err
+		var userVerify cacheUserVerify
+		if err := s.cache.GetObject(ctx, palyload.Issuer, palyload.Subject, &userVerify); err != nil {
+			userFind, err := s.user.GetUserByUserId(s.db, ctx, palyload.Subject)
+			if err != nil {
+				return nil, "", err
+			}
+			userVerify = cacheUserVerify{
+				User:       *userFind,
+				Secret:     shareSecret,
+				AuthHeader: authorization,
+			}
+
+			hoursLeft := int(time.Until(palyload.ExpiresAt.Time).Hours())
+			err = s.cache.AddObject(ctx, palyload.Issuer, palyload.Subject, userVerify, hoursLeft)
+			if err != nil {
+				return nil, "", err
+			}
+
+		}
+
+		return &userVerify.User, palyload.Issuer, err
+
 	}
 
 }
@@ -166,6 +245,7 @@ func newServiceAuth(
 	tenant tenantService,
 	jwtSvc jwtService,
 	db *dx.DB,
+	rabc rabcService,
 
 ) serviceAuth {
 	return &serviceOAuth{
@@ -175,5 +255,6 @@ func newServiceAuth(
 		tenant:      tenant,
 		jwtSvc:      jwtSvc,
 		db:          db,
+		rabcSvc:     rabc,
 	}
 }

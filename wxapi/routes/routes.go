@@ -16,6 +16,7 @@ func InitRoute() {
 		&controllers.Accounts{},
 		&controllers.DataSource{},
 		&controllers.Pure{},
+		&controllers.Dataset{},
 	)
 	if err != nil {
 		panic(err)

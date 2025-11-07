@@ -3,7 +3,8 @@ package core
 import (
 	"context"
 	"core/models"
-	"fmt"
+	"crypto/sha256"
+	"encoding/hex"
 	"strings"
 	"time"
 
@@ -25,15 +26,22 @@ type AccountInfo struct {
 	RoleCode *string `json:"roleCode"`
 	RoleName *string `json:"roleName"`
 }
+type DataSouceViewInfo struct {
+	ViewPath string `json:"viewPath"`
+	Dsl      string
+}
+
 type rabcService interface {
 	NewRole(ctx context.Context, creator *UserClaims, role *models.Role) (*models.Role, error)
 	GetRoleByRoleId(ctx context.Context, user *UserClaims, roleId string) (*models.Role, error)
 	NewUser(ctx context.Context, creator *UserClaims, user *models.User) (*models.User, error)
-	GetListOfRoles(ctx context.Context, user *UserClaims, pager Pager) ([]models.Role, error)
+	GetListOfRoles(ctx context.Context, user *UserClaims, pager Pager) (any, error)
 	//GetListOfRolesSQL(ctx context.Context, user *UserClaims, pager Pager) (string, error)
-	GetListOfAccounts(ctx context.Context, user *UserClaims, pager Pager) ([]AccountInfo, error)
+	GetListOfAccounts(ctx context.Context, user *UserClaims, pager Pager) (any, error)
 	ChangeUserPassword(ctx context.Context, user *UserClaims, username string, newPass string) error
 	//GetDb(user *UserClaims) (*dx.DB, error)
+	ResgisterDataSouceView(ctx context.Context, user *UserClaims, Info DataSouceViewInfo)
+	ResgisterView(ctx context.Context, Tenant, viewPath, apiPath, createdBy string) error
 }
 
 type rabcServiceImpl struct {
@@ -42,6 +50,58 @@ type rabcServiceImpl struct {
 	cache     cacheService
 }
 
+func (r rabcServiceImpl) ResgisterView(ctx context.Context, Tenant, viewPath, apiPath, createdBy string) error {
+	db, err := r.tanentSvc.GetTenant(Tenant)
+	if err != nil {
+		return err
+	}
+	//make sha256 ViewPath
+	sum := sha256.Sum256([]byte(viewPath)) // trả về [32]byte
+	ViewId := hex.EncodeToString(sum[:])
+	view, err := dx.NewDTO[models.UIView]()
+	if err != nil {
+		return err
+	}
+	view.ViewId = ViewId
+	view.ViewPath = viewPath
+	view.CreatedBy = createdBy
+	view.CreatedOn = time.Now().UTC()
+
+	err = db.InsertWithContext(ctx, view)
+	if dbErr := dx.Errors.IsDbError(err); dbErr != nil {
+		if dbErr.ErrorType != dx.Errors.DUPLICATE {
+			return err
+		}
+	}
+	api, err := dx.NewDTO[models.Api]()
+	if err != nil {
+		return err
+	}
+	api.ApiPath = apiPath
+	api.CreatedOn = time.Now().UTC()
+	err = db.InsertWithContext(ctx, api)
+	if dbErr := dx.Errors.IsDbError(err); dbErr != nil {
+		if dbErr.ErrorType != dx.Errors.DUPLICATE {
+			return err
+		}
+	}
+	viewApi, err := dx.NewDTO[models.UIViewApi]()
+	if err != nil {
+		return err
+	}
+	viewApi.ViewId = view.Id
+	viewApi.ApiId = api.Id
+	viewApi.CreatedBy = createdBy
+	viewApi.CreatedOn = time.Now().UTC()
+	err = db.InsertWithContext(ctx, viewApi)
+	if dbErr := dx.Errors.IsDbError(err); dbErr != nil {
+		if dbErr.ErrorType != dx.Errors.DUPLICATE {
+			return err
+		}
+	}
+	return nil
+
+}
 func (s *rabcServiceImpl) NewRole(ctx context.Context, user *UserClaims, role *models.Role) (*models.Role, error) {
 	var db *dx.DB
 	var err error
@@ -84,89 +144,43 @@ func (s *rabcServiceImpl) GetRoleByRoleId(ctx context.Context, user *UserClaims,
 	return role, err
 }
 
-// func (s *rabcServiceImpl) GetListOfRolesSQL(ctx context.Context, user *UserClaims, pager Pager) (sql string, err error) {
-// 	var db *dx.DB
-
-// 	if db, err = s.tanentSvc.GetTenant(user.Tenant); err != nil {
-// 		return "", err
-// 	}
-// 	// roles = []models.Role{}
-
-// 	qr := db.WithContext(ctx).Limit(uint64(pager.Size)).Offset(uint64(pager.Index * pager.Size))
-// 	if len(pager.OrderBy) > 0 {
-// 		qr = qr.Order(strings.Join(pager.OrderBy, ","))
-// 	}
-// 	sqlP, err := qr..ToSql(db, reflect.TypeOf(models.Role{}))
-// 	return sqlP.Sql, err
-
-// }
-func (s *rabcServiceImpl) GetListOfRoles(ctx context.Context, user *UserClaims, pager Pager) (roles []models.Role, err error) {
+func (s *rabcServiceImpl) GetListOfRoles(ctx context.Context, user *UserClaims, pager Pager) (roles any, err error) {
 	var db *dx.DB
 
 	if db, err = s.tanentSvc.GetTenant(user.Tenant); err != nil {
 		return nil, err
 	}
-	roles = []models.Role{}
 
-	qr := db.WithContext(ctx).Limit(uint64(pager.Size)).Offset(uint64(pager.Index * pager.Size))
-	if len(pager.OrderBy) > 0 {
-		qr = qr.Order(strings.Join(pager.OrderBy, ","))
-	}
-	err = qr.Find(&roles)
-	return roles, err
-
-}
-func (s *rabcServiceImpl) GetListOfAccounts(ctx context.Context, user *UserClaims, pager Pager) (accs []AccountInfo, err error) {
-	var db *dx.DB
-
-	if db, err = s.tanentSvc.GetTenant(user.Tenant); err != nil {
-		return nil, err
-	}
+	query := db.QueryModel(models.Role{}).LeftJoin(models.User{}, "role.id=user.roleId").Select(
+		"role(roleId,code,name,description,createdOn),user(count(id) NumOfUsers)",
+	)
 	if len(pager.OrderBy) == 0 {
-		pager.OrderBy = []string{"u.username desc"}
+		query = query.SortDesc("role.createdOn")
+	} else {
+		query = query.Sort(strings.Join(pager.OrderBy, ","))
 	}
-
-	//dx.Options.ShowSql = true
-	// qr := db.WithContext(ctx).From(&models.User{}).Joins("u left join role r on u.roleId=r.id").Select(
-	// 	`u.userId UserId,
-	// 	u.username Username,
-	// 	r.code RoleCode,
-	// 	r.name RoleName,
-	// 	r.roleId RoleId`,
-	// ).Order(strings.Join(pager.OrderBy, ","))
-	// qr.Limit(uint64(pager.Size))
-	// qr.Offset(uint64(pager.Size * pager.Index))
-	accs = []AccountInfo{}
-	err = db.DslQuery(&accs, "user(username,userId,email),role(code,name,description),from(left(user.roleId=role.id)),take(?),skip(?),sort(username asc)", pager.Size, pager.Size*pager.Index)
-	// err = qr.Find(&accs)
-	fmt.Println(err)
-	return accs, err
+	return query.ToArray()
 
 }
-func (s *rabcServiceImpl) GetListOfAccountsOld(ctx context.Context, user *UserClaims, pager Pager) (accs []AccountInfo, err error) {
+func (s *rabcServiceImpl) GetListOfAccounts(ctx context.Context, user *UserClaims, pager Pager) (items any, err error) {
 	var db *dx.DB
 
 	if db, err = s.tanentSvc.GetTenant(user.Tenant); err != nil {
 		return nil, err
 	}
+
+	query := db.QueryModel(models.User{}).LeftJoin(models.Role{}, "user.roleId=role.id").Select(
+		"user(username,userId,email,createdOn,isActive),role(code RoleCode,name RoleName,description)",
+	)
 	if len(pager.OrderBy) == 0 {
-		pager.OrderBy = []string{"u.username desc"}
+		query = query.SortDesc("user.createdOn")
+	} else {
+		query = query.Sort(strings.Join(pager.OrderBy, ","))
 	}
-	//dx.Options.ShowSql = true
-	qr := db.WithContext(ctx).From(&models.User{}).Joins("u left join role r on u.roleId=r.id").Select(
-		`u.userId UserId,
-		u.username Username,
-		r.code RoleCode,
-		r.name RoleName,
-		r.roleId RoleId`,
-	).Order(strings.Join(pager.OrderBy, ","))
-	qr.Limit(uint64(pager.Size))
-	qr.Offset(uint64(pager.Size * pager.Index))
-	accs = []AccountInfo{}
-	err = qr.Find(&accs)
-	return accs, err
+	return query.ToArray()
 
 }
+
 func (s *rabcServiceImpl) ChangeUserPassword(ctx context.Context, user *UserClaims, username string, newPass string) (err error) {
 	var db *dx.DB
 
@@ -185,6 +199,9 @@ func (s *rabcServiceImpl) ChangeUserPassword(ctx context.Context, user *UserClai
 	r := db.Update(updateUser)
 	return r.Error
 
+}
+func (s *rabcServiceImpl) ResgisterDataSouceView(ctx context.Context, user *UserClaims, Info DataSouceViewInfo) {
+	panic("implement me")
 }
 func NewRabcService(
 	tanentSvc tenantService,

@@ -1,30 +1,45 @@
 <script lang="ts">
 	import Container from '@components/ui/Container.svelte';
-	import { apiCall, type ApiResponse } from '@lib/utils/apis';
+	import { apiCall } from '@lib/utils/apis';
 	import { onMount } from 'svelte';
+	class UIForm {
+		viewPath: string;
+		OnMounth(callback: () => void) {
+			onMount(callback);
+		}
+		async PostData(apiEnpoint: string, data: any): Promise<any> {
+			let response = await apiCall.post(apiEnpoint, data, {
+				'View-Path': this.viewPath
+			});
+			return response.data as any;
+		}
+		constructor(viewPath: string) {
+			this.viewPath = viewPath;
+		}
+	}
+	class User extends UIForm {}
+	const user = new User('system/user');
 
 	let items: any[] = [];
 
 	async function loadMore() {
 		const start = items.length;
-		var newItems = await apiCall.post<ApiResponse<any[]>>('accounts/get-list-of-accounts', {
+		var newItems = await user.PostData('accounts/get-list-of-accounts', {
+			index: start,
+			size: 20,
+			orderBy: ['username']
+		});
+
+		items = [...items, ...(newItems || [])];
+	}
+	onMount(async () => {
+		var newItems = await user.PostData('accounts/get-list-of-accounts', {
 			index: 0,
 			size: 20,
 			orderBy: ['username']
 		});
-		// const newItems = Array.from({ length: 10 }, (_, i) => ({
-		// 	id: start + i,
-		// 	name: `Card ${start + i + 1}`
-		// }));
-		items = [...items, ...((newItems.data || []) as any[])];
-	}
-	onMount(async () => {
-		const newItems = await apiCall.post<ApiResponse<any[]>>('accounts/get-list-of-accounts', {
-			index: 0,
-			size: 100,
-			orderBy: ['username']
-		});
-		items = (newItems.data || []) as any[];
+
+		items = [...items, ...(newItems || [])];
 	});
 	function formatKey(key: string): string {
 		return key

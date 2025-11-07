@@ -1,0 +1,96 @@
+PS D:\code\go\wx-example\wx-example\k6\helloworld> k6 run rust.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: rust.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 1000 max VUs, 3m0s max duration (incl. graceful stop):
+              * default: Up to 1000 looping VUs for 2m30s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......................: 12508655 83390.49313/s
+    checks_succeeded...................: 100.00%  12508655 out of 12508655
+    checks_failed......................: 0.00%    0 out of 12508655
+
+    ✓ status is 200
+
+    HTTP
+    http_req_duration.......................................................: avg=4.03ms p(95)=9.5ms p(99)=114.77ms
+      { expected_response:true }............................................: avg=4.03ms p(95)=9.5ms p(99)=114.77ms
+    http_req_failed.........................................................: 0.00%    0 out of 12508655
+    http_reqs...............................................................: 12508655 83390.49313/s
+
+    EXECUTION
+    iteration_duration......................................................: avg=4.15ms p(95)=10ms  p(99)=115.05ms
+    iterations..............................................................: 12508655 83390.49313/s
+    vus.....................................................................: 3        min=2             max=997
+    vus_max.................................................................: 1000     min=1000          max=1000
+
+    NETWORK
+    data_received...........................................................: 1.7 GB   11 MB/s
+    data_sent...............................................................: 1.1 GB   7.3 MB/s
+
+
+
+                                                                                                                                
+running (2m30.0s), 0000/1000 VUs, 12508655 complete and 0 interrupted iterations                                                
+default ✓ [======================================] 0000/1000 VUs  2m30s  
+// khi chay voi Rust CPU len 75%
+---
+
+PS D:\code\go\wx-example\wx-example\k6\helloworld> k6 run go.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: go.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 1000 max VUs, 3m0s max duration (incl. graceful stop):
+              * default: Up to 1000 looping VUs for 2m30s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......................: 12087233 80581.4157/s
+    checks_succeeded...................: 100.00%  12087233 out of 12087233
+    checks_failed......................: 0.00%    0 out of 12087233
+
+    ✓ status is 200
+
+    HTTP
+    http_req_duration.......................................................: avg=3.2ms  p(95)=11.63ms p(99)=19.58ms
+      { expected_response:true }............................................: avg=3.2ms  p(95)=11.63ms p(99)=19.58ms
+    http_req_failed.........................................................: 0.00%    0 out of 12087233
+    http_reqs...............................................................: 12087233 80581.4157/s
+
+    EXECUTION
+    iteration_duration......................................................: avg=3.92ms p(95)=12.98ms p(99)=22.04ms
+    iterations..............................................................: 12087233 80581.4157/s
+    vus.....................................................................: 5        min=2             max=997
+    vus_max.................................................................: 1000     min=1000          max=1000
+
+    NETWORK
+    data_received...........................................................: 1.5 GB   10 MB/s
+    data_sent...............................................................: 1.2 GB   7.7 MB/s
+
+
+
+
+running (2m30.0s), 0000/1000 VUs, 12087233 complete and 0 interrupted iterations
+default ✓ [======================================] 0000/1000 VUs  2m30s
+PS D:\code\go\wx-example\wx-example\k6\helloworld>
