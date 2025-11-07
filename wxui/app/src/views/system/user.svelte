@@ -1,24 +1,19 @@
 <script lang="ts">
+	import { UIForm } from '@components/base';
 	import Container from '@components/ui/Container.svelte';
-	import { apiCall } from '@lib/utils/apis';
-	import { onMount } from 'svelte';
-	class UIForm {
-		viewPath: string;
-		OnMounth(callback: () => void) {
-			onMount(callback);
-		}
-		async PostData(apiEnpoint: string, data: any): Promise<any> {
-			let response = await apiCall.post(apiEnpoint, data, {
-				'View-Path': this.viewPath
-			});
-			return response.data as any;
-		}
-		constructor(viewPath: string) {
-			this.viewPath = viewPath;
-		}
-	}
+
 	class User extends UIForm {}
-	const user = new User('system/user');
+	const user = new User('system');
+	user.OnMounth(async () => {
+		debugger;
+		var newItems = await user.PostData('accounts/get-list-of-accounts', {
+			index: 0,
+			size: 20,
+			orderBy: ['username']
+		});
+
+		items = [...items, ...(newItems || [])];
+	});
 
 	let items: any[] = [];
 
@@ -32,15 +27,7 @@
 
 		items = [...items, ...(newItems || [])];
 	}
-	onMount(async () => {
-		var newItems = await user.PostData('accounts/get-list-of-accounts', {
-			index: 0,
-			size: 20,
-			orderBy: ['username']
-		});
 
-		items = [...items, ...(newItems || [])];
-	});
 	function formatKey(key: string): string {
 		return key
 			.replace(/([A-Z])/g, ' $1')

@@ -3,6 +3,14 @@ import { defineConfig } from 'vitest/config';
 import { resolveAlias } from "./vite.resolve"; // import alias ở đây
 export default defineConfig({
 	plugins: [sveltekit()],
+	esbuild: {
+		tsconfigRaw: {
+			compilerOptions: {
+				experimentalDecorators: true,
+				// emitDecoratorMetadata: true
+			}
+		}
+	},
 	test: {
 		expect: { requireAssertions: true },
 		projects: [

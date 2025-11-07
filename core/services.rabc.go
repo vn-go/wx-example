@@ -71,6 +71,15 @@ func (r rabcServiceImpl) ResgisterView(ctx context.Context, Tenant, viewPath, ap
 	if dbErr := dx.Errors.IsDbError(err); dbErr != nil {
 		if dbErr.ErrorType != dx.Errors.DUPLICATE {
 			return err
+		} else {
+
+			view, err = dx.NewQuery[models.UIView](
+				"uiView(id)", //<-- get id column only
+			).Filter("viewPath=?", viewPath).ToItem(db)
+			// err = db.DslFirstRow(view, "uiview(id),where(viewId=?)", ViewId)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	api, err := dx.NewDTO[models.Api]()
@@ -83,6 +92,11 @@ func (r rabcServiceImpl) ResgisterView(ctx context.Context, Tenant, viewPath, ap
 	if dbErr := dx.Errors.IsDbError(err); dbErr != nil {
 		if dbErr.ErrorType != dx.Errors.DUPLICATE {
 			return err
+		} else {
+			api, err = dx.NewQuery[models.Api]("api(id)").Filter("apiPath=?", apiPath).ToItemWithContext(ctx, db)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	viewApi, err := dx.NewDTO[models.UIViewApi]()

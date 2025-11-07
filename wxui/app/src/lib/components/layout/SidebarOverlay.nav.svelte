@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Group, User } from 'lucide-svelte';
+	import { FormInput, Group, User } from 'lucide-svelte';
 
 	type MenuItem = {
 		id: number;
@@ -11,6 +11,7 @@
 	// Giả lập dữ liệu menu từ API
 	const menuData: MenuItem[] = [
 		{ id: 1, title: 'Users', icon: User, link: '/users' },
+		{ id: 1, title: 'views', icon: FormInput, link: '/views' },
 		{ id: 2, title: 'Roles', icon: Group, link: '/roles' }
 	];
 </script>
