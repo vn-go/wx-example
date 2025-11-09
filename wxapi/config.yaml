@@ -5,7 +5,7 @@ database:
   # driver: "postgres"
   # dsn: "postgres://postgres:123456@localhost:5432/hr?sslmode=disable&"
   driver: "sqlserver"
-  dsn: "sqlserver://sa:123456@localhost:1433?database=hrm"
+  dsn: "sqlserver://sa:123456@localhost:1433?database=hrm2"
 
 jwt:
   default-sercret-key: dadasdsa.dasdsad3213.dad.323asd.a(dadsad)

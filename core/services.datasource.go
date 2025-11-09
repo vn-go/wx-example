@@ -2,7 +2,8 @@ package core
 
 import (
 	"context"
-	"core/models"
+
+	"github.com/vn-go/dx"
 )
 
 // type DataSource[TResult any] struct {
@@ -39,24 +40,13 @@ func (ds *dataServiceImpl) GetList(ctx context.Context, user *UserClaims, dsName
 	if err != nil {
 		return nil, err
 	}
-	err = db.Insert(&models.TrackFilter{
-		DsName:   dsName,
-		Filter:   filter,
-		Selector: selector,
-	})
-	if err != nil {
-		return nil, err
-	}
-	source := db.ModelDatasource(dsName)
-	source.ToSql()
-	if selector != "" {
-		source.Select(selector)
-	}
+	qr := dx.NewDynamicQuery(selector)
+	qr.Join(dsName)
 	if filter != "" {
-		source.Where(filter)
+		qr.Filter(filter)
 	}
-	data, err := source.ToDict()
-	return data, err
+
+	return qr.ToArrayWithContext(ctx, db)
 }
 func newDataService(tenantSvc tenantService) dataService {
 	return &dataServiceImpl{

@@ -1,8 +1,10 @@
 <!--wxui\app\src\lib\components\layout\MainLayout.svelte-->
-<script>
+<script lang="ts">
 	$: console.log('📊 Layout render:', $dialogVisible, $dialogComponent);
-
+	import { UIForm } from '@components/base';
 	import DialogWrapper from '@components/ui/Dialog.svelte';
+	import menuData from '@data/menu.json';
+
 	import {
 		closeDialog,
 		dialogComponent,
@@ -14,13 +16,15 @@
 	import { accessToken } from '@store/auth';
 	//<--loi co nay
 	// import { showDialog } from '@store/dialogStore';
-	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import Header from './Header.svelte';
 	// import Sidebar from './Sidebar.svelte';
 	import SidebarOverlay from './SidebarOverlay.svelte';
+
+	class MainLayout extends UIForm {}
+	let mainForm = new UIForm('main');
 	// store popup login mà bạn có
-	onMount(() => {
+	mainForm.OnMounth(() => {
 		console.log('✅ App just mounted or browser reloaded');
 		const token = get(accessToken); // 👈 đọc giá trị hiện tại
 		if (!token) {
@@ -30,6 +34,8 @@
 			console.log('✅ Đã có access token');
 			// có thể gọi API xác thực hoặc load user info ở đây
 		}
+		debugger;
+		mainForm.PostData('accounts/me/get-menu', menuData).then((res) => {});
 	});
 </script>
 

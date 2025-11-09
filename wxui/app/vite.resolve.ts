@@ -8,4 +8,6 @@ export const resolveAlias: AliasOptions = {
     "@store": path.resolve(__dirname, "./src/lib/store"),
     "@utils": path.resolve(__dirname, "./src/lib/utils"),
     "@views": path.resolve(__dirname, "./src/views"),
+    "@layouts": path.resolve(__dirname, "./src/lib/layouts"),
+    "@data": path.resolve(__dirname, "./src/data"),
 };

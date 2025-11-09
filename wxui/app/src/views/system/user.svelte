@@ -5,7 +5,6 @@
 	class User extends UIForm {}
 	const user = new User('system');
 	user.OnMounth(async () => {
-		debugger;
 		var newItems = await user.PostData('accounts/get-list-of-accounts', {
 			index: 0,
 			size: 20,

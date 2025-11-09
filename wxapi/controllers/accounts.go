@@ -83,7 +83,6 @@ func (acc *Accounts) GetListOfRoles(h wx.Handler, pager core.Pager) (any, error)
 //		return core.Services.RABCSvc.GetListOfRolesSQL(h().Req.Context(), acc.Authenticate.Data, pager)
 //	}
 func (acc *Accounts) GetListOfAccounts(h wx.Handler, pager core.Pager) (any, error) {
-	
 
 	ret, err := core.Services.RABCSvc.GetListOfAccounts(h().Req.Context(), acc.Authenticate.Data, pager)
 	return ret, err
@@ -93,4 +92,17 @@ func (acc *Accounts) ChangeUserPassword(h wx.Handler, data struct {
 	NewPassword string `json:"newPassword" check:"range(3:50)"`
 }) error {
 	return core.Services.RABCSvc.ChangeUserPassword(h().Req.Context(), acc.Authenticate.Data, data.Username, data.NewPassword)
+}
+
+func (acc *Accounts) GetMenu(h struct {
+	wx.Handler `route:"me/get-menu"`
+}, data []core.MenuItem) (any, error) {
+	var err error
+	if acc.Authenticate.Data.IsUpperUser {
+		err = core.Services.SysSvc.SyncMenu(h.Handler().Req.Context(), acc.Authenticate.Data, data)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return nil, nil
 }

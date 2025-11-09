@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"core"
+	"strings"
 
 	"github.com/vn-go/wx"
 )
@@ -32,7 +33,18 @@ func (base *BaseAuthController) New() error {
 		viewPath := ""
 		if req.Header["View-Path"] != nil {
 			viewPath = req.Header["View-Path"][0]
+
 		}
+		if viewPath == "" {
+			if user.IsSysAdmin {
+				viewPath = "sysadmin"
+			} else {
+				return nil, wx.Errors.NewUnauthorizedError()
+			}
+
+		}
+		viewPath = strings.ToLower(viewPath)
+		ctxHandler.ApiPath = strings.ToLower(ctxHandler.ApiPath)
 		ok, err := core.Services.AuthSvc.Authorize(req.Context(), tenant, user, viewPath, ctxHandler.ApiPath)
 		if err != nil {
 			return nil, err
