@@ -63,10 +63,10 @@ func (auth *Auth) Login(handler wx.Handler, data wx.Form[struct {
 		Name:     "refresh_token",
 		Value:    refreshToken,
 		Expires:  time.Now().Add(time.Hour * 24 * 30),
-		HttpOnly: true,                    // ngăn JS đọc
-		Secure:   true,                    // HTTPS
-		SameSite: http.SameSiteStrictMode, // chặt chẽ hơn Lax
-		Path:     "/",                     // toàn app
+		HttpOnly: true,                  // ngăn JS đọc
+		Secure:   true,                  // HTTPS
+		SameSite: http.SameSiteNoneMode, // chặt chẽ hơn Lax
+		Path:     "/",                   // toàn app
 	}
 	http.SetCookie(handler().Res, cookie)
 
@@ -79,7 +79,7 @@ func (auth *Auth) Login(handler wx.Handler, data wx.Form[struct {
 		Expires:  time.Now().Add(expires),
 		HttpOnly: false, // JS cần đọc để gửi header
 		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
 	}
 	http.SetCookie(handler().Res, csrfCookie)

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"core"
+	"fmt"
 	"strings"
 
 	"github.com/vn-go/wx"
@@ -19,6 +20,9 @@ func (base *BaseAuthController) New() error {
 	base.Authenticate.Verify(func(ctx wx.Handler) (*core.UserClaims, error) {
 		ctxHandler := ctx()
 		req := ctxHandler.Req
+		c := req.Cookies()
+
+		fmt.Println("refresh_token:", c)
 
 		authorization := req.Header["Authorization"]
 

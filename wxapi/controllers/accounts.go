@@ -91,9 +91,21 @@ func (acc *Accounts) ChangeUserPassword(h wx.Handler, data struct {
 	Username    string `json:"username" check:"range(3:50)"`
 	NewPassword string `json:"newPassword" check:"range(3:50)"`
 }) error {
-	return core.Services.RABCSvc.ChangeUserPassword(h().Req.Context(), acc.Authenticate.Data, data.Username, data.NewPassword)
+	return core.Services.AuthSvc.ChangePassword(h().Req.Context(), acc.Authenticate.Data, data.NewPassword)
 }
-
+func (acc *Accounts) ChangePassword(h struct {
+	wx.Handler `route:"me/change-password"`
+},
+	data struct {
+		NewPassword string `json:"newPassword" check:"range(3:50)"`
+	},
+) (any, error) {
+	err := core.Services.AuthSvc.ChangePassword(h.Handler().Req.Context(), acc.Authenticate.Data, data.NewPassword)
+	if err != nil {
+		return nil, wx.Errors.NewHttpError(wx.ErrInternalServerError, core.Errors.Create(acc, "ChangePassword", err)) //wx.Errors.NewHttpError(wx.ErrConflict, err)
+	}
+	return nil, nil
+}
 func (acc *Accounts) GetMenu(h struct {
 	wx.Handler `route:"me/get-menu"`
 }, data []core.MenuItem) (any, error) {

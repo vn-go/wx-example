@@ -32,6 +32,7 @@ type App struct {
 	AdminHashPassword string     `db:"pk;size:200;default:''" json:"-"`
 	CreatedOn         time.Time  `db:"ix;default:now()" json:"createdOn"`
 	ModifiedOn        *time.Time `json:"modifiedOn"`
+	MasterSecret      string     `db:"size:500;default:''" json:"-"`
 }
 
 func (r *RefreshToken) Table() string {

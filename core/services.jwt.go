@@ -131,7 +131,7 @@ func (jwtSvc *jwtServiceImpl) DecodeJWTNoVerify(tokenOrHeader string) (payload *
 	return payload, nil
 }
 func (jwtSvc *jwtServiceImpl) DeleteVerifyJWTWithSecretCache(secret, authHeader string) error {
-	return jwtSvc.cache.DeleteObject(context.Background(), "", secret+"://"+authHeader, nil)
+	return jwtSvc.cache.DeleteObject(context.Background(), "", secret+"://"+authHeader, &JWTClaims{})
 }
 func (jwtSvc *jwtServiceImpl) VerifyJWTWithSecret(secret, authHeader string) (*JWTClaims, error) {
 	// Kiểm tra prefix Bearer

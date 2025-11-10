@@ -4,6 +4,7 @@ import (
 	"context"
 	"core/models"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -11,6 +12,13 @@ import (
 	"github.com/vn-go/dx"
 )
 
+type serviceOAuthUser struct {
+	HashPassword string
+	UserId       string
+	Username     string
+	Email        *string
+	RoleCode     *string
+}
 type OAuthResponse struct {
 	AccessToken  string `json:"access_token"`            // Bắt buộc
 	TokenType    string `json:"token_type"`              // Bắt buộc, thường là "Bearer"
@@ -21,6 +29,7 @@ type OAuthResponse struct {
 }
 
 type serviceAuth interface {
+	LoadUserCache(tenant string) error
 	Login(tenant string, ctx context.Context, username, password string) (*OAuthResponse, error)
 	//verify authorization header
 	//return
@@ -29,6 +38,7 @@ type serviceAuth interface {
 	DeleteUserCache(ctx context.Context, tenant, username string) error
 	//check can user can use api in viewPath at tenant
 	Authorize(context context.Context, tenant string, user *models.User, viewPath, apiPath string) (bool, error)
+	ChangePassword(ctx context.Context, user *UserClaims, newPass string) error
 }
 
 type serviceOAuth struct {
@@ -38,7 +48,27 @@ type serviceOAuth struct {
 	tenant      tenantService
 	jwtSvc      jwtService
 	rabcSvc     rabcService
+	secretSvc   *secretService
 	db          *dx.DB
+}
+
+func (s *serviceOAuth) ChangePassword(ctx context.Context, user *UserClaims, newPass string) error {
+	db, err := s.tenant.GetTenant(user.Tenant)
+	if err != nil {
+		return err
+	}
+	newHashPassword, err := s.passwordSvc.HashPassword(user.Username, newPass)
+	if err != nil {
+		return err
+	}
+	err = db.WithContext(ctx).Model(&models.User{}).Where("username=?", user.Username).Update(map[string]interface{}{
+		"hashPassword": newHashPassword,
+	}).Error
+	if err != nil {
+		return err
+	}
+	s.DeleteUserCache(ctx, user.Tenant, user.Username)
+	return nil
 }
 
 func (s *serviceOAuth) Authorize(context context.Context, tenant string, user *models.User, viewPath string, apiPath string) (bool, error) {
@@ -52,15 +82,15 @@ func (s *serviceOAuth) Authorize(context context.Context, tenant string, user *m
 	}
 	panic("unimplemented")
 }
-func (s *serviceOAuth) generateAccessToken(ctx context.Context, tenant string, user *models.User) (string, error) {
+func (s *serviceOAuth) generateAccessToken(ctx context.Context, tenant string, user *serviceOAuthUser) (string, error) {
 	key, err := s.tenant.GetSecretKey(ctx, tenant)
 	if err != nil {
 		return "", err
 	}
-	roldeCode := bx.IsNull(user.RoleCode, "")
-	return s.jwtSvc.NewJWTWithSecret(key, user.UserId, tenant, roldeCode, bx.IsNull(user.Email, ""), time.Hour*4)
+
+	return s.jwtSvc.NewJWTWithSecret(key, user.UserId, tenant, bx.IsNull(user.RoleCode, ""), bx.IsNull(user.Email, ""), time.Hour*4)
 }
-func (s *serviceOAuth) generateRefreshToken(ctx context.Context, tenant string, user *models.User) (string, error) {
+func (s *serviceOAuth) generateRefreshToken(ctx context.Context, tenant string, user *serviceOAuthUser) (string, error) {
 	db, err := s.tenant.GetTenant(tenant)
 	if err != nil {
 		return "", err
@@ -95,18 +125,60 @@ type OAuthResponseCacheItem struct {
 	Oauth    OAuthResponse
 }
 
+func (s *serviceOAuth) getUserByUsername(ctx context.Context, tenant string, username string) (*serviceOAuthUser, error) {
+	ret := &serviceOAuthUser{}
+	err := s.cache.GetObject(ctx, tenant, strings.ToLower(username), ret)
+	if err == nil {
+		return ret, nil
+	}
+	db, err := s.tenant.GetTenant(tenant) // get tenant db by tenant name
+	if err != nil {
+		return nil, err
+	}
+	ret, err = dx.QueryItem[serviceOAuthUser](db, `user(HashPassword,username,UserId,email),
+												role(code RoleCode),
+												from(user,role,left(user.roleId=role.id)),
+												where(username=?)`, username)
+	if err != nil {
+		return nil, err
+	}
+	s.cache.AddObject(ctx, tenant, strings.ToLower(username), ret, 4)
+	return ret, nil
+}
+func (s *serviceOAuth) LoadUserCache(tenant string) error {
+	db, err := s.tenant.GetTenant(tenant) // get tenant db by tenant name
+	if err != nil {
+		return err
+	}
+	users, err := dx.QueryItems[serviceOAuthUser](db, `user(HashPassword,username,UserId,email),
+												role(code RoleCode),
+												from(user,role,left(user.roleId=role.id)),sort(UserId)`)
+	if err != nil {
+		return err
+	}
+	for _, user := range users {
+
+		s.cache.AddObject(context.Background(), tenant, strings.ToLower(user.Username), user, 4)
+	}
+	return nil
+
+}
+
+var loadUserCacheOne sync.Once
+
 func (s *serviceOAuth) Login(tenant string, ctx context.Context, username, password string) (*OAuthResponse, error) {
+	loadUserCacheOne.Do(func() {
+		s.LoadUserCache(tenant)
+	})
 	//key := fmt.Sprintf("%s:%s@%s(Login)", username, password, tenant)
 	ret := &OAuthResponse{}
 	cacheItem := &OAuthResponseCacheItem{}
 	if err := s.cache.GetObject(ctx, tenant, strings.ToLower(username), cacheItem); err == nil {
 		return &cacheItem.Oauth, nil
 	}
-	db, err := s.tenant.GetTenant(tenant) // get tenant db by tenant name
-	if err != nil {
-		return nil, err
-	}
-	user, err := s.user.GetUserByName(db, ctx, username)
+
+	user, err := s.getUserByUsername(ctx, tenant, username)
+	// user, err := s.user.GetUserByName(db, ctx, username)
 	if err != nil {
 		return nil, err
 	}
@@ -145,17 +217,30 @@ func (s *serviceOAuth) Login(tenant string, ctx context.Context, username, passw
 	}
 
 }
+
 func (s *serviceOAuth) DeleteUserCache(ctx context.Context, tenant, username string) error {
-	var userVerify cacheUserVerify
+	key, err := s.tenant.GetSecretKey(ctx, tenant)
+	if err != nil {
+		return err
+	}
+	var userVerify OAuthResponseCacheItem
 	if err := s.cache.GetObject(ctx, tenant, username, &userVerify); err == nil {
-		err = s.cache.DeleteObject(ctx, tenant, username, nil)
+		if err := s.cache.DeleteObject(ctx, tenant, strings.ToLower(username), &userVerify); err != nil {
+			return err
+		}
+		err = s.jwtSvc.DeleteVerifyJWTWithSecretCache(key, userVerify.Oauth.AccessToken)
 		if err != nil {
 			return err
 		}
-		err = s.jwtSvc.DeleteVerifyJWTWithSecretCache(userVerify.Secret, userVerify.AuthHeader)
-		if err != nil {
-			return err
-		}
+
+	}
+	err = s.cache.DeleteObject(ctx, tenant, username, &ComparePasswordCacheItem{})
+	if err != nil {
+		return err
+	}
+	err = s.cache.DeleteObject(ctx, tenant, strings.ToLower(username), &serviceOAuthUser{})
+	if err != nil {
+		return err
 	}
 	return nil
 
@@ -246,6 +331,7 @@ func newServiceAuth(
 	jwtSvc jwtService,
 	db *dx.DB,
 	rabc rabcService,
+	secretSvc *secretService,
 
 ) serviceAuth {
 	return &serviceOAuth{
@@ -256,5 +342,6 @@ func newServiceAuth(
 		jwtSvc:      jwtSvc,
 		db:          db,
 		rabcSvc:     rabc,
+		secretSvc:   secretSvc,
 	}
 }

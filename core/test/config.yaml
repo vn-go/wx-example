@@ -1,0 +1,57 @@
+app: "api"
+database:
+  # driver: "mysql"
+  # dsn: "root:123456@tcp(127.0.0.1:3306)/hrm2?interpolateParams=true"
+  # driver: "postgres"
+  # dsn: "postgres://postgres:123456@localhost:5432/hrm2?sslmode=disable&"
+  driver: "sqlserver"
+  dsn: "sqlserver://sa:123456@localhost:1433?database=hrm"
+
+jwt:
+  default-sercret-key: dadasdsa.dasdsad3213.dad.323asd.a(dadsad)
+  hash-type: bcrypt #argon2
+  share-secret-len: 64
+cache:
+  type: "local" #"memcache" #"local"
+  redis:
+    address: "localhost:6379"
+    password: ""
+  memcache:
+    servers: "localhost:11211"
+  badger:
+    directory: "./badger"
+  prefix: "xasad"
+log:
+  path: "./logs"
+  size: 10
+  backup: 3
+  age: 28
+  compress: true
+cryptor:
+  key: "bsgsdgbdb*dhbsndss9hgdhshd(8dnna"
+broker:
+  bus: "local" #"kafka" #single node
+  topic: "test-001"
+  rabbit:
+    url: "amqp://guest:guest@localhost:5672/"
+    exchange: "tets"
+    queue: "test"
+  redis:
+    addr: "localhost:6379"
+    consumer: "api-hrm"
+  kafka:
+    brokers: localhost:9092
+  nats:
+    server: "nats://localhost:4222"
+    group: "api-hrm"
+tenant:
+  IsMulti: false
+  DefaultAdminUser: "tenant-admin"
+  DefaultAdminPassword: "uvsz%#"
+default-auth:
+  user: "admin"
+  pwd: "/\\dmin123451212"
+debug: true
+bind:
+  host: 0.0.0.0
+  port: 8080

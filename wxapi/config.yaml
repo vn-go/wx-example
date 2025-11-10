@@ -1,11 +1,11 @@
 app: "api"
 database:
-  driver: "mysql"
-  dsn: "root:123456@tcp(127.0.0.1:3306)/hrm2?interpolateParams=true"
+  # driver: "mysql"
+  # dsn: "root:123456@tcp(127.0.0.1:3306)/hrm2?interpolateParams=true"
   # driver: "postgres"
   # dsn: "postgres://postgres:123456@localhost:5432/hrm2?sslmode=disable&"
-  # driver: "sqlserver"
-  # dsn: "sqlserver://sa:123456@localhost:1433?database=hrm"
+  driver: "sqlserver"
+  dsn: "sqlserver://sa:123456@localhost:1433?database=hrm"
 
 jwt:
   default-sercret-key: dadasdsa.dasdsad3213.dad.323asd.a(dadsad)

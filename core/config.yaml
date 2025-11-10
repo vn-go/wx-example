@@ -1,13 +1,15 @@
 app: "api"
 database:
-  driver1: "mysql"
-  dsn1: "root:123456@tcp(127.0.0.1:3306)/hrm"
-  driver: "postgres"
-  dsn: "postgres://postgres:123456@localhost:5432/hrm?sslmode=disable"
+  # driver: "mysql"
+  # dsn: "root:123456@tcp(127.0.0.1:3306)/hrm2?interpolateParams=true"
+  # driver: "postgres"
+  # dsn: "postgres://postgres:123456@localhost:5432/hrm2?sslmode=disable&"
+  driver: "sqlserver"
+  dsn: "sqlserver://sa:123456@localhost:1433?database=hrm"
 
 jwt:
   default-sercret-key: dadasdsa.dasdsad3213.dad.323asd.a(dadsad)
-  hash-type : bcrypt #argon2
+  hash-type: bcrypt #argon2
   share-secret-len: 64
 default-auth:
   user: "root"
@@ -23,15 +25,15 @@ cache:
     directory: "./badger"
   prefix: "xasad"
 log:
-  path:   "./logs"
+  path: "./logs"
   size: 10
   backup: 3
-  age:  28
-  compress:  true
+  age: 28
+  compress: true
 cryptor:
   key: "bsgsdgbdb*dhbsndss9hgdhshd(8dnna"
 broker:
-  bus:  "local" #"kafka" #single node
+  bus: "local" #"kafka" #single node
   topic: "test-001"
   rabbit:
     url: "amqp://guest:guest@localhost:5672/"
@@ -46,7 +48,6 @@ broker:
     server: "nats://localhost:4222"
     group: "api-hrm"
 tenant:
-  IsMulti: true
+  IsMulti: false
   DefaultAdminUser: "root"
   DefaultAdminPassword: "uvsz%#"
-

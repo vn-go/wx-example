@@ -222,8 +222,8 @@ github.com/vmihailenco/msgpack v4.0.4+incompatible h1:dSLoQfGFAo3F6OoNhwUmLwVgaU
 github.com/vmihailenco/msgpack v4.0.4+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=
 github.com/vn-go/bx v1.0.40 h1:qOQ9WnjJd+sgudSGaYr7LS2nU0JBhq7w+4XbYCA7Mgw=
 github.com/vn-go/bx v1.0.40/go.mod h1:UH1ucAGTErfVta1Wvc4sb78n29zfiw2pIcBfSqOBQew=
-github.com/vn-go/dx v1.0.91 h1:S44GppwOkkSQp/1TTs6n803x0WQeUsG/+wDkljErEJo=
-github.com/vn-go/dx v1.0.91/go.mod h1:Z9La9zic8BaP8g+W8vgpWlZLHqlVOm3XNuPgo2AP4IQ=
+github.com/vn-go/dx v1.0.95 h1:b9hF9/Ya6xGBy9OSYJTTl0rhHOJOZut1sr3TDzAYvO0=
+github.com/vn-go/dx v1.0.95/go.mod h1:Z9La9zic8BaP8g+W8vgpWlZLHqlVOm3XNuPgo2AP4IQ=
 github.com/vn-go/wx v0.2.7 h1:OSDzLoP4sQbl8iqjD42kB4MAjW35yxvQ/FpdvbhiuRk=
 github.com/vn-go/wx v0.2.7/go.mod h1:nxJ4SZIQu18qj0CuMwE40A1IlUk123ymRAd1N8NGWQ4=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=

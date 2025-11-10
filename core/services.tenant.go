@@ -75,6 +75,7 @@ type tenantServiceSql struct {
 	PwdSvc      passwordService
 	usrRepo     userRepo
 	cfg         *configInfo
+	secretSvc   *secretService
 }
 
 /*
@@ -233,6 +234,11 @@ func (s *tenantServiceSql) CreateDefaultAdminTenantAccount(ctx context.Context) 
 		}
 		app.Name = s.cfg.AppName
 		app.ShareSecret, err = s.jwtSvc.GenerateSecret()
+
+		if err != nil {
+			return
+		}
+		app.MasterSecret, err = s.jwtSvc.GenerateSecret()
 		if err != nil {
 			return
 		}
@@ -240,8 +246,34 @@ func (s *tenantServiceSql) CreateDefaultAdminTenantAccount(ctx context.Context) 
 		if err != nil {
 			if dbErr := dx.Errors.IsDbError(err); dbErr != nil {
 				if dbErr.ErrorType == dx.Errors.DUPLICATE {
-					// If already exists, ignore error
+					appItem, err := dx.QueryItem[models.App](s.db, "app(),where(name=?)", app.Name)
+					if err != nil {
+						return
+					}
+					neddUpdate := false
+					if appItem.MasterSecret == "" {
+						appItem.MasterSecret, err = s.secretSvc.GenerateMasterKey()
+						neddUpdate = true
+						if err != nil {
+							return
+						}
+					}
+					if appItem.ShareSecret == "" {
+						appItem.ShareSecret, err = s.jwtSvc.GenerateSecret()
+						neddUpdate = true
+						if err != nil {
+							return
+						}
+					}
+					if neddUpdate {
+						r := s.db.Update(appItem)
+						if r.Error != nil {
+							err = r.Error
+							return
+						}
+					}
 					err = nil
+
 				} else {
 					return
 				}
@@ -377,13 +409,15 @@ func newTenantService(
 	PwdSvc passwordService,
 	usrRepo userRepo,
 	cfg *configInfo,
+	secretSvc *secretService,
 ) (tenantService, error) {
 	ret := &tenantServiceSql{
-		db:      db,
-		jwtSvc:  jwtSvc,
-		PwdSvc:  PwdSvc,
-		usrRepo: usrRepo,
-		cfg:     cfg,
+		db:        db,
+		jwtSvc:    jwtSvc,
+		PwdSvc:    PwdSvc,
+		usrRepo:   usrRepo,
+		cfg:       cfg,
+		secretSvc: secretSvc,
 	}
 	if cfg.Tenant.IsMulti {
 		if err := ret.CreateDefaultAdminTenantAccount(context.Background()); err != nil {

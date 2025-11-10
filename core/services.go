@@ -116,6 +116,8 @@ type servicesTypes struct {
 	Dataset   datasetService
 	ViewSvc   *viewService
 	SysSvc    *systemService
+	TamperSvc *tamperService
+	SecretSvc *secretService
 	//Pwd passwordService
 	//config configInfo
 }
@@ -142,4 +144,6 @@ var Services = (&bx.Wire[servicesTypes]{}).WireThenGet(
 	newValidatorService,
 	newViewService,
 	newSystemService,
+	newTamperService,
+	newSecretService,
 )

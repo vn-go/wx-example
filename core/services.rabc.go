@@ -38,7 +38,7 @@ type rabcService interface {
 	GetListOfRoles(ctx context.Context, user *UserClaims, pager Pager) (any, error)
 	//GetListOfRolesSQL(ctx context.Context, user *UserClaims, pager Pager) (string, error)
 	GetListOfAccounts(ctx context.Context, user *UserClaims, pager Pager) (any, error)
-	ChangeUserPassword(ctx context.Context, user *UserClaims, username string, newPass string) error
+
 	//GetDb(user *UserClaims) (*dx.DB, error)
 	ResgisterDataSouceView(ctx context.Context, user *UserClaims, Info DataSouceViewInfo)
 	ResgisterView(ctx context.Context, Tenant, viewPath, apiPath, createdBy string) error
@@ -195,25 +195,6 @@ func (s *rabcServiceImpl) GetListOfAccounts(ctx context.Context, user *UserClaim
 
 }
 
-func (s *rabcServiceImpl) ChangeUserPassword(ctx context.Context, user *UserClaims, username string, newPass string) (err error) {
-	var db *dx.DB
-
-	if db, err = s.tanentSvc.GetTenant(user.Tenant); err != nil {
-		return err
-	}
-	updateUser := &models.User{}
-	if err = db.First(updateUser, "username=?", username); err != nil {
-		return err
-	}
-	hashPassword, err := s.pwdSvc.HashPassword(username, newPass)
-	if err != nil {
-		return err
-	}
-	updateUser.HashPassword = hashPassword
-	r := db.Update(updateUser)
-	return r.Error
-
-}
 func (s *rabcServiceImpl) ResgisterDataSouceView(ctx context.Context, user *UserClaims, Info DataSouceViewInfo) {
 	panic("implement me")
 }

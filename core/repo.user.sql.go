@@ -28,11 +28,12 @@ func (repo *userRepoSql) GetUserByUserId(db *dx.DB, ctx context.Context, userId 
 	return ret, nil
 }
 func (repo *userRepoSql) GetUserByName(db *dx.DB, ctx context.Context, username string) (*models.User, error) {
-	ret := &models.User{}
-	if err := db.WithContext(ctx).First(ret, "username=?", username); err != nil {
-		return nil, err
-	}
-	return ret, nil
+	// ret := &models.User{}
+	// if err := db.WithContext(ctx).First(ret, "username=?", username); err != nil {
+	// 	return nil, err
+	// }
+	// return ret, nil
+	return dx.QueryItem[models.User](db, "user(),where(username=?)", username)
 }
 
 type initCreateDefaultUser struct {

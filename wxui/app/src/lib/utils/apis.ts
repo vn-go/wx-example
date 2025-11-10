@@ -16,7 +16,8 @@ export class ApiCall {
         url: string,
         method: HttpMethod,
         body?: any,
-        headers: Record<string, string> = {}
+        headers: Record<string, string> = {},
+
     ): Promise<ApiResponse<T>> {
         try {
             const opts: RequestInit = {
@@ -26,6 +27,7 @@ export class ApiCall {
                     'authorization': `Bearer ${getAccessToken()}`,
                     ...headers,
                 },
+                credentials: "include", // 🔥 rất quan trọng
             }
 
             if (body && method !== 'GET') {

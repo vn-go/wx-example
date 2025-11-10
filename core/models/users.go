@@ -52,19 +52,9 @@ func (u *User) Table() string {
 	return "sys_users"
 }
 
-type TrackFilter struct {
-	Id uint64 `db:"pk;auto" json:"id"`
-	// UserId is a text of guid
-	// uk: uniquekey
-	// size:36 -> length of field
-	DsName   string `db:"size:50"`
-	Filter   string `db:"size:2000"`
-	Selector string `db:"size:2000"`
-}
-
 func init() {
 	//rehgister User
-	dx.AddModels(&User{}, &Role{}, &TrackFilter{})
+	dx.AddModels(&User{}, &Role{})
 	dx.AddForeignKey[User]("RoleId", &Role{}, "Id", &dx.FkOpt{
 		OnDelete: false,
 		OnUpdate: false,

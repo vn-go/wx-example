@@ -25,6 +25,7 @@ export async function login(username, password) {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
+            credentials: "include",  // 🔥 IMPOTANT!
             body: formData.toString(),
         });
 
