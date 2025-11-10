@@ -55,7 +55,10 @@ func (s *systemService) SyncMenu(context context.Context, user *UserClaims, menu
 						appMenu.IdPaths = fmt.Sprintf("%s%d.", parentItem.IdPaths, appMenu.ID)
 
 					}
-					db.Update(&appMenu)
+					r := db.Update(&appMenu)
+					if r.Error != nil {
+						return err
+					}
 
 				} else {
 					return fmt.Errorf("cannot find menu with viewPath %s", appMenu.ViewPath)
