@@ -1,4 +1,3 @@
-<!--wxui\app\src\lib\components\layout\MainLayout.svelte-->
 <script lang="ts">
 	$: console.log('📊 Layout render:', $dialogVisible, $dialogComponent);
 	import { UIForm } from '@components/base';
@@ -63,3 +62,5 @@
 		</main>
 	</div>
 </div>
+
+<!--wxui\app\src\lib\components\layout\MainLayout.svelte-->

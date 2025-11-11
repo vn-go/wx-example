@@ -1,0 +1,19 @@
+@import "tailwindcss" layer(base, components, utilities);
+
+@layer components {
+    .tw-red-title {
+        @apply text-6xl font-bold text-red-600 underline;
+    }
+
+    .h1 {
+        @apply tw-red-title;
+    }
+
+    .btn {
+        @apply bg-blue-600 hover:bg-blue-800 text-white font-bold py-4 px-8 rounded-xl shadow-2xl transition;
+    }
+
+    .card {
+        @apply bg-white p-10 rounded-3xl shadow-2xl border border-gray-100;
+    }
+}
