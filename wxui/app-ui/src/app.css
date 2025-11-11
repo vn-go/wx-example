@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+.debug {
+    border: solid 4px red;
+}
+
+.main-header {
+    @apply bg-gray-100 p-1;
+}
+
+.main-sidebar {
+    @apply w-56 bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto hidden md:block
+}
+
+.main-content {
+    @apply flex-1 p-6 overflow-y-auto
+}
