@@ -1,0 +1,17 @@
+import tailwindcss from '@tailwindcss/vite'
+import vue from '@vitejs/plugin-vue'
+import path from 'path'
+import { defineConfig } from 'vite'
+export default defineConfig({
+    plugins: [
+        vue(),
+        tailwindcss(), // Stable v4 plugin
+    ],
+
+    resolve: {
+        alias: {
+            '@layouts': path.resolve(__dirname, 'src/layouts'),
+            '@components': path.resolve(__dirname, 'src/components'),
+        }
+    }
+})

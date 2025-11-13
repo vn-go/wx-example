@@ -5,17 +5,14 @@
 
 <div class="flex flex-col min-h-screen debug">
   <!-- Header -->
-  <header class="debug">
-    
-    <slot name="header" {title}>
-     {title}
-    </slot>
-  </header>
+  <slot name="header" {title}>
+    {title}
+   </slot>
 
   <!-- Main: Sidebar + Content -->
   <div class="flex flex-1 overflow-hidden">
     <!-- Sidebar -->
-    <aside class="debug">
+    <aside class="debug" style="position: relative; width: 200px">
       <slot name="sidebar">
        
       </slot>

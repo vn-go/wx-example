@@ -13,9 +13,9 @@
 		"moduleResolution": "bundler",
 		"baseUrl": ".",
 		"paths": {
-			"@components/*": [
-				"src/lib/components/*"
-			],
+			// "@components/*": [
+			// 	"src/lib/components/*"
+			// ],
 			"@lib/*": [
 				"src/lib/*"
 			],
@@ -36,6 +36,12 @@
 			],
 			"@data/*": [
 				"src/data/*"
+			],
+			"@components/*": [
+				"src/components/*"
+			],
+			"@core/*": [
+				"src/core/*"
 			]
 		}
 	}
