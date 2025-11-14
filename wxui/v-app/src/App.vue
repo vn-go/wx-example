@@ -20,6 +20,7 @@ const doLogin=()=> {
 
 }
 let currentPagrPath="";
+
 const loadPage=async (pagePath)=>{
   currentPagrPath=pagePath;
   debugger;
