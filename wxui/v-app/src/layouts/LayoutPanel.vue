@@ -2,7 +2,7 @@
 <script setup>
 import Buger from '@components/buger.vue';
 import { defineEmits, nextTick, onMounted, ref } from 'vue';
-import emitter from './../event-bus.js';
+import emitter from '../core/eventBus.js';
 
 const sidebarRef = ref(null);
 const bodyRef = ref(null);
@@ -110,13 +110,13 @@ const slideFromRight = (duration = 500) => {
           @mouseove="onMOuseMove"
           @mouseout="onMouseOut"
           ref="sidebarRef"
-          style="position: fixed;top:40px;height:calc(100vh - 40px);" 
+          style="position: fixed;top:44px;height:calc(100vh - 44px);" 
           :class="{ open: isOpen }" 
           class="sidebar h-[200px] bg-blue-200 z-20"
         >
           <slot name="sidebar">Default Sidebar</slot>
         </aside>
-        <div class="h-full w-full flex-1" ref="bodyRef">
+        <div class="h-full w-full flex-1 pt-1" ref="bodyRef">
         <slot name="body">Default Body Content</slot>
         </div>
        

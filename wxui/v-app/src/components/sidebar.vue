@@ -45,10 +45,13 @@ function doLoadPage(data) {
 }
 onMounted(()=>{
     window.addEventListener("popstate", (event) => {
-        emmit("on-page-change",window.location.pathname);
+      const fullPathWithQuery = window.location.pathname + window.location.search
+
+        emmit("on-page-change",fullPathWithQuery);
 
     })
-    emmit("on-page-change",window.location.pathname);
+    const fullPathWithQuery = window.location.pathname + window.location.search
+    emmit("on-page-change",fullPathWithQuery);
 })
 
 </script>

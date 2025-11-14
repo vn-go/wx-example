@@ -9,11 +9,14 @@
     }
   ],
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@layouts/*": [
-        "src/layouts/*"
-      ]
-    }
+    // "baseUrl": ".",
+    // "paths": {
+    //   "@layouts/*": [
+    //     "src/layouts/*"
+    //   ],
+    //   "@core/*": [
+    //     "src/core/*"
+    //   ]
+    // }
   }
 }

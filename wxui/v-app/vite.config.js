@@ -12,6 +12,7 @@ export default defineConfig({
         alias: {
             '@layouts': path.resolve(__dirname, 'src/layouts'),
             '@components': path.resolve(__dirname, 'src/components'),
+            '@core': path.resolve(__dirname, 'src/core'),
         }
     }
 })
