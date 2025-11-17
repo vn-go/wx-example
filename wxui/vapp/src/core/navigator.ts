@@ -1,11 +1,11 @@
-import { onMounted } from "vue";
 class UrlNav {
     private _onNav: (path?: string, search?: string) => void;
     pathname: string;
-    constructor() {
+    private _init = false;
+    init() {
         const self = this;
-        onMounted(() => {
-            self.raiseOnNav();
+        self.raiseOnNav();
+        if (!this._init) {
             window.addEventListener('popstate', (event) => {
                 let nextPath = window.location.pathname;
                 if (nextPath.startsWith('/')) {
@@ -18,7 +18,12 @@ class UrlNav {
                 }
 
             });
-        })
+            this._init = true;
+        }
+    }
+    constructor() {
+
+
     }
     raiseOnNav() {
         if (this._onNav) {

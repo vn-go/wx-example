@@ -3,3 +3,7 @@
 .debug {
   border: solid 4px red;
 }
+
+.widget-container {
+  @apply bg-white border-b border-gray-200 px-2 shadow-sm;
+}

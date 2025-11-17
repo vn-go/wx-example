@@ -1,6 +1,6 @@
 <template>
     
-    <header :ref="el => app.headerEle.value = el" class="bg-white border-b border-gray-200 flex items-center px-1 shadow-sm z-30">
+    <header :ref="el => app.headerEle.value = el" class="widget-container  flex items-center">
       <div class="flex items-center space-x-3">
         <!-- Burger icon -->
         <button
@@ -18,7 +18,7 @@
     </header>
     <aside
   :ref="el => app.sideBarEle.value = el"
-  class="sidebar debug2"
+  class="sidebar widget-container  z-30"
  :class="{ 'translate-x-0': app.sidebarOpen }"
 >
     <slot name="sidebar">
@@ -26,7 +26,7 @@
         </slot>
     </aside>
     
-    <div class="flex flex-col debug " :ref="ele=>app.bodyEle.value=ele">
+    <div class="flex flex-col widget-container " :ref="ele=>app.bodyEle.value=ele">
         <slot name="body">
             body
 

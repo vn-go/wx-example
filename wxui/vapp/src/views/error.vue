@@ -1,18 +1,25 @@
-<script setup>
+<script setup lang="ts">
+import libs from '@core/lib';
 
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
 
+
+function goHome() {
+  libs.urlNav.move('/')
+}
 </script>
+
 <template>
-    <div class="card">
-        <DataTable :value="customers" 
-        paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" 
-        tableStyle="min-width: 50rem">
-            <Column field="name" header="Name" style="width: 25%"></Column>
-            <Column field="country.name" header="Country" style="width: 25%"></Column>
-            <Column field="company" header="Company" style="width: 25%"></Column>
-            <Column field="representative.name" header="Representative" style="width: 25%"></Column>
-        </DataTable>
-    </div>
+  <div class="flex flex-col items-center justify-center h-full bg-gray-50 p-6">
+    <h1 class="text-6xl font-bold text-red-500 mb-4">404</h1>
+    <h2 class="text-2xl font-semibold mb-2">Page Not Found</h2>
+    <p class="text-gray-600 mb-6 text-center">
+      Sorry, the page you are looking for does not exist or has been moved.
+    </p>
+    <button
+      @click="goHome"
+      class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+    >
+      Go to Home
+    </button>
+  </div>
 </template>
