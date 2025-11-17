@@ -39,3 +39,5 @@ cd preact-app
 npm install
 npm install -D tailwindcss@next @tailwindcss/vite@next
 npm install @preact/signals
+
+npm create vite@latest xapp

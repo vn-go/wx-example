@@ -82,9 +82,25 @@ func (acc *Accounts) GetListOfRoles(h wx.Handler, pager core.Pager) (any, error)
 
 //		return core.Services.RABCSvc.GetListOfRolesSQL(h().Req.Context(), acc.Authenticate.Data, pager)
 //	}
-func (acc *Accounts) GetListOfAccounts(h wx.Handler, pager core.Pager) (any, error) {
+type PagerInfo struct {
+	First uint64 `json:"first"`
+	Last  uint64 `json:"last"`
+}
+type getListOfAccountsResult struct {
+	Items        any    `json:"itens"`
+	TotalRecords uint64 `json:"totalRecords"`
+}
 
-	ret, err := core.Services.RABCSvc.GetListOfAccounts(h().Req.Context(), acc.Authenticate.Data, pager)
+func (acc *Accounts) GetListOfAccounts(h wx.Handler, pager PagerInfo) (any, error) {
+	if pager.Last == 0 {
+		return make([]any, 0), nil
+	}
+	pageSize := pager.Last - pager.First
+	pageIndex := int(pager.First / pageSize)
+	ret, err := core.Services.RABCSvc.GetListOfAccounts(h().Req.Context(), acc.Authenticate.Data, core.Pager{
+		Index: pageIndex,
+		Size:  int(pageSize),
+	})
 	return ret, err
 }
 func (acc *Accounts) ChangeUserPassword(h wx.Handler, data struct {

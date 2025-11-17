@@ -184,7 +184,10 @@ func (s *rabcServiceImpl) GetListOfAccounts(ctx context.Context, user *UserClaim
 	}
 
 	query := db.QueryModel(models.User{}).LeftJoin(models.Role{}, "user.roleId=role.id").Select(
-		"user(username,userId,email,createdOn,isActive),role(code RoleCode,name RoleName,description)",
+		`user(username,userId,email,createdOn,isActive),
+			role(code RoleCode,name RoleName,description),
+			take(?)`,
+		pager.Size,
 	)
 	if len(pager.OrderBy) == 0 {
 		query = query.SortDesc("user.createdOn")

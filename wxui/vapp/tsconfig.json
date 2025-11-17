@@ -1,0 +1,25 @@
+{
+  //"extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "composite": true,
+    "moduleResolution": "bundler",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": [
+        "src/core/*"
+      ],
+      "@app-layouts/*": [
+        "src/app-layouts/*"
+      ],
+      "@widgets/*": [
+        "src/widgets/*"
+      ],
+      "@views/*": [
+        "src/views/*"
+      ]
+    }
+  },
+}

@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"core/models"
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -173,7 +174,7 @@ func (s *serviceOAuth) Login(tenant string, ctx context.Context, username, passw
 	//key := fmt.Sprintf("%s:%s@%s(Login)", username, password, tenant)
 	ret := &OAuthResponse{}
 	cacheItem := &OAuthResponseCacheItem{}
-	if err := s.cache.GetObject(ctx, tenant, strings.ToLower(username), cacheItem); err == nil {
+	if err := s.cache.GetObject(ctx, tenant, strings.ToLower(fmt.Sprintf("%s/%s", username, password)), cacheItem); err == nil {
 		return &cacheItem.Oauth, nil
 	}
 
@@ -202,7 +203,7 @@ func (s *serviceOAuth) Login(tenant string, ctx context.Context, username, passw
 			ExpiresIn:    30,
 			RefreshToken: refreshToken,
 		}
-		s.cache.AddObject(ctx, tenant, strings.ToLower(username), OAuthResponseCacheItem{
+		s.cache.AddObject(ctx, tenant, strings.ToLower(fmt.Sprintf("%s/%s", username, password)), OAuthResponseCacheItem{
 			Tanent:   tenant,
 			Username: strings.ToLower(username),
 			Oauth:    *ret,
