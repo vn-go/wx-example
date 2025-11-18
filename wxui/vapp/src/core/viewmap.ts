@@ -9,7 +9,11 @@ export async function loadViews(viewPath?: string, errorView?: string) {
         viewPath = viewPath.substring(1, viewPath.length);
     }
     if (!viewsData[`../views/${viewPath}.vue`]) {
-        return markRaw(defineAsyncComponent(viewsData[`../views/${errorView}.vue`]));
+        let ret = markRaw(defineAsyncComponent(viewsData[`../views/${errorView}.vue`]));
+        console.log(ret);
+        return ret;
     }
-    return markRaw(defineAsyncComponent(viewsData[`../views/${viewPath}.vue`]));
+    let ret = markRaw(defineAsyncComponent(viewsData[`../views/${viewPath}.vue`]));
+    console.log(ret);
+    return ret;
 }
