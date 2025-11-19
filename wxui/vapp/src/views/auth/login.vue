@@ -52,18 +52,22 @@
         username:"",
         password:""
       }
-      errMsg=libs.newRef(null);
+      errMsg=libs.newRef();
       private _onAfterLogin=undefined;
       async doLogin() {
-         let res= await libs.login(this.data.username,this.data.password);
-         if (res.error) {
-            this.errMsg=res.error;
-            
-         } else {
-            libs.sessionStore.set("tk",res.access_token);
-            await this.raiseAfterLogin();
-            
-         }
+        let res= await libs.apiPublic.formPost('auth/login',{
+          grant_type: 'password',
+          username:this.data.username,
+          password:this.data.password
+        });
+       
+        if(res.error){
+          this.errMsg=res.error.statusText;
+        }else {
+          libs.sessionStore.set("tk",res.data.access_token);
+          await this.raiseAfterLogin();
+        }
+        
          
       }
      async raiseAfterLogin() {

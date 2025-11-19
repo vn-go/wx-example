@@ -1,11 +1,12 @@
-import { reactive, ref, type Reactive, type Ref } from 'vue';
+import { reactive, ref, type Reactive } from 'vue';
+import ApiCaller from './api';
 import login from './api.login';
-import { post } from './apiPost';
 import { getAppMenuData } from './appMenuData';
 import UrlNav from './navigator';
 import SessionStore from './sessionStore';
 import BaseUI from "./ui";
 import getViewMap, { loadViews } from './viewmap';
+const sessionStore = new SessionStore("app-store");
 const libs = {
     BaseUI: BaseUI,
     _afterLogin: undefined,
@@ -18,26 +19,18 @@ const libs = {
     loadViews: async (viewPath?: string, errorView?: string) => {
         return await loadViews(viewPath, errorView);
     },
-    newRef: <T>(val?: T): Ref<T> => {
+    newRef: <T>(val?: T): any => {
         let ret = ref(val);
         return ret as any;
     },
     getAppMenuData: getAppMenuData,
-    sessionStore: new SessionStore("app-store"),
+    sessionStore: sessionStore,
     login: login,
     newReactive: <T>(val: T): Reactive<T> => {
         return reactive(val as any) as any;
     },
-    api: {
-        post: async (apiEndpoint: string, data?: any) => {
-            try {
-                return await post(apiEndpoint, data, libs.sessionStore.get("tk"))
-            } catch (error) {
-                console.log(error);
-            }
-
-        }
-    },
+    api: new ApiCaller(() => { return sessionStore.get("tk") }),
+    apiPublic: new ApiCaller(),
     raiseAfterLogin: async () => {
         debugger;
         await libs._afterLogin();

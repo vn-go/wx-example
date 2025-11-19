@@ -1,5 +1,5 @@
 import { onMounted, type Ref, ref } from 'vue';
-
+import { formatDate } from './formatDate';
 
 class BaseUI {
     refKey(key: string) {
@@ -54,6 +54,9 @@ class BaseUI {
     }
     onMounted(fn: (() => void | null)) {
         this._onMount = fn;
+    }
+    formatDate(dateValue: Date | string | number, format = "dd/MM/yyyy") {
+        return formatDate(dateValue, format);
     }
 }
 export default BaseUI

@@ -4,23 +4,31 @@ import libs from '@core/lib';
 import BurgerButton from '@widgets/app-header-buger.vue';
 import AppSiderbar from '@widgets/app-siderbar.vue';
 import { ref, shallowRef } from "vue";
+import LoadingMask from './components/LoadingMask.vue';
 const currentComponent = shallowRef<any>(null);
 const currentView = ref();
 
 class Application extends libs.BaseUI {
   currentComponent = libs.newRef<any>(null);
   $currentView:any;
-
+  isShowMask=libs.newRef(true);
   userInfo: any;
   constructor() {
     super();
     this.refKey("$currentView")
-    // watch(this.$currentView, (val) => {
-    //   if (val) {
-    //     console.log("Mounted instance:", val);
-        
-    //   }
-    // });
+    
+    libs.api.onDial(()=>{
+      this.isShowMask.value=true;
+    });
+    libs.api.onFinished(()=>{
+      this.isShowMask.value=false;
+    });
+    libs.apiPublic.onDial(()=>{
+      this.isShowMask.value=true;
+    })
+    libs.apiPublic.onFinished(()=>{
+      this.isShowMask.value=false;
+    });
     libs.onAfterLogin(async ()=>{
           debugger;
           let userInfoResult=await this.getUserInfo();
@@ -120,6 +128,7 @@ const application=new Application();
 </script>
 
 <template>
+  <LoadingMask :visible="application.isShowMask.value"></LoadingMask>
   <AppLayout>
     <template #burger> <BurgerButton/></template>
     <template #sidebar><AppSiderbar/></template>

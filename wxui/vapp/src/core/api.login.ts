@@ -13,7 +13,7 @@ const login = async (username: string, password: string) => {
         },
         credentials: "include",  // 🔥 IMPOTANT!
         body: formData.toString(),
-    })
+    });
 
     const data = await res.json()
 
