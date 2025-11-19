@@ -2,6 +2,7 @@ import { reactive, ref, type Reactive } from 'vue';
 import ApiCaller from './api';
 import login from './api.login';
 import { getAppMenuData } from './appMenuData';
+import Modal from './modal';
 import UrlNav from './navigator';
 import SessionStore from './sessionStore';
 import BaseUI from "./ui";
@@ -38,6 +39,10 @@ const libs = {
 
     onAfterLogin: (fn: () => void) => {
         libs._afterLogin = fn;
+    },
+    newModal(rawHtml?: string) {
+        return new Modal(rawHtml);
     }
+
 }
 export default libs;

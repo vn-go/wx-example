@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col w-full h-full">
         <DataTable :value="user.users" 
-               
+               :reorderableColumns="true"
                 scrollable 
                sortMode="multiple"
                resizableColumns columnResizeMode="fit" showGridlines
@@ -15,6 +15,13 @@
             </Column>
             <Column field="isActive" header="Active" style="width: 220px;" sortable ></Column>
             <Column field="roleName" header="Role" tyle="width: 100%;"></Column>
+            <Column   tyle="width:120">
+                <template #body="{ data }">
+                    <button class="btn" @click="user.doEdit(data)">
+                            Edit
+                    </button>
+                </template>
+            </Column>
         </DataTable>
     </div>
 </template>
@@ -27,7 +34,7 @@ import { Column, DataTable } from 'primevue';
         async onInit() {
             
             let retApi=await this.loadData();
-            console.log(retApi.data);
+          
             this.users.value=retApi.data ;
         }
         async loadData(){
@@ -35,6 +42,11 @@ import { Column, DataTable } from 'primevue';
                 "first": 0,
                 "last": 1000
                 })
+        }
+        async doEdit(data) {
+            let modal=libs.newModal("html/modal.html");
+            console.log(modal);
+            await modal.load("views/system/users");
         }
 
     }

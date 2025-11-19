@@ -19,6 +19,9 @@
       ],
       "@views/*": [
         "src/views/*"
+      ],
+      "@components/*": [
+        "src/components/*"
       ]
     }
   },

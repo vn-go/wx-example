@@ -8,6 +8,10 @@
   @apply bg-white border-b border-gray-200 px-2 shadow-sm;
 }
 
+.btn {
+  @apply px-3 py-1 bg-white text-gray-700 border border-gray-300 rounded shadow-sm hover:bg-gray-50 hover:shadow transition;
+}
+
 /* .p-datatable {
 
 

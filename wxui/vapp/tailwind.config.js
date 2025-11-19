@@ -5,7 +5,11 @@ module.exports = {
         "./src/**/*.{vue,js,ts}"
     ],
     theme: {
-        extend: {},
+        extend: {
+            fontFamily: {
+                sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+            },
+        },
     },
     plugins: [
         require('tailwindcss-primeui')
