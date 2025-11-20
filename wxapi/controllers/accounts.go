@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"core"
+	"fmt"
+	"time"
 
 	"core/models"
 
@@ -91,6 +93,15 @@ type getListOfAccountsResult struct {
 	TotalRecords uint64 `json:"totalRecords"`
 }
 
+func (acc *Accounts) GetEdit(h wx.Handler, data struct {
+	UserId string `json:"userId"`
+}) (any, error) {
+	start := time.Now()
+	ret, err := core.Services.RABCSvc.GetAccountById(h().Req.Context(), acc.Authenticate.Data, data.UserId)
+	n := time.Since(start).Milliseconds()
+	fmt.Println(n)
+	return ret, err
+}
 func (acc *Accounts) GetListOfAccounts(h wx.Handler, pager PagerInfo) (any, error) {
 	if pager.Last == 0 {
 		return make([]any, 0), nil

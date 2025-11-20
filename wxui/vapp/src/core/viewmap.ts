@@ -4,6 +4,7 @@ export default function getViewMap() {
 };
 import { defineAsyncComponent, markRaw } from 'vue';
 export async function loadViews(viewPath?: string, errorView?: string) {
+    debugger;
     const viewsData = getViewMap();
     if (viewPath.startsWith('/')) {
         viewPath = viewPath.substring(1, viewPath.length);

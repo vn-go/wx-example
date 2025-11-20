@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	Id uint64 `db:"pk;auto" json:"id"`
+	Id uint64 `db:"pk;auto" json:"-"`
 	// UserId is a text of guid
 	// uk: uniquekey
 	// size:36 -> length of field

@@ -1,4 +1,4 @@
-import { reactive, ref, type Reactive } from 'vue';
+import { getCurrentInstance, reactive, ref, type Reactive } from 'vue';
 import ApiCaller from './api';
 import login from './api.login';
 import { getAppMenuData } from './appMenuData';
@@ -7,11 +7,14 @@ import UrlNav from './navigator';
 import SessionStore from './sessionStore';
 import BaseUI from "./ui";
 import getViewMap, { loadViews } from './viewmap';
-
 const sessionStore = new SessionStore("app-store");
 const libs = {
     BaseUI: BaseUI,
     _afterLogin: undefined,
+    getCurrentInstance: getCurrentInstance,
+    getEle: () => {
+        return (getCurrentInstance() as any).$ele;
+    },
     newDOMRef: () => {
         let ret = ref<HTMLElement | null>(null);
         return ret as any;
@@ -48,6 +51,7 @@ const libs = {
         const opener = new Modal("html/modal.html");
         await opener.load(componentPath, data);
     },
+
 
 
 }

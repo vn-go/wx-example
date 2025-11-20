@@ -3,7 +3,9 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import { createApp } from 'vue';
 import App from './App.vue';
+import './primevue-fix.css';
 import './style.css';
+
 const app = createApp(App);
 
 app.use(PrimeVue, {
@@ -22,7 +24,11 @@ app.use(PrimeVue, {
         }
     },
     theme: {
-        preset: Aura
+        preset: Aura,
+        options: {
+            darkModeSelector: null,   // tắt dark mode
+            cssLayer: false           // không inject color-scheme vào CSS
+        }
     }
     //unstyled: true,
     //pt: Aura

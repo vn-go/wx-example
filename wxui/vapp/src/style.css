@@ -9,48 +9,48 @@
 }
 
 .modal-container {
-  @apply bg-white border border-gray-200 px-2 m-4 shadow-sm;
+  @apply bg-white border border-gray-200 px-2 m-4 shadow-gray-700 shadow-2xl;
 }
 
-.btn {
-  @apply px-3 py-1 bg-white text-gray-700 border border-gray-300 rounded shadow-sm hover:bg-gray-50 hover:shadow transition;
-}
+.toolbar-container {
+  @apply px-0 p-1 shadow-sm flex flex-row;
 
-/* .p-datatable {
-
-
-  @apply w-full h-full px-0 m-0 bg-white shadow-sm;
-
-  .p-datatable-table-container {
-
-    @apply w-full h-full px-0 m-0 bg-white shadow-sm;
-
-    .p-virtualscroller {
-      @apply w-full h-full px-0 m-0 bg-white shadow-sm;
-    }
-
-    .p-datatable-header-cell {
-      @apply border-0;
-    }
-
-    .p-datatable-thead {
-      @apply border-0;
-
-      tr {
-        @apply border-0;
-      }
-
-      th {
-        @apply border-0;
-      }
-    }
+  .btn {
+    @apply m-0.5;
   }
+}
+
+/* Base button nhỏ hơn */
+.btn {
+  @apply px-2 py-1 text-sm bg-white text-gray-700 border border-gray-300 rounded shadow-sm hover:bg-gray-50 hover:shadow transition;
+}
+
+/* New (pastel blue) */
+.btn-new {
+  @apply border-blue-300 text-blue-600 hover:bg-blue-50;
+}
+
+/* Update (pastel green) */
+.btn-update {
+  @apply border-emerald-300 text-emerald-600 hover:bg-emerald-50;
+}
+
+/* Delete (pastel red) */
+.btn-delete {
+  @apply border-red-300 text-red-600 hover:bg-red-50;
+}
+
+/* Close (neutral) */
+.btn-close {
+  @apply border-gray-400 text-gray-600 hover:bg-gray-100;
+}
 
 
+input {
+  background-color: unset;
 
+}
 
-} */
-/*p-datatable-table p-datatable-scrollable-table*/
 .p-datatable.p-component.p-datatable-scrollable {
   display: table;
   @apply h-full w-full;

@@ -4,11 +4,19 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>vapp</title>
-  <link rel="stylesheet" href="https://unpkg.com/primevue/resources/themes/lara-light-blue/theme.css" />
-  <link rel="stylesheet" href="https://unpkg.com/primevue/resources/primevue.min.css" />
-  <link rel="stylesheet" href="https://unpkg.com/primeicons/primeicons.css" />
+  <style type="text/css" data-primevue-style-id="global-variables">
+    @media (prefers-color-scheme: dark) {
+
+      :root,
+      :host {
+        color-scheme: light !important;
+      }
+    }
+  </style>
+
 </head>
 
 <body class="w-full h-full">

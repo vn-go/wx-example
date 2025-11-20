@@ -31,7 +31,8 @@ import { Column, DataTable } from 'primevue';
     
     class Users extends libs.BaseUI {
         users=libs.newRef();
-        async onInit() {
+        
+        async onInit(uiEle) {
             
             let retApi=await this.loadData();
           
@@ -52,6 +53,7 @@ import { Column, DataTable } from 'primevue';
 
     }
     const user=libs.newReactive(new Users());
-    
+    alert(user.rootEle);
+
    
 </script>

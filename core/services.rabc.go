@@ -38,7 +38,7 @@ type rabcService interface {
 	GetListOfRoles(ctx context.Context, user *UserClaims, pager Pager) (any, error)
 	//GetListOfRolesSQL(ctx context.Context, user *UserClaims, pager Pager) (string, error)
 	GetListOfAccounts(ctx context.Context, user *UserClaims, pager Pager) (any, error)
-
+	GetAccountById(ctx context.Context, user *UserClaims, userId string) (any, error)
 	//GetDb(user *UserClaims) (*dx.DB, error)
 	ResgisterDataSouceView(ctx context.Context, user *UserClaims, Info DataSouceViewInfo)
 	ResgisterView(ctx context.Context, Tenant, viewPath, apiPath, createdBy string) error
@@ -50,6 +50,18 @@ type rabcServiceImpl struct {
 	cache     cacheService
 }
 
+/*
+this function get account info by userid
+*/
+func (r rabcServiceImpl) GetAccountById(ctx context.Context, user *UserClaims, userId string) (any, error) {
+	var db *dx.DB
+	var err error
+	if db, err = r.tanentSvc.GetTenant(user.Tenant); err != nil {
+		return nil, err
+	}
+
+	return dx.QueryItem[models.User](db, "user(),where(userId=?)", userId)
+}
 func (r rabcServiceImpl) ResgisterView(ctx context.Context, Tenant, viewPath, apiPath, createdBy string) error {
 	db, err := r.tanentSvc.GetTenant(Tenant)
 	if err != nil {

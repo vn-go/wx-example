@@ -81,6 +81,7 @@ export class ApiCaller {
 
             // Try parse JSON, nếu empty body thì data = null
             try {
+                ret.ok = true;
                 ret.data = res.status !== 204 ? await res.json() : null;
             } catch (err: any) {
                 ret.error = {
