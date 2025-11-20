@@ -9,3 +9,8 @@ setx GOCACHE D:\go-cache
 
 setx GOPATH D:\go
 setx GOCACHE D:\go-cachego clean -cache -modcache -testcache
+
+//vue build
+npm run build
+npm install -g serve
+serve -s dist

@@ -71,7 +71,9 @@
 
             </template>
             <template #footer>
-                <FormFooter/>
+                <FormFooter @onClose="()=>{
+                  userEditor.doClose();
+                }"/>
             </template>
         </EditorForm>
     </div>
