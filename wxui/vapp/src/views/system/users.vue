@@ -44,9 +44,10 @@ import { Column, DataTable } from 'primevue';
                 })
         }
         async doEdit(data) {
-            let modal=libs.newModal("html/modal.html");
-            console.log(modal);
-            await modal.load("views/system/users");
+            // let modal=libs.newModal("html/modal.html");
+            // console.log(modal);
+            // await modal.load("views/system/users");
+            await libs.showModal("views/system/users.editor",{userId:data.userId})
         }
 
     }

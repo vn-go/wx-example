@@ -1,13 +1,11 @@
 import PrimeVue from 'primevue/config';
 
-
-
+import Aura from '@primeuix/themes/aura';
 import { createApp } from 'vue';
 import App from './App.vue';
 import './style.css';
 const app = createApp(App);
 
-// createApp(App).mount('#app')
 app.use(PrimeVue, {
     ripple: true,  // tùy chọn
     locale: {
@@ -22,6 +20,11 @@ app.use(PrimeVue, {
             trueLabel: 'True',
             falseLabel: 'False'
         }
+    },
+    theme: {
+        preset: Aura
     }
+    //unstyled: true,
+    //pt: Aura
 });
 app.mount('#app');

@@ -7,6 +7,7 @@ import UrlNav from './navigator';
 import SessionStore from './sessionStore';
 import BaseUI from "./ui";
 import getViewMap, { loadViews } from './viewmap';
+
 const sessionStore = new SessionStore("app-store");
 const libs = {
     BaseUI: BaseUI,
@@ -42,7 +43,12 @@ const libs = {
     },
     newModal(rawHtml?: string) {
         return new Modal(rawHtml);
-    }
+    },
+    async showModal(componentPath: string, data?: any) {
+        const opener = new Modal("html/modal.html");
+        await opener.load(componentPath, data);
+    },
+
 
 }
 export default libs;

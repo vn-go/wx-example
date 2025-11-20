@@ -8,6 +8,10 @@
   @apply bg-white border-b border-gray-200 px-2 shadow-sm;
 }
 
+.modal-container {
+  @apply bg-white border border-gray-200 px-2 m-4 shadow-sm;
+}
+
 .btn {
   @apply px-3 py-1 bg-white text-gray-700 border border-gray-300 rounded shadow-sm hover:bg-gray-50 hover:shadow transition;
 }
@@ -60,6 +64,20 @@
       th.p-datatable-header-cell {
         @apply bg-white border-b border-gray-200 px-2 shadow-sm p-2;
 
+      }
+    }
+
+    div.p-datatable-column-header-content {
+
+
+      span.p-datatable-column-title {
+        @apply text-gray-900 w-0.5;
+      }
+
+      span[data-pc-section] {
+        svg {
+          @apply text-gray-700;
+        }
       }
     }
   }

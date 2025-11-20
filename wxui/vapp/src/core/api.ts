@@ -1,8 +1,9 @@
 const API_BASE = (import.meta as any).env.VITE_API_BASE_URL;
 
 export type ApiResult = {
+    ok?: boolean;
     error?: {
-        ok: boolean;
+
         status: number;
         statusText: string;
         data: string;
@@ -70,7 +71,7 @@ export class ApiCaller {
 
             if (!res.ok) {
                 ret.error = {
-                    ok: false,
+
                     status: res.status,
                     statusText: res.statusText,
                     data: await res.text(),
@@ -83,7 +84,7 @@ export class ApiCaller {
                 ret.data = res.status !== 204 ? await res.json() : null;
             } catch (err: any) {
                 ret.error = {
-                    ok: false,
+
                     status: res.status,
                     statusText: "Invalid JSON",
                     data: err.message || "Failed to parse JSON",
@@ -93,7 +94,7 @@ export class ApiCaller {
             return ret;
         } catch (err: any) {
             ret.error = {
-                ok: false,
+
                 status: 0,
                 statusText: "Network Error",
                 data: err.message || "Unknown network error",
