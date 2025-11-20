@@ -16,9 +16,9 @@
         <span class="text-sm font-medium hidden sm:inline text-gray-700">My App</span>
       </div>
     </header>
-    <aside
+    <aside style="z-index:10000;"
   :ref="el => app.sideBarEle.value = el"
-  class="sidebar widget-container  z-30"
+  class="sidebar widget-container"
  :class="{ 'translate-x-0': app.sidebarOpen }"
 >
     <slot name="sidebar">

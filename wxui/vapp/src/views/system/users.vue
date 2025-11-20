@@ -45,15 +45,13 @@ import { Column, DataTable } from 'primevue';
                 })
         }
         async doEdit(data) {
-            // let modal=libs.newModal("html/modal.html");
-            // console.log(modal);
-            // await modal.load("views/system/users");
-            await libs.showModal("views/system/users.editor",{userId:data.userId})
+            await this.newModal("views/system/users",{userId:data.userId}).setSize(600,500).render();
+            
         }
 
     }
-    const user=libs.newReactive(new Users());
-    alert(user.rootEle);
+    const user=libs.newReactive(new Users("system/users"));
+   
 
    
 </script>

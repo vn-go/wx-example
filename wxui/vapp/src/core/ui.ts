@@ -1,13 +1,17 @@
 // BaseUI.ts
 import { getCurrentInstance, onMounted, ref, type Ref } from 'vue';
 import { formatDate as libFormatDate } from './formatDate';
+import Modal, { type ModalInstance } from './modal';
+const opener = new Modal("html/modal.html");
 
 export default class BaseUI {
     vueComponent: any;
     rootEle: HTMLElement | null = null;
     private _onMount: (() => void) | null = null;
+    viewPath: string;
 
-    constructor() {
+    constructor(viewPath?: string) {
+        this.viewPath = viewPath;
         // Lấy instance Vue hiện tại
         this.vueComponent = getCurrentInstance();
 
@@ -18,6 +22,12 @@ export default class BaseUI {
                 (this.vueComponent?.ctx?.$ele as HTMLElement) || // pattern project cũ
                 (this.vueComponent?.proxy?.$el as HTMLElement) || // fallback Composition API
                 null;
+            if (this.rootEle && this.rootEle instanceof HTMLElement) {
+                if (this.viewPath) {
+                    this.rootEle.setAttribute('view-path', this.viewPath);
+                }
+
+            }
 
             // Gọi callback onMounted nếu có
             if (this._onMount) this._onMount();
@@ -25,6 +35,7 @@ export default class BaseUI {
             // Gọi onInit() sau mounted
             this.onInit();
         });
+
     }
 
     /**
@@ -85,5 +96,19 @@ export default class BaseUI {
             };
             check();
         });
+    }
+    newModal(componentPath): ModalInstance {
+        if (this.rootEle && this.rootEle instanceof HTMLElement) {
+            return opener.load(this.rootEle as HTMLElement, componentPath);
+        }
+
+    }
+    doClose() {
+        const uiId = this.rootEle.getAttribute("ui-id");
+        const parentUiId = this.rootEle.parentElement.getAttribute("ui-id");
+        if (uiId === parentUiId) {
+            this.rootEle.parentElement.remove();
+        }
+
     }
 }
