@@ -1,6 +1,6 @@
 <template>
    
-   <div class="toolbar-container">
+   <div class="w-full px-2 py-2 border-t border-gray-200 bg-gray-50 flex justify-end gap-1">
 
 <button v-if="showNew"
         class="btn btn-new"

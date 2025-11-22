@@ -25,6 +25,8 @@
   @apply px-2 py-1 text-sm bg-white text-gray-700 border border-gray-300 rounded shadow-sm hover:bg-gray-50 hover:shadow transition;
 }
 
+
+
 /* New (pastel blue) */
 .btn-new {
   @apply border-blue-300 text-blue-600 hover:bg-blue-50;

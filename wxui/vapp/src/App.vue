@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@app-layouts/app.vue';
+import emitter from '@core/eventBus';
 import libs from '@core/lib';
 import BurgerButton from '@widgets/app-header-buger.vue';
 import AppSiderbar from '@widgets/app-siderbar.vue';
@@ -11,24 +12,18 @@ const currentView = ref();
 class Application extends libs.BaseUI {
   currentComponent = libs.newRef<any>(null);
   $currentView:any;
-  isShowMask=libs.newRef(true);
+  isShowMask=libs.newRef(false);
   userInfo: any;
   constructor() {
     super();
     this.refKey("$currentView")
-    
-    libs.api.onDial(()=>{
+    emitter.on("on-api-dial",()=>{
       this.isShowMask.value=true;
     });
-    libs.api.onFinished(()=>{
+    emitter.on("on-api-complete",()=>{
       this.isShowMask.value=false;
     });
-    libs.apiPublic.onDial(()=>{
-      this.isShowMask.value=true;
-    })
-    libs.apiPublic.onFinished(()=>{
-      this.isShowMask.value=false;
-    });
+   
     libs.onAfterLogin(async ()=>{
           debugger;
           let userInfoResult=await this.getUserInfo();
@@ -41,76 +36,31 @@ class Application extends libs.BaseUI {
   }
   
   async onInit() {
-      
-      let userInfoResult=await this.getUserInfo();
-      let isRequireLogin=false;
-      if (userInfoResult.error && userInfoResult.error.status==401){
-         isRequireLogin=true;
-
-      } else {
-          this.userInfo=libs.newReactive(userInfoResult.data)
-      }
-      
-      let self=this;
+    let self=this;
+      emitter.on('require-login', async ()=>{
+        debugger;
+        let currentPatname=libs.urlNav.getPathname();
+        
+        if(currentPatname!="auth/login"){
+          libs.urlNav.changeUrl("/auth/login",libs.urlNav.makeQuery("ret",currentPatname));
+          await self.loadView("/auth/login");
+        }
+      });
+      emitter.on("after-login",async ()=>{
+        debugger;
+        let redirectTo=libs.urlNav.getQuery("ret")??"/";
+        libs.urlNav.move(redirectTo);
+      })
       libs.urlNav.onNav(async (pathName,search)=>{
-          if(!pathName) {
-            libs.urlNav.move("home");
-            return;
-          }
-          if(!libs.sessionStore.get("tk")||isRequireLogin){
-            let currentPatname=libs.urlNav.getPathname();
-            if (currentPatname!="auth/login"){
-              libs.urlNav.changeUrl("/auth/login",libs.urlNav.makeQuery("ret",currentPatname));
-              await self.loadView("/auth/login");
-              self.$currentView= await self.getBindComponent("$currentView"); 
-              if(self.$currentView && self.$currentView.value && self.$currentView.value.instance){
-                self.$currentView.value.instance.onAfterLogin(async ()=>{
-                   
-                    userInfoResult=await self.getUserInfo();
-                  
-                    if (userInfoResult.error && userInfoResult.error.status==401){
-                      isRequireLogin=true;
-
-                    } else {
-                      self.userInfo=libs.newReactive(userInfoResult.data);
-                      isRequireLogin=false;
-                    }
-                    libs.urlNav.move(currentPatname);
-                })
-              }
-            } else {
-              await self.loadView("/auth/login");
-              self.$currentView= await self.getBindComponent("$currentView"); 
-              if(self.$currentView && self.$currentView.value && self.$currentView.value.instance){
-                self.$currentView.value.instance.onAfterLogin(async ()=>{
-                 
-                  userInfoResult=await self.getUserInfo();
-                  
-                    if (userInfoResult.error && userInfoResult.error.status==401){
-                      isRequireLogin=true;
-
-                    } else {
-                      self.userInfo=libs.newReactive(userInfoResult.data);
-                      isRequireLogin=false;
-                    }
-                    libs.urlNav.move("home");
-                })
-              }
-              
-            }
-            
-          } else {
-            if (pathName=="auth/login"){
-                libs.urlNav.move("home");
-            } else {
-              if(!pathName) {
-                pathName="home";
-              }
-              await self.loadView(pathName);
-            }
-            
-          }
-        });
+        debugger;
+        if(!pathName){
+          await self.loadView("home");
+        } else {
+          await self.loadView(pathName);
+        }
+        
+      });
+      
       libs.urlNav.init();
       
   }
@@ -120,7 +70,7 @@ class Application extends libs.BaseUI {
    
   }
   async getUserInfo() {
-      return await libs.api.post("/accounts/me")
+      return await libs.api.post("app","/accounts/me")
   }
   
 }

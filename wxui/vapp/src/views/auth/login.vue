@@ -45,7 +45,8 @@
   </template>
   
   <script setup lang="ts">
-    import libs from '@core/lib';
+    import emitter from '@core/eventBus';
+import libs from '@core/lib';
 
    class Login extends libs.BaseUI{
       data ={
@@ -55,7 +56,7 @@
       errMsg=libs.newRef();
       private _onAfterLogin=undefined;
       async doLogin() {
-        let res= await libs.apiPublic.formPost('auth/login',{
+        let res= await libs.apiPublic.formPost(this.getViewPath(), 'auth/login',{
           grant_type: 'password',
           username:this.data.username,
           password:this.data.password
@@ -65,7 +66,7 @@
           this.errMsg=res.error.statusText;
         }else {
           libs.sessionStore.set("tk",res.data.access_token);
-          await this.raiseAfterLogin();
+          emitter.emit("after-login",{})
         }
         
          
@@ -80,7 +81,7 @@
      }
     
    }
-   const instance= new Login();
+   const instance= new Login("auth/login");
 
    const login=libs.newReactive(instance) ;
    function getIns() {

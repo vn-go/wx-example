@@ -1,80 +1,97 @@
 <template>
-    <div class="w-full h-full debug">
+    <div class="w-full h-full">
 
         <EditorForm>
-            <template #header>
-                <span>Edit user</span>
-            </template>
-            <template #body>
-                <div class="grid grid-cols-2 gap-6">
+          <template #header>
+            <span class="font-semibold text-gray-800">Edit user</span>
+</template>
+<template #body>
+    <div class="p-6 form-data">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-<!-- Left Column -->
-<div class="space-y-4">
-  
+            <div class="space-y-6">
+                
+                <div>
+                    <label>Username</label>
+                    <input 
+                        disabled 
+                        value="root" 
+                    >
+                </div>
 
-  <div>
-    <label class="font-semibold">Username</label>
-    <input disabled value="root" class="input readonly">
-  </div>
+                <div>
+                    <label>Email</label>
+                    <input 
+                        type="email" 
+                        v-model="userEditor.userData.email" 
+                    >
+                </div>
 
-  <div>
-    <label class="font-semibold">Email</label>
-    <input type="email" v-model="userEditor.userData.email" class="input">
-  </div>
+                <div class="flex items-center gap-3 pt-2">
+                    <input 
+                        type="checkbox" 
+                        v-model="userEditor.userData.isActive"
+                    >
+                    <label>Active</label>
+                </div>
 
-  <div class="flex items-center gap-3">
-    <input type="checkbox" v-model="userEditor.userData.isActive">
-    <label>Active</label>
-  </div>
+                <div class="flex items-center gap-3">
+                    <input 
+                        type="checkbox" 
+                        v-model="userEditor.userData.isSysAdmin"
+                    >
+                    <label>System Admin</label>
+                </div>
+            </div>
 
-  <div class="flex items-center gap-3">
-    <input type="checkbox" v-model="userEditor.userData.isSysAdmin">
-    <label>System Admin</label>
-  </div>
-</div>
+            <div class="space-y-6">
 
-<!-- Right Column -->
-<div class="space-y-4">
+                <div>
+                    <label>Role ID</label>
+                    <v-select  label="name"></v-select>
+                </div>
 
-  <div>
-    <label class="font-semibold">Role ID</label>
-    <select v-model="userEditor.userData.roleId" class="input">
-      <option :value="null">-- No role --</option>
-      
-    </select>
-  </div>
+                
 
-  <div>
-    <label class="font-semibold">Role Code</label>
-    <input v-model="userEditor.userData.roleCode" class="input">
-  </div>
+                <div>
+                    <label>Created By</label>
+                    <input 
+                        disabled 
+                        value="admin" 
+                    >
+                </div>
 
-  <div>
-    <label class="font-semibold">Created By</label>
-    <input disabled value="admin" class="input readonly">
-  </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Created On</label>
+                    <!-- <input 
+                        disabled 
+                        value="2025-11-10T10:06:48Z" 
+                    > -->
+                    <vue-datePicker :text-input="true" 
+                    v-model="userEditor.userData.createdOn"
+                    :enable-tab-navigation="true"/>
+                </div>
 
-  <div>
-    <label class="font-semibold">Created On</label>
-    <input disabled value="2025-11-10T10:06:48Z" class="input readonly">
-  </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Modified On</label>
+                    <input 
+                        disabled 
+                        value="" 
+                        
+                    >
+                </div>
 
-  <div>
-    <label class="font-semibold">Modified On</label>
-    <input disabled value="" class="input readonly">
-  </div>
-
-</div>
-</div>
-
-
-
-            </template>
-            <template #footer>
-                <FormFooter @onClose="()=>{
-                  userEditor.doClose();
-                }"/>
-            </template>
+            </div>
+        </div>
+    </div>
+</template>
+<template #footer>
+    <div class="">
+        <FormFooter @onClose="()=>{
+            userEditor.doClose();
+        }"/>
+    </div>
+</template>
         </EditorForm>
     </div>
 </template>
@@ -82,13 +99,17 @@
 import EditorForm from '@app-layouts/editor-form.vue';
 import FormFooter from '@components/FormFooter.vue';
 import libs from '@core/lib';
+import { VueDatePicker } from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
+import vSelect from 'vue-select';
 class UserEditor extends libs.BaseUI {
     userId= undefined;
     userData=libs.newRef({});
     errMsg= libs.newRef();
     
     async onInit() {
-        let res= await libs.api.post("accounts/get-edit",{userId:this.userId});
+      alert(this.getViewPath());
+        let res= await libs.api.post(this.getViewPath(), "accounts/get-edit",{userId:this.userId});
         if (!res.ok){
             this.errMsg.value= res.error.statusText
         }else {

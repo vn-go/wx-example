@@ -39,13 +39,16 @@ import { Column, DataTable } from 'primevue';
             this.users.value=retApi.data ;
         }
         async loadData(){
-            return await libs.api.post("/accounts/get-list-of-accounts",{
+            
+            return await libs.api.post(this.getViewPath(),"/accounts/get-list-of-accounts",{
                 "first": 0,
                 "last": 1000
                 })
         }
+        
         async doEdit(data) {
-            await this.newModal("views/system/users",{userId:data.userId}).setSize(600,500).render();
+           
+            await this.newModal("views/system/users").setTitle("test").setData({userId:data.userId}).setSize(700,500).render();
             
         }
 

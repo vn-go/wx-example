@@ -1,16 +1,48 @@
 // BaseUI.ts
 import { getCurrentInstance, onMounted, ref, type Ref } from 'vue';
+import ApiCaller from './api';
+import { findViewPath } from './findViewPath';
 import { formatDate as libFormatDate } from './formatDate';
 import Modal, { type ModalInstance } from './modal';
+import UrlNav from './navigator';
+import SessionStore from './sessionStore';
 const opener = new Modal("html/modal.html");
+const urlNav = new UrlNav();
+class APICls {
 
+    private _owner: BaseUI;
+    private _caller: ApiCaller;
+    constructor(owner: BaseUI) {
+        this._owner = owner;
+        const self = this;
+        this._caller = new ApiCaller(() => {
+            return self._owner.sessionStore.get("tk")
+        });
+    }
+    async post(apiEnpoint: string, data?: any) {
+        const rs = await this._caller.post(this._owner.getViewPath(), apiEnpoint, data);
+        if (!rs.ok) {
+            if (rs.status == 401) {
+                urlNav.move("/auth/login", `ret=${urlNav.getPathname()}`);
+                //urlNav.changeUrl("/auth/login", `ret=${urlNav.getPathname()}`);
+                return;
+            }
+        }
+        return rs;
+
+    }
+}
 export default class BaseUI {
     vueComponent: any;
     rootEle: HTMLElement | null = null;
     private _onMount: (() => void) | null = null;
     viewPath: string;
+    remoteCaller: APICls
+    sessionStore: SessionStore;
 
     constructor(viewPath?: string) {
+        this.sessionStore = new SessionStore("app-store")
+        this.remoteCaller = new APICls(this)
         this.viewPath = viewPath;
         // Lấy instance Vue hiện tại
         this.vueComponent = getCurrentInstance();
@@ -35,6 +67,7 @@ export default class BaseUI {
             // Gọi onInit() sau mounted
             this.onInit();
         });
+
 
     }
 
@@ -107,8 +140,11 @@ export default class BaseUI {
         const uiId = this.rootEle.getAttribute("ui-id");
         const parentUiId = this.rootEle.parentElement.getAttribute("ui-id");
         if (uiId === parentUiId) {
-            this.rootEle.parentElement.remove();
+            this.rootEle.parentElement.parentElement.remove();
         }
 
+    }
+    getViewPath() {
+        return findViewPath(this.rootEle);
     }
 }

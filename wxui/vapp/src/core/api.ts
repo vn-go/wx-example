@@ -1,16 +1,18 @@
 const API_BASE = (import.meta as any).env.VITE_API_BASE_URL;
-
+let _onRequireAuth = undefined;
+export function onRequireAuth(fn: () => {}) {
+    _onRequireAuth = fn;
+}
 export type ApiResult = {
     ok?: boolean;
+    status?: number;
     error?: {
-
-        status: number;
         statusText: string;
         data: string;
     };
     data?: any;
 };
-
+import emitter from "./eventBus";
 export class ApiCaller {
     private _accessToken?: () => {} = undefined;
 
@@ -29,11 +31,11 @@ export class ApiCaller {
     onFinished(fn: () => void) { this._onFinished = fn; }
 
     /** POST JSON */
-    async post(apiEndpoint: string, data?: any): Promise<ApiResult> {
+    async post(viewPath: string, apiEndpoint: string, data?: any): Promise<ApiResult> {
         const url = this.buildUrl(apiEndpoint);
         const headers: Record<string, string> = { "Content-Type": "application/json" };
         if (this._accessToken) headers["Authorization"] = `Bearer ${this._accessToken()}`;
-
+        headers["View-Path"] = viewPath;
         return this._fetch(url, {
             method: "POST",
             headers,
@@ -42,9 +44,10 @@ export class ApiCaller {
     }
 
     /** POST form-urlencoded */
-    async formPost(apiEndpoint: string, data?: Record<string, any>): Promise<ApiResult> {
+    async formPost(viewPath: string, apiEndpoint: string, data?: Record<string, any>): Promise<ApiResult> {
         const url = this.buildUrl(apiEndpoint);
         const headers: Record<string, string> = { "Content-Type": "application/x-www-form-urlencoded" };
+        headers["View-Path"] = viewPath;
         if (this._accessToken) headers["Authorization"] = `Bearer ${this._accessToken()}`;
 
         const formData = new URLSearchParams(data || {}).toString();
@@ -64,15 +67,22 @@ export class ApiCaller {
 
     /** Private fetch handler */
     private async _fetch(url: string, options: RequestInit): Promise<ApiResult> {
-        this._onDial();
+
+        emitter.emit("on-api-dial");
         const ret: ApiResult = {};
         try {
             const res = await fetch(url, options);
+            if (res.status == 401) {
 
+                emitter.emit('require-login', {});
+                return;
+            }
             if (!res.ok) {
+
+                ret.status = res.status;
                 ret.error = {
 
-                    status: res.status,
+
                     statusText: res.statusText,
                     data: await res.text(),
                 };
@@ -81,28 +91,34 @@ export class ApiCaller {
 
             // Try parse JSON, nếu empty body thì data = null
             try {
+                ret.status = res.status;
                 ret.ok = true;
                 ret.data = res.status !== 204 ? await res.json() : null;
             } catch (err: any) {
+                ret.status = res.status;
                 ret.error = {
 
-                    status: res.status,
+
                     statusText: "Invalid JSON",
                     data: err.message || "Failed to parse JSON",
                 };
             }
+            finally {
+                emitter.emit("on-api-complete");
+            }
 
             return ret;
         } catch (err: any) {
+            ret.status = 0;
             ret.error = {
 
-                status: 0,
+
                 statusText: "Network Error",
                 data: err.message || "Unknown network error",
             };
             return ret;
         } finally {
-            this._onFinished();
+            emitter.emit("on-api-complete");
         }
     }
 }

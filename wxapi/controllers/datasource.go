@@ -2,7 +2,10 @@ package controllers
 
 import (
 	"core"
+	"strings"
+	"sync"
 
+	"github.com/google/uuid"
 	"github.com/vn-go/dx"
 	"github.com/vn-go/wx"
 )
@@ -47,4 +50,26 @@ func (ds *DataSource) GetQuery(h wx.Handler, data struct {
 	}
 	return ret, err
 
+}
+
+var cacheDsl sync.Map
+
+func (ds *DataSource) RegisterDataSource(h wx.Handler, data struct {
+	Dsl string `json:"dsl"`
+}) (any, error) {
+	if ret, ok := cacheDsl.Load(strings.ToLower(data.Dsl)); ok {
+		return struct {
+			Id string `json:"id"`
+		}{
+			Id: ret.(string),
+		}, nil
+	} else {
+		retId := uuid.NewString()
+		cacheDsl.Store(strings.ToLower(data.Dsl), retId)
+		return struct {
+			Id string `json:"id"`
+		}{
+			Id: ret.(string),
+		}, nil
+	}
 }

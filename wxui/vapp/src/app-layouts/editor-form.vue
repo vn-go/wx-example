@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col w-full h-full">
-        <div>
+        <div class="widget-container">
             <slot name="header">
                 Header
             </slot>
@@ -12,8 +12,8 @@
             </slot>
 
         </div>
-        <div class="w-full  m-0 p-0 flex flex-row">
-            <div class="w-full"></div>
+        <div class="w-full  m-0 p-0">
+          
             <slot name="footer">
                 Footer
             </slot>

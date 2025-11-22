@@ -1,3 +1,4 @@
+
 export function getAppMenuData() {
     return [
         {
@@ -11,6 +12,10 @@ export function getAppMenuData() {
                     id: 2,
                     title: "Roles",
                     pathname: "/system/roles"
+                }, {
+                    id: 3,
+                    title: "Views",
+                    pathname: "/system/views"
                 }
             ]
         }, {

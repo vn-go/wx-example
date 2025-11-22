@@ -12,6 +12,7 @@ export class ModalInstance {
     private htmlModules: any;
     private componentModules: any;
     private rootEle: HTMLElement;
+    private _title?: string;
     constructor(rootEle: HTMLElement, htmlModules, componentModules, templatePath: string, componentPath: string, data?: any) {
         this.htmlModules = htmlModules;
         this.componentModules = componentModules;
@@ -22,6 +23,10 @@ export class ModalInstance {
         this.height = 0;
         this.rootEle = rootEle;
         this.data = data;
+    }
+    setTitle(title: string): ModalInstance {
+        this._title = title
+        return this;
     }
     setData(data: any): ModalInstance {
         this.data = data;
@@ -38,6 +43,7 @@ export class ModalInstance {
         return this;
     }
     async render() {
+
         const htmlContent = await this.htmlModules[`../${this.templatePath}`]();
         const parserDOM = parseAndAccessRoles(htmlContent);
         draggableWindowWiget(parserDOM);
@@ -46,21 +52,33 @@ export class ModalInstance {
         let childEle = parserDOM.container as HTMLElement;
         parserDOM.container.setAttribute("ui-id", this.componentPath);
         this._applySize(parserDOM.container)
+        const r = document.body.getBoundingClientRect();
+        // parserDOM.container.style.left = `${r.width}px`;
+        parserDOM.container.style.zIndex = "-1";
         this.rootEle.appendChild(parserDOM.container);
         const maxWith = document.body.getBoundingClientRect().width;
         const maxHeight = document.body.getBoundingClientRect().height
         parserDOM.container.style.maxWidth = `${maxWith}px`;
         parserDOM.container.style.maxHeight = `${maxHeight}px`;
+        if (!this._title) {
+            parserDOM.header.style.display = "none";
+        }
+        parserDOM.title.innerText = this._title || ' ';
         //document.body.appendChild(parserDOM.container);
 
         let app = undefined;
-        await showElementFromRight(childEle as HTMLElement, async () => {
-            const componentLoader = this.componentModules[`../${this.componentPath}.vue`]
-            const Component = (await componentLoader()).default;
-            app = createApp(Component, this.data);
-            app.mount(parserDOM.body)
-            childEle.children[0].setAttribute("ui-id", this.componentPath);
-        });
+        const componentLoader = this.componentModules[`../${this.componentPath}.vue`]
+        const Component = (await componentLoader()).default;
+        app = createApp(Component, this.data);
+        app.mount(parserDOM.body)
+        childEle.children[0].setAttribute("ui-id", this.componentPath);
+        childEle.children[0].setAttribute("view-path", this.rootEle.getAttribute("view-path"));
+
+        await showElementFromRight(parserDOM.container as HTMLElement, () => {
+            parserDOM.container.style.zIndex = "10000";
+        }, async () => {
+
+        }, 500);
 
 
         return { childEle, app }

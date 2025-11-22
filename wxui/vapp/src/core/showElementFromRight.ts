@@ -7,7 +7,7 @@
  * @param duration Total duration of the entire animation in milliseconds (default: 800ms)
  * @param easing Timing function (default: ease-out)
  */
-function showElementFromRight(element: HTMLElement, onFinish: () => {}, duration: number = 300, easing: string = 'ease-out'): Promise<undefined> {
+function showElementFromRight(element: HTMLElement, afterSetup: () => void, onFinish: () => {}, duration: number = 300, easing: string = 'ease-out'): Promise<undefined> {
     const ret = new Promise<undefined>((resolve, reject) => {
         // Ensure the element is positioned absolutely or fixed for transform to work properly
         element.style.position = 'fixed';
@@ -19,7 +19,7 @@ function showElementFromRight(element: HTMLElement, onFinish: () => {}, duration
 
         // Force reflow to ensure initial state is applied before animation
         void element.offsetWidth;
-
+        afterSetup();
         // Phase 1: First, move from right edge → still on the right but visible + vertically centered
         // Phase 2: Then move to the true center of the screen
         const keyframes = [
