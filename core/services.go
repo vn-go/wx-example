@@ -100,24 +100,26 @@ func NewContainer(configPath string) *Container {
 // )
 
 type servicesTypes struct {
-	Config    *configInfo
-	Users     userService
-	UserRepo  userRepo
-	Cache     cacheService
-	Db        *dx.DB
-	TenantSvc tenantService
-	AuthSvc   serviceAuth
-	Log       logService
-	Encrypt   encryptService
-	Broker    bx.Broker
-	JWTSvc    jwtService
-	RABCSvc   rabcService
-	DataSvc   dataService
-	Dataset   datasetService
-	ViewSvc   *viewService
-	SysSvc    *systemService
-	TamperSvc *tamperService
-	SecretSvc *secretService
+	Config      *configInfo
+	Users       userService
+	UserRepo    userRepo
+	Cache       cacheService
+	Db          *dx.DB
+	TenantSvc   tenantService
+	AuthSvc     serviceAuth
+	Log         logService
+	Encrypt     encryptService
+	Broker      bx.Broker
+	JWTSvc      jwtService
+	RABCSvc     rabcService
+	DataSvc     dataService
+	Dataset     datasetService
+	ViewSvc     *viewService
+	SysSvc      *systemService
+	TamperSvc   *tamperService
+	SecretSvc   *secretService
+	DataJWTSvc  *dataJWTService
+	DataSignSvc *dataJWTService
 	//Pwd passwordService
 	//config configInfo
 }
@@ -146,4 +148,6 @@ var Services = (&bx.Wire[servicesTypes]{}).WireThenGet(
 	newSystemService,
 	newTamperService,
 	newSecretService,
+	newDataJWTService,
+	newDataSignService,
 )

@@ -13,8 +13,10 @@ const sessionStore = new SessionStore("app-store");
 
 
 const libs = {
+    currentApp: undefined,
     BaseUI: BaseUI,
     _afterLogin: undefined,
+
     getCurrentInstance: getCurrentInstance,
     getEle: () => {
         return (getCurrentInstance() as any).$ele;
@@ -51,10 +53,10 @@ const libs = {
     newModal(rawHtml?: string) {
         return new Modal(rawHtml);
     },
-    async showModal(rootEle: HTMLHtmlElement, componentPath: string, data?: any) {
-        const opener = new Modal("html/modal.html");
-        await opener.load(rootEle, componentPath, data);
-    },
+    // async showModal(rootEle: HTMLHtmlElement, componentPath: string, data?: any) {
+    //     const opener = new Modal("html/modal.html");
+    //     await opener.load( rootEle, componentPath, data);
+    // },
 
 
 

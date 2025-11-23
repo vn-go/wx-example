@@ -7,7 +7,7 @@ import (
 )
 
 func InitRoute() {
-	controllers.GetListOfRoles()
+
 	// acc all controllers to routes
 	err := wx.Routes("/api",
 
@@ -18,6 +18,7 @@ func InitRoute() {
 		&controllers.Pure{},
 		&controllers.Dataset{},
 		&controllers.ViewManager{},
+		&controllers.Roles{},
 	)
 	if err != nil {
 		panic(err)

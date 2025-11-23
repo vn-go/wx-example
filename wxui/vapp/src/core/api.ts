@@ -52,7 +52,7 @@ export class ApiCaller {
 
         const formData = new URLSearchParams(data || {}).toString();
 
-        return this._fetch(url, {
+        return await this._fetch(url, {
             method: "POST",
             headers,
             body: formData,
@@ -73,9 +73,27 @@ export class ApiCaller {
         try {
             const res = await fetch(url, options);
             if (res.status == 401) {
+                if (this._accessToken) {
+                    emitter.emit('require-login', {});
+                    ret.status = res.status;
+                    ret.error = {
 
-                emitter.emit('require-login', {});
-                return;
+
+                        statusText: res.statusText,
+                        data: await res.text(),
+                    };
+                    return ret;
+                } else {
+                    ret.status = res.status;
+                    ret.error = {
+
+
+                        statusText: res.statusText,
+                        data: await res.text(),
+                    };
+                    return ret;
+                }
+
             }
             if (!res.ok) {
 

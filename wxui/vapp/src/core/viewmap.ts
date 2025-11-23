@@ -10,11 +10,18 @@ export async function loadViews(viewPath?: string, errorView?: string) {
         viewPath = viewPath.substring(1, viewPath.length);
     }
     if (!viewsData[`../views/${viewPath}.vue`]) {
-        let ret = markRaw(defineAsyncComponent(viewsData[`../views/${errorView}.vue`]));
-        console.log(ret);
+        let cmp = defineAsyncComponent(viewsData[`../views/${errorView}.vue`]);
+        console.log(cmp);
+        let ret = markRaw(cmp);
+
         return ret;
     }
-    let ret = markRaw(defineAsyncComponent(viewsData[`../views/${viewPath}.vue`]));
-    console.log(ret);
+    let cmp = defineAsyncComponent(viewsData[`../views/${viewPath}.vue`]);
+    console.log(cmp);
+    let ret = markRaw(cmp);
+    //const v = await cmp["__asyncLoader"]()
+    //console.log(v);
+
+
     return ret;
 }

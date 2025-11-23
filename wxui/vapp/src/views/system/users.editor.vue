@@ -14,8 +14,8 @@
                 <div>
                     <label>Username</label>
                     <input 
-                        disabled 
-                        value="root" 
+                       
+                        v-model="userEditor.userData.username" 
                     >
                 </div>
 
@@ -56,8 +56,8 @@
                 <div>
                     <label>Created By</label>
                     <input 
-                        disabled 
-                        value="admin" 
+                        
+                        v-model="userEditor.userData.createdBy" 
                     >
                 </div>
 
@@ -75,8 +75,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Modified On</label>
                     <input 
-                        disabled 
-                        value="" 
+                    v-model="userEditor.userData.modifiedOn" 
                         
                     >
                 </div>
@@ -84,11 +83,16 @@
             </div>
         </div>
     </div>
+    
 </template>
 <template #footer>
     <div class="">
-        <FormFooter @onClose="()=>{
+        <FormFooter 
+        @onClose="()=>{
             userEditor.doClose();
+        }"
+        @onUpdate="()=>{
+            userEditor.doUpdate();
         }"/>
     </div>
 </template>
@@ -106,17 +110,35 @@ class UserEditor extends libs.BaseUI {
     userId= undefined;
     userData=libs.newRef({});
     errMsg= libs.newRef();
+    updateToken: any;
     
+    async onPreInit() {
+        // register all api for this UI
+        this.apiDiscovery([
+            "accounts/get-edit",
+            "accounts/update",
+            "accounts/delete",
+            "accounts/new",
+        ]);
+    }
     async onInit() {
-      alert(this.getViewPath());
+        
         let res= await libs.api.post(this.getViewPath(), "accounts/get-edit",{userId:this.userId});
         if (!res.ok){
             this.errMsg.value= res.error.statusText
         }else {
-            this.userData.value= res.data;
+            this.userData.value= res.data.data;
+            this.updateToken= res.data.token;
         }
 
     }
+    async doUpdate() {
+        let res= await libs.api.post(this.getViewPath(), "accounts/update-by-id",{
+            data:this.userData,
+            token:this.updateToken,
+        });
+    }
+    
 }
 const instance =new UserEditor()
 const  userEditor=libs.newReactive(instance) ;

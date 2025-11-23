@@ -5,7 +5,9 @@ import (
 	"core/models"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -38,22 +40,60 @@ type rabcService interface {
 	GetListOfRoles(ctx context.Context, user *UserClaims, pager Pager) (any, error)
 	//GetListOfRolesSQL(ctx context.Context, user *UserClaims, pager Pager) (string, error)
 	GetListOfAccounts(ctx context.Context, user *UserClaims, pager Pager) (any, error)
-	GetAccountById(ctx context.Context, user *UserClaims, userId string) (any, error)
+	GetAccountById(ctx context.Context, user *UserClaims, userId string) (*models.User, error)
 	//GetDb(user *UserClaims) (*dx.DB, error)
 	ResgisterDataSouceView(ctx context.Context, user *UserClaims, Info DataSouceViewInfo)
 	ResgisterView(ctx context.Context, Tenant, viewPath, apiPath, createdBy string) error
+	GetRoleById(context context.Context, user *UserClaims, roleId string) (data *RoleEdit, err error)
 }
 
 type rabcServiceImpl struct {
-	tanentSvc tenantService
-	pwdSvc    passwordService
-	cache     cacheService
+	tanentSvc   tenantService
+	pwdSvc      passwordService
+	cache       cacheService
+	dataJwtsvc  *dataJWTService
+	dataSignSvc *dataSignService
+}
+
+type RoleKeyField struct {
+	RoleId    string
+	Code      string
+	CreatedBy string
+	CreatedOn time.Time
+}
+type RoleEdit EditClaims[models.Role, RoleKeyField]
+
+func (r rabcServiceImpl) GetRoleById(context context.Context, user *UserClaims, roleId string) (data *RoleEdit, err error) {
+
+	db, err := r.getDbByUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	roleItem := &models.Role{}
+	err = db.First(roleItem, "roleId=?", roleId)
+	if err != nil {
+		return nil, err
+	}
+	data = &RoleEdit{
+		Data: *roleItem,
+	}
+	err = r.dataSignSvc.SignData(context, user.Tenant, data)
+	if err != nil {
+		return nil, err
+	}
+	return
+
+}
+
+func (r rabcServiceImpl) getDbByUser(user *UserClaims) (*dx.DB, error) {
+	return r.tanentSvc.GetTenant(user.Tenant)
 }
 
 /*
 this function get account info by userid
 */
-func (r rabcServiceImpl) GetAccountById(ctx context.Context, user *UserClaims, userId string) (any, error) {
+func (r rabcServiceImpl) GetAccountById(ctx context.Context, user *UserClaims, userId string) (*models.User, error) {
 	var db *dx.DB
 	var err error
 	if db, err = r.tanentSvc.GetTenant(user.Tenant); err != nil {
@@ -62,7 +102,25 @@ func (r rabcServiceImpl) GetAccountById(ctx context.Context, user *UserClaims, u
 
 	return dx.QueryItem[models.User](db, "user(),where(userId=?)", userId)
 }
+
+type initResgisterView struct {
+	once sync.Once
+	err  error
+}
+
+var initResgisterViewCache sync.Map
+
 func (r rabcServiceImpl) ResgisterView(ctx context.Context, Tenant, viewPath, apiPath, createdBy string) error {
+	key := fmt.Sprintf("%s,%s,%s", Tenant, viewPath, apiPath)
+	a, _ := initResgisterViewCache.LoadOrStore(key, &initResgisterView{})
+	i := a.(*initResgisterView)
+	i.once.Do(func() {
+		i.err = r.ResgisterViewNoCache(ctx, Tenant, viewPath, apiPath, createdBy)
+	})
+	return i.err
+
+}
+func (r rabcServiceImpl) ResgisterViewNoCache(ctx context.Context, Tenant, viewPath, apiPath, createdBy string) error {
 	db, err := r.tanentSvc.GetTenant(Tenant)
 	if err != nil {
 		return err
@@ -217,11 +275,14 @@ func NewRabcService(
 	tanentSvc tenantService,
 	cache cacheService,
 	pwdSvc passwordService,
+	dataJwtsvc *dataJWTService,
+	dataSignSvc *dataSignService,
 
 ) rabcService {
 	return &rabcServiceImpl{
-		tanentSvc: tanentSvc,
-		cache:     cache,
-		pwdSvc:    pwdSvc,
+		tanentSvc:   tanentSvc,
+		cache:       cache,
+		pwdSvc:      pwdSvc,
+		dataSignSvc: dataSignSvc,
 	}
 }

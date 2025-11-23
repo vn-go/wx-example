@@ -1,6 +1,7 @@
 import PrimeVue from 'primevue/config';
 
 import emitter from '@core/eventBus';
+import libs from '@core/lib';
 import Aura from '@primeuix/themes/aura';
 import { createApp } from 'vue';
 import 'vue-select/dist/vue-select.css';
@@ -8,6 +9,7 @@ import App from './App.vue';
 import './primevue-fix.css';
 import './style.css';
 import './style.form.css';
+import './syle.primvue.table.hack.css';
 const app = createApp(App);
 app.provide('emitter', emitter);
 
@@ -37,3 +39,4 @@ app.use(PrimeVue, {
     //pt: Aura
 });
 app.mount('#app');
+libs.currentApp = app;

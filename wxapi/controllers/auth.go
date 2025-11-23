@@ -100,3 +100,6 @@ func (auth *Auth) GenerateCSRFToken() string {
 	// base64 URL-safe, không có + / =
 	return base64.RawURLEncoding.EncodeToString(b)
 }
+
+// api-discovery
+

@@ -5,7 +5,8 @@
 <button v-if="showNew"
         class="btn btn-new"
         :disabled="loading"
-        @click="$emit('onNew')">
+        @click="$emit('onNew')"
+        >
     New
 </button>
 

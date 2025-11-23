@@ -15,7 +15,7 @@
             </Column>
             <Column field="isActive" header="Active" style="width: 220px;" sortable ></Column>
             <Column field="roleName" header="Role" tyle="width: 100%;"></Column>
-            <Column   tyle="width:120">
+            <Column   style="width:120">
                 <template #body="{ data }">
                     <button class="btn" @click="user.doEdit(data)">
                             Edit
@@ -31,7 +31,15 @@ import { Column, DataTable } from 'primevue';
     
     class Users extends libs.BaseUI {
         users=libs.newRef();
-        
+        async onPreInit() {
+        // register all api for this UI
+            this.apiDiscovery([
+                "accounts/get-edit",
+                "accounts/update-by-id",
+                "accounts/delete",
+                "accounts/new",
+            ]);
+        }
         async onInit(uiEle) {
             
             let retApi=await this.loadData();
@@ -48,7 +56,7 @@ import { Column, DataTable } from 'primevue';
         
         async doEdit(data) {
            
-            await this.newModal("views/system/users").setTitle("test").setData({userId:data.userId}).setSize(700,500).render();
+            await this.newModal("views/system/users.editor").setTitle("test").setData({userId:data.userId}).setSize(700,500).render();
             
         }
 

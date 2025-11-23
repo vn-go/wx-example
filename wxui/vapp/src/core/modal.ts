@@ -2,6 +2,39 @@ import { createApp } from 'vue';
 import draggableWindowWiget from './draggableWindowWiget';
 import parseAndAccessRoles from './parseAndAccessRoles';
 import showElementFromRight from './showElementFromRight';
+class UiWatcher {
+    app: any;
+    container: any;
+    observer: MutationObserver;
+    constructor(app, container) {
+        this.app = app;
+        this.container = container;
+
+        this.observer = new MutationObserver(() => {
+            if (!document.body.contains(container)) {
+                this.app.unmount();
+                this.observer.disconnect();
+            }
+        });
+
+        this.observer.observe(document.body, { childList: true, subtree: true });
+    }
+}
+class rootWatcher {
+
+    observer: MutationObserver;
+
+    constructor(rootEle, childEle) {
+        this.observer = new MutationObserver(() => {
+            if (!document.body.contains(rootEle)) {
+                childEle.remove();
+                this.observer.disconnect();
+            }
+        });
+
+        this.observer.observe(document.body, { childList: true, subtree: true });
+    }
+}
 export class ModalInstance {
     private renderEle: HTMLElement;
     private componentPath: string;
@@ -13,9 +46,11 @@ export class ModalInstance {
     private componentModules: any;
     private rootEle: HTMLElement;
     private _title?: string;
-    constructor(rootEle: HTMLElement, htmlModules, componentModules, templatePath: string, componentPath: string, data?: any) {
+    private ownerViewPath: string;
+    constructor(ownerViewPath: string, rootEle: HTMLElement, htmlModules, componentModules, templatePath: string, componentPath: string, data?: any) {
         this.htmlModules = htmlModules;
         this.componentModules = componentModules;
+        this.ownerViewPath = ownerViewPath
 
         this.templatePath = templatePath;
         this.componentPath = componentPath;
@@ -51,11 +86,14 @@ export class ModalInstance {
         // container.innerHTML = htmlContent;
         let childEle = parserDOM.container as HTMLElement;
         parserDOM.container.setAttribute("ui-id", this.componentPath);
+        childEle.children[0].setAttribute("ui-id", this.componentPath);
+        parserDOM.container.setAttribute("view-path", this.ownerViewPath || this.rootEle.getAttribute("view-path"));
         this._applySize(parserDOM.container)
         const r = document.body.getBoundingClientRect();
         // parserDOM.container.style.left = `${r.width}px`;
         parserDOM.container.style.zIndex = "-1";
-        this.rootEle.appendChild(parserDOM.container);
+        document.body.appendChild(parserDOM.container);
+        // this.rootEle.appendChild(parserDOM.container);
         const maxWith = document.body.getBoundingClientRect().width;
         const maxHeight = document.body.getBoundingClientRect().height
         parserDOM.container.style.maxWidth = `${maxWith}px`;
@@ -66,13 +104,16 @@ export class ModalInstance {
         parserDOM.title.innerText = this._title || ' ';
         //document.body.appendChild(parserDOM.container);
 
-        let app = undefined;
+
         const componentLoader = this.componentModules[`../${this.componentPath}.vue`]
         const Component = (await componentLoader()).default;
-        app = createApp(Component, this.data);
-        app.mount(parserDOM.body)
-        childEle.children[0].setAttribute("ui-id", this.componentPath);
-        childEle.children[0].setAttribute("view-path", this.rootEle.getAttribute("view-path"));
+
+        let app = createApp(Component, this.data);
+
+        app.mount(parserDOM.body);
+
+
+
 
         await showElementFromRight(parserDOM.container as HTMLElement, () => {
             parserDOM.container.style.zIndex = "10000";
@@ -80,8 +121,14 @@ export class ModalInstance {
 
         }, 500);
 
-
-        return { childEle, app }
+        (new UiWatcher(app, parserDOM.container));
+        (new rootWatcher(this.rootEle, parserDOM.container));
+        return {
+            childEle, app, close() {
+                app.unmount();
+                parserDOM.container.remove();
+            }
+        }
     }
     private _applySize(ele: Element): HTMLElement {
         let w = this.width;
@@ -120,9 +167,9 @@ class Modal {
 
 
     }
-    load(rootEle: HTMLElement, componentPath: string, data?: any): ModalInstance {
+    load(ownerViewPath: string, rootEle: HTMLElement, componentPath: string, data?: any): ModalInstance {
 
-        let ret = new ModalInstance(rootEle, this.htmlModules, this.componentModules, this.htmlLayout, componentPath, data);
+        let ret = new ModalInstance(ownerViewPath, rootEle, this.htmlModules, this.componentModules, this.htmlLayout, componentPath, data);
 
         return ret;
     }

@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+.p-datatable.p-component {
+    @apply bg-white h-full;
+
+    div.p-datatable-table-container {
+        @apply bg-white border border-gray-200 px-0 m-0 shadow-gray-700 shadow-2xl h-full;
+
+        table[role="table"].p-datatable-table {
+            @apply bg-white border border-gray-200 px-0 m-0;
+
+            thead.p-datatable-thead {
+                background-color: unset;
+
+                tr[role="row"] {
+
+                    @apply bg-amber-500;
+
+                    th.p-datatable-header-cell {
+
+                        @apply bg-gray-50 text-gray-700;
+
+                        div.p-datatable-column-header-content {
+                            @apply text-gray-700;
+
+                        }
+                    }
+                }
+            }
+
+            tbody.p-datatable-tbody {
+                @apply bg-white;
+
+                tr[role="row"] {
+                    @apply bg-white border-0;
+
+
+
+                    td[role="cell"] {
+
+
+                        @apply text-gray-900 m-0 p-1.5;
+                    }
+                }
+            }
+
+        }
+    }
+
+
+}

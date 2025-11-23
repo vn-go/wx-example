@@ -11,6 +11,7 @@ type UIView struct {
 	//sha256 of view viewPath
 	ViewId      string `db:"size:64;unique"`
 	ViewPath    string `db:"size:255;unique"`
+	Title       string `db:"size:250;default:''"`
 	Description string `db:"size:255"`
 	CreatedOn   time.Time
 	ModifiedOn  *time.Time
@@ -52,9 +53,10 @@ func (*UIDataSource) Table() string {
 }
 
 type UIViewApi struct {
-	Id          uint64 `db:"pk;auto"`
+	Id          uint64 `db:"pk;auto" json:"-"`
 	ViewId      uint64 `db:"unique:view_api_uix"`
 	ApiId       uint64 `db:"unique:view_api_uix"`
+	Title       string `db:"size:250;default:''"`
 	Description string
 	CreatedOn   time.Time
 	ModifiedOn  *time.Time
@@ -68,8 +70,10 @@ func (*UIViewApi) Table() string {
 type Api struct {
 	Id          uint64 `db:"pk;auto"`
 	ApiPath     string `db:"size:255;unique"`
+	Title       string `db:"size:250;default:''"`
 	Description string
 	CreatedOn   time.Time
+	CreatedBy   string `db:"size:50;idx;default:''"`
 	ModifiedOn  *time.Time
 }
 

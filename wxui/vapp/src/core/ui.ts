@@ -39,6 +39,8 @@ export default class BaseUI {
     viewPath: string;
     remoteCaller: APICls
     sessionStore: SessionStore;
+    private _endPointList: string[];
+
 
     constructor(viewPath?: string) {
         this.sessionStore = new SessionStore("app-store")
@@ -48,7 +50,8 @@ export default class BaseUI {
         this.vueComponent = getCurrentInstance();
 
         // Lifecycle hook: mounted
-        onMounted(() => {
+        onMounted(async () => {
+            this.onPreInit();
             // Lấy root element an toàn
             this.rootEle =
                 (this.vueComponent?.ctx?.$ele as HTMLElement) || // pattern project cũ
@@ -60,6 +63,10 @@ export default class BaseUI {
                 }
 
             }
+            debugger;
+            if (this._endPointList) {
+                await this._applyEnpointList();
+            }
 
             // Gọi callback onMounted nếu có
             if (this._onMount) this._onMount();
@@ -69,6 +76,12 @@ export default class BaseUI {
         });
 
 
+    }
+    private async _applyEnpointList() {
+        debugger;
+        await this.remoteCaller.post("view-manager/api-discovery", {
+            apiList: this._endPointList
+        })
     }
 
     /**
@@ -132,7 +145,7 @@ export default class BaseUI {
     }
     newModal(componentPath): ModalInstance {
         if (this.rootEle && this.rootEle instanceof HTMLElement) {
-            return opener.load(this.rootEle as HTMLElement, componentPath);
+            return opener.load(this.getViewPath(), this.rootEle as HTMLElement, componentPath);
         }
 
     }
@@ -144,7 +157,26 @@ export default class BaseUI {
         }
 
     }
+    /*
+         Get the current view path of the UI.
+        Each UI screen has its own view path.
+        This value is used by the Back-End for authorization checks.
+    */
     getViewPath() {
         return findViewPath(this.rootEle);
+    }
+    /*
+        Before UI call any API with specify viewPath
+        This method need to be called
+        if current User is SysAdmin
+        List of API follow by viewPath will be add in Database
+        otherwise
+        Authorization will check viewPath and User claims and return accessible list of Api
+    */
+    apiDiscovery(endPointList: string[]) {
+        this._endPointList = endPointList;
+    }
+    onPreInit(): void {
+
     }
 }

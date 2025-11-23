@@ -93,14 +93,56 @@ type getListOfAccountsResult struct {
 	TotalRecords uint64 `json:"totalRecords"`
 }
 
+func (acc *Accounts) UpdateById(h wx.Handler,
+	data struct {
+		Data  models.User `json:"data"`
+		Token string      `json:"token"`
+	}) (any, error) {
+	claim, err := core.Services.DataJWTSvc.ValidateToken(h().Req.Context(), data.Token, acc.Authenticate.Data.Tenant)
+	if err != nil {
+		return nil, err
+	}
+	readOnlyFields := []string{
+		"username",
+		"userId",
+	}
+	token, err := core.Services.DataJWTSvc.GenerateToken(h().Req.Context(), acc.Authenticate.Data, readOnlyFields, data.Data)
+	if err != nil {
+		return nil, err
+	}
+	if token != data.Token {
+		return nil, &wx.BadRequestError{
+			Message: "invalid token",
+		}
+	}
+	return claim.Data, nil
+}
 func (acc *Accounts) GetEdit(h wx.Handler, data struct {
 	UserId string `json:"userId"`
 }) (any, error) {
 	start := time.Now()
 	ret, err := core.Services.RABCSvc.GetAccountById(h().Req.Context(), acc.Authenticate.Data, data.UserId)
+	if err != nil {
+		return nil, err
+	}
+	readOnlyFields := []string{
+		"username",
+		"userId",
+	}
+	token, err := core.Services.DataJWTSvc.GenerateToken(h().Req.Context(), acc.Authenticate.Data, readOnlyFields, ret)
+	if err != nil {
+		return nil, err
+	}
 	n := time.Since(start).Milliseconds()
 	fmt.Println(n)
-	return ret, err
+	retData := struct {
+		Data  any    `json:"data"`
+		Token string `json:"token"`
+	}{
+		Data:  ret,
+		Token: token,
+	}
+	return retData, err
 }
 func (acc *Accounts) GetListOfAccounts(h wx.Handler, pager PagerInfo) (any, error) {
 	if pager.Last == 0 {
