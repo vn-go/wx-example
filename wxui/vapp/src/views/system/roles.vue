@@ -27,9 +27,12 @@ class Roles extends libs.BaseUI {
     async onPreInit(){
         this.apiDiscovery(
             [
-                "roles/get-list",
-                "roles/get-item",
-                
+                "roles/list",
+                "roles/item-get",
+                "roles/item-update",
+                "roles/add-users",
+                "roles/remove-users",
+                "roles/item-delete",
             ]
         )
     }

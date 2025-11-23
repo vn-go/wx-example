@@ -45,13 +45,14 @@ type rabcService interface {
 	ResgisterDataSouceView(ctx context.Context, user *UserClaims, Info DataSouceViewInfo)
 	ResgisterView(ctx context.Context, Tenant, viewPath, apiPath, createdBy string) error
 	GetRoleById(context context.Context, user *UserClaims, roleId string) (data *RoleEdit, err error)
+	UpdateRole(context context.Context, user *UserClaims, data *RoleEdit) (any, error)
 }
 
 type rabcServiceImpl struct {
 	tanentSvc   tenantService
 	pwdSvc      passwordService
 	cache       cacheService
-	dataJwtsvc  *dataJWTService
+	
 	dataSignSvc *dataSignService
 }
 
@@ -63,6 +64,27 @@ type RoleKeyField struct {
 }
 type RoleEdit EditClaims[models.Role, RoleKeyField]
 
+func (r rabcServiceImpl) UpdateRole(context context.Context, user *UserClaims, data *RoleEdit) (any, error) {
+	err := r.dataSignSvc.Verify(context, user, data)
+	if err != nil {
+		return nil, err
+	}
+	db, err := r.tanentSvc.GetTenant(user.Tenant)
+	if err != nil {
+		return nil, err
+	}
+	roleItem := &models.Role{}
+	err = db.First(roleItem, "roleId=?", data.Data.RoleId)
+	if err != nil {
+		return nil, err
+	}
+	data.Data.Id = roleItem.Id
+	rs := db.Update(&data.Data)
+	if rs.Error != nil {
+		return nil, rs.Error
+	}
+	return rs.RowsAffected, nil
+}
 func (r rabcServiceImpl) GetRoleById(context context.Context, user *UserClaims, roleId string) (data *RoleEdit, err error) {
 
 	db, err := r.getDbByUser(user)
@@ -78,10 +100,12 @@ func (r rabcServiceImpl) GetRoleById(context context.Context, user *UserClaims, 
 	data = &RoleEdit{
 		Data: *roleItem,
 	}
-	err = r.dataSignSvc.SignData(context, user.Tenant, data)
+	err = r.dataSignSvc.SignData(context, user, data)
 	if err != nil {
 		return nil, err
 	}
+	data.Data = models.Role{}
+	r.dataSignSvc.Verify(context, user, data)
 	return
 
 }
@@ -275,7 +299,7 @@ func NewRabcService(
 	tanentSvc tenantService,
 	cache cacheService,
 	pwdSvc passwordService,
-	dataJwtsvc *dataJWTService,
+	
 	dataSignSvc *dataSignService,
 
 ) rabcService {

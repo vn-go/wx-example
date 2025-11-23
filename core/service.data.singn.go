@@ -6,9 +6,12 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"reflect"
+	"sync"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -90,6 +93,78 @@ func Encrypt(plaintext, secretKey string) (string, error) {
 	return hex.EncodeToString(ciphertext), nil
 }
 
+type getKeyFieldResult struct {
+	keyFieldsIndex            [][]int
+	keyFieldIndex             []int
+	keyFieldIndexInMasterData [][]int
+	TokenFieldIndex           []int
+	dataFieldIndex            []int
+	keyType                   reflect.Type
+}
+
+func (s *dataSignService) getKeyFieldNoCache(data any) (*getKeyFieldResult, error) {
+	ret := &getKeyFieldResult{
+		keyFieldsIndex:            [][]int{},
+		keyFieldIndexInMasterData: [][]int{},
+	}
+	typ := reflect.TypeOf(data)
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+
+	}
+
+	typeOfDataField, ok := typ.FieldByName("Data")
+	if !ok {
+		return nil, fmt.Errorf("field Data was not found in %T", data)
+	}
+	ret.dataFieldIndex = typeOfDataField.Index
+	keyField, ok := typ.FieldByName("Key")
+	ret.keyFieldIndex = keyField.Index
+	if !ok {
+		return nil, fmt.Errorf("key field of %T was not found", data)
+	}
+	tokenField, ok := typ.FieldByName("Token")
+	if !ok {
+		return nil, fmt.Errorf("Token field of %T was not found", data)
+	}
+	ret.TokenFieldIndex = tokenField.Index
+	ret.keyType = keyField.Type
+	for i := 0; i < keyField.Type.NumField(); i++ {
+		ret.keyFieldsIndex = append(ret.keyFieldsIndex, keyField.Type.Field(i).Index)
+		fieldName := keyField.Type.Field(i).Name
+
+		dataField, ok := typeOfDataField.Type.FieldByName(fieldName)
+		if !ok {
+			return nil, fmt.Errorf("%s was not found in %T", keyField.Type.Field(i).Name, data)
+		}
+		ret.keyFieldIndexInMasterData = append(ret.keyFieldIndexInMasterData, append(typeOfDataField.Index, dataField.Index...))
+	}
+
+	return ret, nil
+}
+
+type initGetKeyField struct {
+	val  *getKeyFieldResult
+	err  error
+	once sync.Once
+}
+
+var initGetKeyFieldCache sync.Map
+
+func (s *dataSignService) getKeyField(data any) (*getKeyFieldResult, error) {
+	typ := reflect.TypeOf(data)
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+	a, _ := initGetKeyFieldCache.LoadOrStore(typ, &initGetKeyField{})
+	i := a.(*initGetKeyField)
+	i.once.Do(func() {
+		i.val, i.err = s.getKeyFieldNoCache(data)
+	})
+	return i.val, i.err
+
+}
+
 /*
 	 this function will make a new HMAC-SHA256 with Key data
 
@@ -106,59 +181,47 @@ func Encrypt(plaintext, secretKey string) (string, error) {
 			}
 		}
 */
-func (s *dataSignService) SignData(ctx context.Context, tenant string, data any) error {
+func (s *dataSignService) SignData(ctx context.Context, user *UserClaims, data any) error {
 
-	secretKey, err := s.tenantSvc.GetSecretKey(ctx, tenant)
-	if err != nil {
-		return err
-	}
+	secretKey := user.UserId
+	// if err != nil {
+	// 	return err
+	// }
 	val := reflect.ValueOf(data)
-	typ := reflect.TypeOf(data)
-	if typ.Kind() == reflect.Ptr {
-		typ = typ.Elem()
+	//typ := reflect.TypeOf(data)
+	if val.Kind() == reflect.Ptr {
+		//typ = typ.Elem()
 		val = val.Elem()
 	}
 
-	keyField, ok := typ.FieldByName("Key")
-	if !ok {
-		return fmt.Errorf("key field of %T was not found", data)
+	fiedlInfo, err := s.getKeyField(data)
+	if err != nil {
+		return err
 	}
-	dataVal := val.FieldByName("Data")
-	if !dataVal.IsValid() {
-		return fmt.Errorf("argument Data field of %T was not found", data)
+	keyVal := reflect.New(fiedlInfo.keyType).Elem()
+	if err != nil {
+		return err
 	}
-	keyType := keyField.Type
-	keyVal := reflect.New(keyType).Elem()
-	for i := 0; i < keyType.NumField(); i++ {
-
-		fieldOfValInData := dataVal.FieldByName(keyType.Field(i).Name)
+	for i, f := range fiedlInfo.keyFieldsIndex {
+		fieldOfValInData := val.FieldByIndex(fiedlInfo.keyFieldIndexInMasterData[i]) //dataVal.FieldByIndex(fiedlInfo.dataFeidlIndex[i])
 		if fieldOfValInData.IsValid() {
-			keyVal.Field(i).Set(fieldOfValInData)
+			keyVal.FieldByIndex(f).Set(fieldOfValInData)
 		}
 	}
+	// for i := 0; i < keyType.NumField(); i++ {
+
+	// 	fieldOfValInData := dataVal.FieldByName(keyType.Field(i).Name)
+	// 	if fieldOfValInData.IsValid() {
+	// 		keyVal.Field(i).Set(fieldOfValInData)
+	// 	}
+	// }
 	claims := SignedJWTClaims{
-		RegisteredClaims: jwt.RegisteredClaims{
-			// Issuer: "eorm-auth",
-			// ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * time.Minute)),
-			// IssuedAt:  jwt.NewNumericDate(time.Now()),
-		},
-		Data: keyVal.Interface(),
+		RegisteredClaims: jwt.RegisteredClaims{},
+		Data:             keyVal.Interface(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	//return token.SignedString([]byte(secretKey))
-	// // mak
-	// bff, err := json.Marshal(keyValue)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// // Trả về chuỗi băm dưới dạng hex
-	// token, err := Encrypt(string(bff), secretKey)
-	// if err != nil {
-	// 	return err
-	// }
 	accessToken, err := token.SignedString([]byte(secretKey))
 	if err != nil {
 		return err
@@ -166,6 +229,76 @@ func (s *dataSignService) SignData(ctx context.Context, tenant string, data any)
 	val.FieldByName("Token").SetString(accessToken)
 	return nil
 
+}
+func (s *dataSignService) Verify(ctx context.Context, user *UserClaims, data any) error {
+	secret := user.UserId
+	// if err != nil {
+	// 	return err
+	// }
+	keyFieldInfo, err := s.getKeyField(data)
+	if err != nil {
+		return err
+	}
+	val := reflect.ValueOf(data)
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
+	}
+
+	tokenFieldValue := val.FieldByIndex(keyFieldInfo.TokenFieldIndex)
+	if !tokenFieldValue.IsValid() {
+		return fmt.Errorf("can not read token from %T", data)
+	}
+	tokenString := tokenFieldValue.String()
+
+	// Parse token
+	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid signing method")
+		}
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return errors.New("invalid token claims")
+	}
+
+	rawData, err := json.Marshal(claims["data"])
+	if err != nil {
+		return err
+	}
+
+	dataVal := val.FieldByIndex(keyFieldInfo.keyFieldIndex)
+	if !dataVal.IsValid() {
+		return fmt.Errorf("invalid data in %T", data)
+	}
+
+	ptr := dataVal.Addr() // *T
+
+	// ⬇ Unmarshal trực tiếp vào field
+	if err := json.Unmarshal(rawData, ptr.Interface()); err != nil {
+		return err
+	}
+
+	for i, f := range keyFieldInfo.keyFieldsIndex {
+
+		field := val.FieldByIndex(keyFieldInfo.keyFieldIndexInMasterData[i])
+
+		if field.IsValid() {
+			valField := dataVal.FieldByIndex(f)
+			if valField.IsValid() {
+				data := valField.Interface()
+				fmt.Println(data)
+				field.Set(valField)
+			}
+
+		}
+	}
+
+	return nil
 }
 
 func newDataSignService(tenantSvc tenantService) *dataSignService {

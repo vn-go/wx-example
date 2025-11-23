@@ -19,6 +19,7 @@ type User struct {
 	// ix -> index
 	CreatedOn  time.Time `db:"ix;default:now()" json:"createdOn"`
 	ModifiedOn *time.Time
+	ModifiedBy *string `db:"size:50;default:'admin'"  json:"modifiedBy"`
 	//df means default value
 	IsActive               bool       `db:"default:true" json:"isActive"`
 	LatestLoginFail        *time.Time `db:"ix" json:"latestLoginFail"`

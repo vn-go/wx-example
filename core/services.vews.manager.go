@@ -146,6 +146,9 @@ func (v *viewService) GetListOfViews(context context.Context, data *UserClaims) 
 	if err != nil {
 		return nil, err
 	}
+	// a:=models.UIView{}
+	// b:=models.RoleUiView{}
+	// a.Id=b.ViewId
 	return db.DslToArray(`
 		u(viewId,viewPath,title,description,createdOn,createdBy),
 		rv(count(id) TotalRoles), // get total role
@@ -155,7 +158,7 @@ func (v *viewService) GetListOfViews(context context.Context, data *UserClaims) 
 				roleUiView rv,
 				role r, 
 				user ur,
-				left(u.viewId=rv.viewId),
+				left(u.id=rv.viewId),
 				left(rv.roleid=r.id),
 				left(r.id=ur.roleId)
 			),
