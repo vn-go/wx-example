@@ -8,3 +8,6 @@ wxapi/logs
 dotnet/hrm/hrm/bin
 host
 wxui/app/node_modules
+backend/api/data.json
+backend/api/data2.json
+backend/api/data

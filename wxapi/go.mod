@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	core v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.11.1
-	github.com/vn-go/dx v1.0.95
+	github.com/vn-go/dx v1.0.96
 	github.com/vn-go/wx v0.2.7
 )
 
@@ -52,7 +52,7 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/flatbuffers v25.2.10+incompatible // indirect
-	github.com/google/uuid v1.6.0 // indirect
+	github.com/google/uuid v1.6.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
