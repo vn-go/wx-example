@@ -2,7 +2,9 @@ package core
 
 import (
 	"core/services/acc"
+	"core/services/aes"
 	"core/services/config"
+	"core/services/errs"
 	"core/services/pwd"
 	"core/services/tenant"
 
@@ -13,7 +15,7 @@ import (
 	"github.com/vn-go/dx"
 )
 
-type services struct {
+type Service struct {
 	ConfigSvc *config.ConfigService
 	CacheSvc  cacher.CacheService
 	AppSvc    *app.AppService
@@ -23,6 +25,8 @@ type services struct {
 	AccSvc    *acc.AccService
 	Db        *dx.DB
 	TenantSvc *tenant.TenantService
+	ErrSvc    *errs.ErrService
+	AesSvc    *aes.AesService
 }
 
 var servicesInjectors = []any{
@@ -35,4 +39,8 @@ var servicesInjectors = []any{
 	//db.NewDbService,
 	acc.NewAccService,
 	tenant.NewTenantService,
+	errs.NewErrService,
+	aes.NewAesService,
 }
+
+type User jwt.Indentifier

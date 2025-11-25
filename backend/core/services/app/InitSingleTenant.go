@@ -15,8 +15,12 @@ func (app *AppService) InitSingleTenant() error {
 	appItem.Code = "App"
 	appItem.Name = "Application"
 	appItem.SecretKey, err = app.jwtSvc.GenerateSecret(0)
+	if err != nil {
+		return err
+	}
 	appItem.CreatedBy = "application"
 	appItem.CreatedOn = time.Now().UTC()
+	appItem.AesKey, err = app.GenerateRandomKey()
 	if err != nil {
 		return err
 	}
@@ -26,27 +30,30 @@ func (app *AppService) InitSingleTenant() error {
 		if !dbErr.IsDuplicateEntryError() {
 			return dbErr
 		} else {
-			// err = app.db.First(appItem, "code=?", appItem.Code)
-			// if err != nil {
-			// 	return err
-			// }
+			if appItem.Name == "" {
+				appItem.Name = "Application"
+			}
 			if appItem.SecretKey == "" {
 				appItem.SecretKey, err = app.jwtSvc.GenerateSecret(0)
 				if err != nil {
 					return err
 				}
-				if appItem.Name == "" {
-					appItem.Name = "Application"
+
+			}
+			if appItem.AesKey == "" {
+				appItem.AesKey, err = app.GenerateRandomKey()
+				if err != nil {
+					return err
 				}
-				rs := app.db.Update(appItem)
-				if rs.Error != nil {
-					if dbErr = dx.Errors.IsDbError(rs.Error); dbErr != nil {
-						if !dbErr.IsDuplicateEntryError() {
-							return dbErr
-						}
-					} else {
-						return rs.Error
+			}
+			rs := app.db.Update(appItem)
+			if rs.Error != nil {
+				if dbErr = dx.Errors.IsDbError(rs.Error); dbErr != nil {
+					if !dbErr.IsDuplicateEntryError() {
+						return dbErr
 					}
+				} else {
+					return rs.Error
 				}
 			}
 		}

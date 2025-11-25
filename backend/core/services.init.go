@@ -18,19 +18,19 @@ func newConfigService() *config.ConfigService {
 	return cfgService
 }
 
-var Services *services
+var Services *Service
 var once sync.Once
 
 func Start(configYamlPath string) {
 	once.Do(func() {
 		initConfig(configYamlPath)
-		svcRet := (&bx.Wire[services]{}).WireThenGet(
+		svcRet := (&bx.Wire[Service]{}).WireThenGet(
 			servicesInjectors...,
 		)
 		Services = svcRet
 	})
 
 }
-func (svc services) Close() {
+func (svc Service) Close() {
 	svc.Db.Close()
 }

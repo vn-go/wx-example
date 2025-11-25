@@ -5,6 +5,8 @@ import (
 	"core/services/acc"
 	"encoding/json"
 	"fmt"
+	_ "net/http"
+	_ "net/http/pprof" // Chỉ cần import để kích hoạt các endpoint pprof
 	"os"
 	"testing"
 
@@ -72,7 +74,7 @@ func BenchmarkLoginService(b *testing.B) {
 			if err != nil {
 				panic(err)
 			}
-			assert.Greater(b, len(token), 0)
+			assert.NotEmpty(b, token)
 		}
 	})
 	b.Run("paralell", func(b *testing.B) {
@@ -82,7 +84,8 @@ func BenchmarkLoginService(b *testing.B) {
 				if err != nil {
 					panic(err)
 				}
-				assert.Greater(b, len(token), 0)
+
+				assert.NotEmpty(b, token)
 			}
 		})
 	})
@@ -124,7 +127,7 @@ func ReadConfigFromFile(filePath string) (*ConfigData, error) {
 	return &config, nil
 }
 func TestRead(t *testing.T) {
-	data, err := ReadConfigFromFile(`D:\code\go\wx-example\wx-example\backend\api\data\data3.json`)
+	data, err := ReadConfigFromFile(`D:\code\go\wx-example\wx-example\backend\api\data\data8.json`)
 	if err != nil {
 		panic(err)
 	}
@@ -149,4 +152,95 @@ func TestRead(t *testing.T) {
 			panic(err)
 		}
 	}
+}
+func TestGetListOfAcc(t *testing.T) {
+	core.Start(yamFilePath)
+	defer core.Services.Close()
+	core.Services.AppSvc.InitData()
+	data, err := core.Services.AccSvc.GetAllUsers(t.Context())
+	if err != nil {
+		panic(err)
+	}
+	t.Log(data)
+}
+
+/*
+go test -bench ^BenchmarkGetListOfAcc$ -cpuprofile=cpu.prof -memprofile=mem.prof core/core_test
+*/
+func BenchmarkGetListOfAcc(b *testing.B) {
+	core.Start(yamFilePath)
+	defer core.Services.Close()
+	core.Services.AppSvc.InitData()
+	b.Run("run", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			data, err := core.Services.AccSvc.GetAllUsers(b.Context())
+			if err != nil {
+				panic(err)
+			}
+			assert.Equal(b, 269, len(data))
+		}
+	})
+	b.Run("parallel", func(b *testing.B) {
+		b.RunParallel(func(p *testing.PB) {
+			for p.Next() {
+				data, err := core.Services.AccSvc.GetAllUsers(b.Context())
+				if err != nil {
+					panic(err)
+				}
+				assert.Equal(b, 269, len(data))
+			}
+		})
+	})
+
+}
+func TestLogin(t *testing.T) {
+	core.Start(yamFilePath)
+	defer core.Services.Close()
+	core.Services.AppSvc.InitData()
+	users, err := core.Services.AccSvc.GetAllUsers(t.Context())
+	if err != nil {
+		panic(err)
+	}
+
+	for _, user := range users {
+		tk, err := core.Services.AccSvc.LoginAndGetJWT(t.Context(), "", user.Username, user.Username)
+		if err != nil {
+			panic(err)
+		}
+		assert.GreaterOrEqual(t, len(tk.AccessToken), 0)
+	}
+}
+func BenchmarkLogin(b *testing.B) {
+	core.Start(yamFilePath)
+	defer core.Services.Close()
+	core.Services.AppSvc.InitData()
+	users, err := core.Services.AccSvc.GetAllUsers(b.Context())
+	if err != nil {
+		panic(err)
+	}
+	b.Run("test", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			for _, user := range users {
+				tk, err := core.Services.AccSvc.LoginAndGetJWT(b.Context(), "", user.Username, user.Username)
+				if err != nil {
+					panic(err)
+				}
+				assert.GreaterOrEqual(b, len(tk.AccessToken), 0)
+			}
+		}
+	})
+	b.Run("parallel", func(b *testing.B) {
+		b.RunParallel(func(p *testing.PB) {
+			for p.Next() {
+				for _, user := range users {
+					tk, err := core.Services.AccSvc.LoginAndGetJWT(b.Context(), "", user.Username, user.Username)
+					if err != nil {
+						panic(err)
+					}
+					assert.GreaterOrEqual(b, len(tk.AccessToken), 0)
+				}
+			}
+		})
+	})
 }

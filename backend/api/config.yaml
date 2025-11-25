@@ -2,10 +2,10 @@ app: "api"
 database:
   # driver: "mysql"
   # dsn: "root:123456@tcp(127.0.0.1:3306)/hrm2?interpolateParams=true"
-  # driver: "postgres"
-  # dsn: "postgres://postgres:123456@localhost:5432/hrm2?sslmode=disable&"
-  driver: "sqlserver"
-  dsn: "sqlserver://sa:123456@localhost:1433?database=erp"
+  driver: "postgres"
+  dsn: "postgres://postgres:123456@localhost:5432/erp?sslmode=disable&"
+  # driver: "sqlserver"
+  # dsn: "sqlserver://sa:123456@localhost:1433?database=erp"
 
 jwt:
   default-sercret-key: dadasdsa.dasdsad3213.dad.323asd.a(dadsad)
@@ -51,7 +51,7 @@ tenant:
 default-auth:
   user: "admin"
   pwd: "/\\dmin123451212"
-debug: false
+debug: true
 bind:
   host: 0.0.0.0
   port: 8080

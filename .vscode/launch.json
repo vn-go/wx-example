@@ -66,11 +66,11 @@
             "program": "${workspaceFolder}/wxapi"
         },
         {
-            "name": "Hell oWorld",
+            "name": "backend-api",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/helloworld"
+            "program": "${workspaceFolder}/backend/api/main.go"
         }
     ]
 }

@@ -10,6 +10,7 @@ type SysApp struct {
 
 	baseInfo
 	SecretKey string `db:"size(250)" json:"-"`
+	AesKey    string `db:"size(250); default:''" json:"-"`
 }
 
 func init() {

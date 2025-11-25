@@ -1,6 +1,7 @@
 package app
 
 import (
+	"core/services/aes"
 	"core/services/config"
 	"core/services/jwt"
 	"core/services/pwd"
@@ -18,6 +19,7 @@ type AppService struct {
 	cfgSvc *config.ConfigService
 	jwtSvc *jwt.JwtService
 	pwdSvc pwd.PwdService
+	aes.AesService
 
 	db *dx.DB
 }

@@ -4,25 +4,44 @@ import (
 	"context"
 	"core/models"
 	"time"
+
+	"github.com/vn-go/dx"
 )
 
-func (acc *AccService) LoginAndGetJWT(ctx context.Context, tenant, username, password string) (string, error) {
+func (acc *AccService) LoginAndGetJWT(ctx context.Context, tenant, username, password string) (*OAuthResponse, error) {
 	user := &models.SysUsers{}
 	err := acc.db.First(user, "username=?", username)
 	if err != nil {
-		return "", err
+		if dx.Errors.IsRecordNotFound(err) {
+			return nil, acc.Unauthenticate()
+		}
+		return nil, err
 	}
 	ok, err := acc.pwdSvc.ComparePassword(ctx, tenant, username, password, user.HashPassword)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	if ok {
 		secret, err := acc.tenantSvc.GetSecret(tenant)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
-		return acc.jwtSvc.NewJWTWithSecret(secret, "app", user, 2*time.Hour)
+		tk, err := acc.jwtSvc.NewJWTWithSecret(secret, tenant, user, 2*time.Hour)
+		if err != nil {
+			return nil, err
+		}
+		refresToken, err := acc.CreateRefreshToken(ctx, tenant, username, tk)
+		if err != nil {
+			return nil, err
+		}
+		return &OAuthResponse{
+			AccessToken:  tk,
+			TokenType:    "Bearer",
+			ExpiresIn:    int((2 * time.Hour).Seconds()),
+			RefreshToken: refresToken,
+		}, nil
+		// return acc.jwtSvc.NewJWTWithSecret(secret, "app", user, 2*time.Hour)
 	} else {
-		return "", nil
+		return nil, acc.Unauthenticate()
 	}
 }
