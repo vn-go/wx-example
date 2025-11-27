@@ -6,6 +6,7 @@
                sortMode="multiple"
                resizableColumns columnResizeMode="fit" showGridlines
                >
+               <Column field="displayName" header="Full Name"   style="width: 220px;" sortable ></Column>
             <Column field="username" header="Username"   style="width: 220px;" sortable ></Column>
             <Column field="email" header="Email"   style="width: 220px;" sortable ></Column>
             <Column field="createdOn" header="Created On"   style="width: 220px;" sortable >
@@ -34,10 +35,9 @@ import { Column, DataTable } from 'primevue';
         async onPreInit() {
         // register all api for this UI
             this.apiDiscovery([
-                "accounts/get-edit",
-                "accounts/update-by-id",
-                "accounts/delete",
-                "accounts/new",
+               "system/users/list",
+                "system/users/item",
+               
             ]);
         }
         async onInit(uiEle) {
@@ -47,16 +47,15 @@ import { Column, DataTable } from 'primevue';
             this.users.value=retApi.data ;
         }
         async loadData(){
-            
-            return await libs.api.post(this.getViewPath(),"/accounts/get-list-of-accounts",{
-                "first": 0,
-                "last": 1000
+            return await libs.api.post(this.getViewPath(),"system/users/list",{
+                "index": 0,
+                "size": 1000
                 })
         }
         
         async doEdit(data) {
            
-            await this.newModal("views/system/users.editor").setTitle("test").setData({userId:data.userId}).setSize(700,500).render();
+            await this.newModal("views/system/users.editor").setTitle("test").setData({userId:data.id}).setSize(700,500).render();
             
         }
 

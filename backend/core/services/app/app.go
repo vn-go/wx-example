@@ -24,6 +24,10 @@ type AppService struct {
 	db *dx.DB
 }
 
+func (app *AppService) ApiDiscovery(apiList []string) (any, error) {
+	panic("unimplemented")
+}
+
 func NewAppService(
 	cfgSvc *config.ConfigService,
 	jwtSvc *jwt.JwtService,

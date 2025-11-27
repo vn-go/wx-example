@@ -2,9 +2,12 @@ package acc
 
 import (
 	"context"
+
 	"core/models"
 	"core/services/aes"
 	"core/services/base"
+	"core/services/data"
+	"core/services/errs"
 	"core/services/jwt"
 	"core/services/pwd"
 	"core/services/tenant"
@@ -18,8 +21,9 @@ type AccService struct {
 	jwtSvc    *jwt.JwtService
 	pwdSvc    pwd.PwdService
 	tenantSvc *tenant.TenantService
-
-	aes.AesService
+	errSvc    *errs.ErrService
+	data      *data.DataSignService
+	aesSvc    *aes.AesService
 }
 
 func (acc *AccService) ListUsers(context context.Context, data *jwt.Indentifier) (any, error) {
@@ -36,11 +40,11 @@ func (acc *AccService) ValidateToken(context context.Context, authorization stri
 		return nil, err
 	}
 	if token.TokenType != "Bearer" {
-		return nil, acc.ErrService.ForbiddenErr()
+		return nil, acc.errSvc.ForbiddenErr()
 	}
 	tokenClaims, err := acc.jwtSvc.DecodeJwtTokenWithouSignature(token.Token)
 	if err != nil {
-		return nil, acc.ErrService.Unauthenticate()
+		return nil, acc.errSvc.Unauthenticate()
 	}
 	tenant := tokenClaims.Data.Tenant
 	secret, err := acc.tenantSvc.GetSecret(tenant)
@@ -49,7 +53,7 @@ func (acc *AccService) ValidateToken(context context.Context, authorization stri
 	}
 	ok, err := acc.jwtSvc.VerifyToken(token.Token, secret)
 	if err != nil || !ok {
-		return nil, acc.ErrService.Unauthenticate()
+		return nil, acc.errSvc.Unauthenticate()
 	}
 
 	return &tokenClaims.Data, nil
@@ -67,11 +71,18 @@ func NewAccService(
 	db *dx.DB,
 	jwtSvc *jwt.JwtService,
 	pwdSvc pwd.PwdService,
-	tenantSvc *tenant.TenantService) *AccService {
+	tenantSvc *tenant.TenantService,
+	data *data.DataSignService,
+	aesSvc *aes.AesService,
+	errSvc *errs.ErrService,
+) *AccService {
 	return &AccService{
 		db:        db,
 		jwtSvc:    jwtSvc,
 		pwdSvc:    pwdSvc,
 		tenantSvc: tenantSvc,
+		errSvc:    errSvc,
+		data:      data,
+		aesSvc:    aesSvc,
 	}
 }

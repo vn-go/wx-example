@@ -9,7 +9,12 @@ func (e *ErrService) IsForbidden(err error) bool {
 	}
 	return false
 }
-
+func (e *ErrService) IsUnauthenticate(err error) bool {
+	if e, ok := err.(*Err); ok {
+		return e.Typ == ErrUnautheticate
+	}
+	return false
+}
 func (e ErrService) Unauthenticate() error {
 	return &Err{
 		Message: "Unauthenticate",

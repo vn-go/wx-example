@@ -58,6 +58,7 @@ func main() {
 	//Create swager if you need
 	swagger := wx.CreateSwagger(server, "/docs")
 	// Show authenication login in swagger
+
 	swagger.OAuth2Password("/api/auth/login")
 	// Build swagger
 	swagger.Build()

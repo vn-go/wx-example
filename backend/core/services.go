@@ -4,6 +4,7 @@ import (
 	"core/services/acc"
 	"core/services/aes"
 	"core/services/config"
+	"core/services/data"
 	"core/services/errs"
 	"core/services/pwd"
 	"core/services/tenant"
@@ -27,6 +28,7 @@ type Service struct {
 	TenantSvc *tenant.TenantService
 	ErrSvc    *errs.ErrService
 	AesSvc    *aes.AesService
+	DataSvc   *data.DataSignService
 }
 
 var servicesInjectors = []any{
@@ -41,6 +43,7 @@ var servicesInjectors = []any{
 	tenant.NewTenantService,
 	errs.NewErrService,
 	aes.NewAesService,
+	data.NewDataSignService,
 }
 
 type User jwt.Indentifier

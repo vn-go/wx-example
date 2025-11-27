@@ -7,10 +7,12 @@ type JWTClaims[TPayload any] struct {
 	Data                   TPayload
 }
 type Indentifier struct {
-	RoleId   *string `json:"roleId"`
-	Email    string  `json:"email"`
-	Tenant   string  `json:"tenant"`
-	UserId   string  `json:"userId"`
-	Username string  `json:"username"`
+	RoleId     *string `json:"roleId"`
+	Email      string  `json:"email"`
+	Tenant     string  `json:"tenant"`
+	UserId     string  `json:"userId"`
+	Username   string  `json:"username"`
+	ViewPath   string  `json:"-"`
+	IsSysAdmin bool    `json:"omitempty"`
 }
 type IndentifierClaims = JWTClaims[Indentifier]

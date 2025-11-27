@@ -6,7 +6,8 @@ replace core => ./../core
 
 require (
 	core v0.0.0-00010101000000-000000000000
-	github.com/vn-go/wx v0.2.7
+	github.com/vn-go/dx v1.0.98
+	github.com/vn-go/wx v0.2.12
 )
 
 require (
@@ -78,7 +79,6 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vn-go/bx v1.0.40 // indirect
-	github.com/vn-go/dx v1.0.97 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/github.com/Shopify/sarama/otelsarama v0.31.0 // indirect
 	go.opentelemetry.io/otel v1.37.0 // indirect

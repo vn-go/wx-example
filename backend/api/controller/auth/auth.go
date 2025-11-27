@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"core/services/errs"
+	
 
 	"github.com/vn-go/wx"
 )
@@ -15,7 +16,7 @@ type Auth struct {
 }
 
 func (aut *Auth) Login(h struct {
-	wx.Handler `route:"login"`
+	wx.Handler `route:"/api/auth/login"`
 }, data wx.Form[struct {
 	Username string `json:"username"`
 	Password string `json:"password"`

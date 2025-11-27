@@ -85,11 +85,12 @@ func (jwtSvc *JwtService) NewJWTWithSecret(secret, Issuer string, account *model
 	claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(ttl))
 	//claims.Issuer = Issuer
 	claims.Data = Indentifier{
-		RoleId:   account.RoleId,
-		Email:    account.Email,
-		Tenant:   Issuer,
-		UserId:   account.Id,
-		Username: account.Username,
+		RoleId:     account.RoleId,
+		Email:      account.Email,
+		Tenant:     Issuer,
+		UserId:     account.Id,
+		Username:   account.Username,
+		IsSysAdmin: account.IsSysAdmin,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

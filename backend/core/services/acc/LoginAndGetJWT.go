@@ -13,7 +13,7 @@ func (acc *AccService) LoginAndGetJWT(ctx context.Context, tenant, username, pas
 	err := acc.db.First(user, "username=?", username)
 	if err != nil {
 		if dx.Errors.IsRecordNotFound(err) {
-			return nil, acc.Unauthenticate()
+			return nil, acc.errSvc.Unauthenticate()
 		}
 		return nil, err
 	}
@@ -42,6 +42,6 @@ func (acc *AccService) LoginAndGetJWT(ctx context.Context, tenant, username, pas
 		}, nil
 		// return acc.jwtSvc.NewJWTWithSecret(secret, "app", user, 2*time.Hour)
 	} else {
-		return nil, acc.Unauthenticate()
+		return nil, acc.errSvc.Unauthenticate()
 	}
 }

@@ -9,7 +9,8 @@ import App from './App.vue';
 import './primevue-fix.css';
 import './style.css';
 import './style.form.css';
-import './syle.primvue.table.hack.css';
+import './style.grid.form.css';
+import './style.primvue.table.hack.css';
 const app = createApp(App);
 app.provide('emitter', emitter);
 

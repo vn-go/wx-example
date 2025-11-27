@@ -10,7 +10,13 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
             <div class="space-y-6">
-                
+                <div>
+                    <label>Full name</label>
+                    <input 
+                       
+                        v-model="userEditor.userData.displayName" 
+                    >
+                </div>
                 <div>
                     <label>Username</label>
                     <input 
@@ -115,7 +121,7 @@ class UserEditor extends libs.BaseUI {
     async onPreInit() {
         // register all api for this UI
         this.apiDiscovery([
-            "accounts/get-edit",
+            "users/get-item",
             "accounts/update",
             "accounts/delete",
             "accounts/new",
@@ -123,7 +129,9 @@ class UserEditor extends libs.BaseUI {
     }
     async onInit() {
         
-        let res= await libs.api.post(this.getViewPath(), "accounts/get-edit",{userId:this.userId});
+        let res= await libs.api.post(this.getViewPath(), "system/users/get-item", {
+            "userId":this.userId
+        });
         if (!res.ok){
             this.errMsg.value= res.error.statusText
         }else {
@@ -133,7 +141,7 @@ class UserEditor extends libs.BaseUI {
 
     }
     async doUpdate() {
-        let res= await libs.api.post(this.getViewPath(), "accounts/update-by-id",{
+        let res= await libs.api.post(this.getViewPath(), "users/update",{
             data:this.userData,
             token:this.updateToken,
         });

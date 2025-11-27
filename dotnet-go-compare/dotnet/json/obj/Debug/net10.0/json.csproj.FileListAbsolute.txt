@@ -1,0 +1,15 @@
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\obj\Debug\net10.0\json.GeneratedMSBuildEditorConfig.editorconfig
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\obj\Debug\net10.0\json.AssemblyInfoInputs.cache
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\obj\Debug\net10.0\json.AssemblyInfo.cs
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\obj\Debug\net10.0\json.csproj.CoreCompileInputs.cache
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\obj\Debug\net10.0\json.sourcelink.json
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\bin\Debug\net10.0\json.exe
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\bin\Debug\net10.0\json.deps.json
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\bin\Debug\net10.0\json.runtimeconfig.json
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\bin\Debug\net10.0\json.dll
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\bin\Debug\net10.0\json.pdb
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\obj\Debug\net10.0\json.dll
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\obj\Debug\net10.0\refint\json.dll
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\obj\Debug\net10.0\json.pdb
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\obj\Debug\net10.0\json.genruntimeconfig.cache
+D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json\obj\Debug\net10.0\ref\json.dll

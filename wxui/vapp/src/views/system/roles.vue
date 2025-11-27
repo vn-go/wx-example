@@ -11,9 +11,12 @@
             <Column header="description" field="description"></Column>
             <Column>
                 <template #body="{ data }">
-                    <button class="btn" @click="()=>{
+                    <button v-if="data.roleId!=null" class="btn" @click="()=>{
                         roles.doEdit(data.roleId)
                     }">Edit</button>
+                    <button v-if="data.roleId==null" class="btn" @click="()=>{
+                        roles.doNewItem()
+                    }">New</button>
                 </template>
             </Column>
         </DataTable>
@@ -41,18 +44,24 @@ class Roles extends libs.BaseUI {
         
     }
     async getListOfRoles() {
-        let res= await this.remoteCaller.post("roles/get-list",{
+        let res= await this.remoteCaller.post("system/roles/list",{
                 "index": 0,
                 "size": 20,
                
                 });
         if(res.ok){
+            res.data.push({});
             return res.data;
         }
     }
     async doEdit(roleId){
         await this.newModal("views/system/roles.editor").setTitle("Edit role").setData({
             roleId:roleId
+        }).render();
+    }
+    async doNewItem(){
+        await this.newModal("views/system/roles.editor").setTitle("New role").setData({
+            roleId:null
         }).render();
     }
 }

@@ -2,12 +2,13 @@ package data
 
 import (
 	"context"
+	"core/services/errs"
 	"core/services/jwt"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"reflect"
 	"sync"
+
+	json "github.com/json-iterator/go"
 
 	jwtV5 "github.com/golang-jwt/jwt/v5"
 )
@@ -19,12 +20,15 @@ type getKeyFieldResult struct {
 	TokenFieldIndex           []int
 	dataFieldIndex            []int
 	keyType                   reflect.Type
+	StatuFieldIndex           []int
 }
 type DataSignService struct {
+	errs.ErrService
 }
 type SignedJWTClaims struct {
 	jwtV5.RegisteredClaims
-	Data any `json:"data"`
+	Data   any    `json:"data"`
+	Status string `json:"status"`
 }
 
 func (s *DataSignService) getKeyFieldNoCache(data any) (*getKeyFieldResult, error) {
@@ -43,11 +47,18 @@ func (s *DataSignService) getKeyFieldNoCache(data any) (*getKeyFieldResult, erro
 		return nil, fmt.Errorf("field Data was not found in %T", data)
 	}
 	ret.dataFieldIndex = typeOfDataField.Index
+	Status, ok := typ.FieldByName("Status")
+
+	if !ok {
+		return nil, fmt.Errorf("Status field of %T was not found", data)
+	}
+	ret.StatuFieldIndex = Status.Index
 	keyField, ok := typ.FieldByName("Key")
-	ret.keyFieldIndex = keyField.Index
+
 	if !ok {
 		return nil, fmt.Errorf("key field of %T was not found", data)
 	}
+	ret.keyFieldIndex = keyField.Index
 	tokenField, ok := typ.FieldByName("Token")
 	if !ok {
 		return nil, fmt.Errorf("Token field of %T was not found", data)
@@ -58,15 +69,42 @@ func (s *DataSignService) getKeyFieldNoCache(data any) (*getKeyFieldResult, erro
 		ret.keyFieldsIndex = append(ret.keyFieldsIndex, keyField.Type.Field(i).Index)
 		fieldName := keyField.Type.Field(i).Name
 
+		// fieldIndex, err := s.getFieldIndexByFieldName(typeOfDataField, fieldName)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// fmt.Println(fieldIndex)
 		dataField, ok := typeOfDataField.Type.FieldByName(fieldName)
 		if !ok {
 			return nil, fmt.Errorf("%s was not found in %T", keyField.Type.Field(i).Name, data)
 		}
+
 		ret.keyFieldIndexInMasterData = append(ret.keyFieldIndexInMasterData, append(typeOfDataField.Index, dataField.Index...))
 	}
 
 	return ret, nil
 }
+
+// func (s *DataSignService) getFieldIndexByFieldName(typeOfDataField reflect.StructField, fieldName string) ([]int, error) {
+// 	ret, ok := typeOfDataField.Type.FieldByNameFunc(func(name string) bool {
+// 		return strings.EqualFold(name, fieldName)
+// 	})
+// 	if ok {
+// 		return ret.Index, nil
+// 	} else {
+// 		for i := 0; i < typeOfDataField.Type.NumField(); i++ {
+// 			fmt.Println(typeOfDataField.Type.Field(i).Name)
+// 			if typeOfDataField.Type.Field(i).Anonymous {
+// 				innerField, err := s.getFieldIndexByFieldName(typeOfDataField.Type.Field(i), fieldName)
+// 				if err != nil {
+// 					return nil, err
+// 				}
+// 				return append(typeOfDataField.Index, innerField...), nil
+// 			}
+// 		}
+// 	}
+// 	return nil, fmt.Errorf("%s was not found in %T", fieldName, typeOfDataField.Type)
+// }
 
 type initGetKeyField struct {
 	val  *getKeyFieldResult
@@ -86,6 +124,10 @@ func (s *DataSignService) getKeyField(data any) (*getKeyFieldResult, error) {
 	i.once.Do(func() {
 		i.val, i.err = s.getKeyFieldNoCache(data)
 	})
+	if i.err != nil {
+		initGetKeyFieldCache.Delete(typ)
+		return nil, i.err
+	}
 	return i.val, i.err
 
 }
@@ -133,16 +175,11 @@ func (s *DataSignService) SignData(ctx context.Context, user *jwt.Indentifier, d
 			keyVal.FieldByIndex(f).Set(fieldOfValInData)
 		}
 	}
-	// for i := 0; i < keyType.NumField(); i++ {
-
-	// 	fieldOfValInData := dataVal.FieldByName(keyType.Field(i).Name)
-	// 	if fieldOfValInData.IsValid() {
-	// 		keyVal.Field(i).Set(fieldOfValInData)
-	// 	}
-	// }
+	statusVal := val.FieldByIndex(fiedlInfo.StatuFieldIndex).String()
 	claims := SignedJWTClaims{
 		RegisteredClaims: jwtV5.RegisteredClaims{},
 		Data:             keyVal.Interface(),
+		Status:           statusVal,
 	}
 
 	token := jwtV5.NewWithClaims(jwtV5.SigningMethodHS256, claims)
@@ -178,17 +215,17 @@ func (s *DataSignService) Verify(ctx context.Context, user *jwt.Indentifier, dat
 	// Parse token
 	token, err := jwtV5.Parse(tokenString, func(t *jwtV5.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwtV5.SigningMethodHMAC); !ok {
-			return nil, errors.New("invalid signing method")
+			return nil, s.BadRequest("invalid token")
 		}
 		return []byte(secret), nil
 	})
 	if err != nil {
-		return err
+		return s.BadRequest("invalid token")
 	}
 
 	claims, ok := token.Claims.(jwtV5.MapClaims)
 	if !ok || !token.Valid {
-		return errors.New("invalid token claims")
+		return s.BadRequest("invalid token") //errors.New("invalid token claims")
 	}
 
 	rawData, err := json.Marshal(claims["data"])
