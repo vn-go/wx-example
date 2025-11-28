@@ -118,7 +118,28 @@ func (aut *AuthBase) ParseError(err error) error {
 		if dxErr.IsEntryNotFoundError() {
 			return &wx.HttpError{
 				Code: http.StatusNotFound,
-				Data: "Not found",
+				Data: struct {
+					Code    string `json:"code"`
+					Message string `json:"message"`
+					//Fields  []string `json:"fields"`
+				}{
+					Message: "Not found",
+					Code:    "not_found",
+				},
+			}
+		}
+		if dxErr.IsDuplicateEntryError() {
+			return &wx.HttpError{
+				Code: http.StatusConflict,
+				Data: struct {
+					Code    string   `json:"code"`
+					Message string   `json:"message"`
+					Fields  []string `json:"fields"`
+				}{
+					Message: "Duplicate entry",
+					Fields:  dxErr.Fields,
+					Code:    "duplicate_entry",
+				},
 			}
 		}
 	}

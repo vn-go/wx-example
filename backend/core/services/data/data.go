@@ -31,37 +31,40 @@ type SignedJWTClaims struct {
 	Status string `json:"status"`
 }
 
-func (s *DataSignService) getKeyFieldNoCache(data any) (*getKeyFieldResult, error) {
+func (s *DataSignService) getKeyFieldNoCache(typ reflect.Type) (*getKeyFieldResult, error) {
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
 	ret := &getKeyFieldResult{
 		keyFieldsIndex:            [][]int{},
 		keyFieldIndexInMasterData: [][]int{},
 	}
-	typ := reflect.TypeOf(data)
-	if typ.Kind() == reflect.Ptr {
-		typ = typ.Elem()
+	// typ := reflect.TypeOf(data)
+	// if typ.Kind() == reflect.Ptr {
+	// 	typ = typ.Elem()
 
-	}
+	// }
 
 	typeOfDataField, ok := typ.FieldByName("Data")
 	if !ok {
-		return nil, fmt.Errorf("field Data was not found in %T", data)
+		return nil, fmt.Errorf("field Data was not found in %s", typ.String())
 	}
 	ret.dataFieldIndex = typeOfDataField.Index
 	Status, ok := typ.FieldByName("Status")
 
 	if !ok {
-		return nil, fmt.Errorf("Status field of %T was not found", data)
+		return nil, fmt.Errorf("Status field of %s was not found", typ.String())
 	}
 	ret.StatuFieldIndex = Status.Index
 	keyField, ok := typ.FieldByName("Key")
 
 	if !ok {
-		return nil, fmt.Errorf("key field of %T was not found", data)
+		return nil, fmt.Errorf("key field of %s was not found", typ.String())
 	}
 	ret.keyFieldIndex = keyField.Index
 	tokenField, ok := typ.FieldByName("Token")
 	if !ok {
-		return nil, fmt.Errorf("Token field of %T was not found", data)
+		return nil, fmt.Errorf("Token field of %s was not found", typ)
 	}
 	ret.TokenFieldIndex = tokenField.Index
 	ret.keyType = keyField.Type
@@ -76,7 +79,7 @@ func (s *DataSignService) getKeyFieldNoCache(data any) (*getKeyFieldResult, erro
 		// fmt.Println(fieldIndex)
 		dataField, ok := typeOfDataField.Type.FieldByName(fieldName)
 		if !ok {
-			return nil, fmt.Errorf("%s was not found in %T", keyField.Type.Field(i).Name, data)
+			return nil, fmt.Errorf("%s was not found in %s", keyField.Type.Field(i).Name, typ)
 		}
 
 		ret.keyFieldIndexInMasterData = append(ret.keyFieldIndexInMasterData, append(typeOfDataField.Index, dataField.Index...))
@@ -114,17 +117,17 @@ type initGetKeyField struct {
 
 var initGetKeyFieldCache sync.Map
 
-func (s *DataSignService) getKeyField(data any) (*getKeyFieldResult, error) {
-	typ := reflect.TypeOf(data)
+func (s *DataSignService) getKeyField(typ reflect.Type) (*getKeyFieldResult, error) {
+
 	if typ.Kind() == reflect.Ptr {
 		typ = typ.Elem()
 	}
 	a, _ := initGetKeyFieldCache.LoadOrStore(typ, &initGetKeyField{})
 	i := a.(*initGetKeyField)
 	i.once.Do(func() {
-		i.val, i.err = s.getKeyFieldNoCache(data)
+		i.val, i.err = s.getKeyFieldNoCache(typ)
 	})
-	if i.err != nil {
+	if i.err != nil || i.val == nil {
 		initGetKeyFieldCache.Delete(typ)
 		return nil, i.err
 	}
@@ -151,17 +154,19 @@ func (s *DataSignService) getKeyField(data any) (*getKeyFieldResult, error) {
 func (s *DataSignService) SignData(ctx context.Context, user *jwt.Indentifier, data any) error {
 
 	secretKey := user.UserId
-	// if err != nil {
-	// 	return err
-	// }
+
 	val := reflect.ValueOf(data)
-	//typ := reflect.TypeOf(data)
+	typ := reflect.TypeOf(data)
 	if val.Kind() == reflect.Ptr {
-		//typ = typ.Elem()
+		typ = typ.Elem()
 		val = val.Elem()
+		if typ.Kind() != reflect.Struct {
+
+			panic("data must be a struct")
+		}
 	}
 
-	fiedlInfo, err := s.getKeyField(data)
+	fiedlInfo, err := s.getKeyField(typ)
 	if err != nil {
 		return err
 	}
@@ -194,10 +199,12 @@ func (s *DataSignService) SignData(ctx context.Context, user *jwt.Indentifier, d
 }
 func (s *DataSignService) Verify(ctx context.Context, user *jwt.Indentifier, data any) error {
 	secret := user.UserId
-	// if err != nil {
-	// 	return err
-	// }
-	keyFieldInfo, err := s.getKeyField(data)
+	typ := reflect.TypeOf(data)
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+
+	}
+	keyFieldInfo, err := s.getKeyField(typ)
 	if err != nil {
 		return err
 	}

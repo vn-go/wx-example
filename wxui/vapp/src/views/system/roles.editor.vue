@@ -56,7 +56,7 @@
             </div>
         </div>
         <div class="footer">
-            <input type="text" v-model="role.dataItem.data.code" />
+
             <button class="btn-update" v-if="role.dataItem.data.id" @click="() => {
                 role.doUpdate()
             }">Update</button>

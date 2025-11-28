@@ -59,3 +59,48 @@ func (r *Roles) NewItem(h wx.Handler) (data *core.DataContract[models.SysRoles, 
 	}
 	return
 }
+func (r *Roles) Update(h wx.Handler, data *core.DataContract[models.SysRoles, RoleNewItemLock]) (any, error) {
+	ctx := h()
+	db, err := r.AuthBase.GetUserDb()
+	if err != nil {
+		return nil, err
+	}
+	err = r.Svc.DataSvc.Verify(ctx.Req.Context(), r.Data, data)
+	if err != nil {
+		return nil, r.ParseError(err)
+	}
+	if data.Status == "new" {
+		err = db.InsertWithContext(ctx.Req.Context(), &data.Data)
+		if err != nil {
+			return nil, r.ParseError(err)
+		}
+		return data, nil
+	} else {
+		rs := db.UpdateWithContext(ctx.Req.Context(), &data.Data)
+		if rs.Error != nil {
+			return nil, r.ParseError(rs.Error)
+		}
+	}
+	return data, nil
+}
+func (r *Roles) Item(h wx.Handler, id string) (data *core.DataContract[models.SysRoles, RoleNewItemLock], err error) {
+	ctx := h()
+	db, err := r.AuthBase.GetUserDb()
+	if err != nil {
+		return
+	}
+	roleItem := models.SysRoles{}
+	err = db.First(&roleItem, "id=?", id)
+	if err != nil {
+		return nil, r.ParseError(err)
+	}
+	data = &core.DataContract[models.SysRoles, RoleNewItemLock]{
+		Data:   roleItem,
+		Status: "edit",
+	}
+	err = r.Svc.DataSvc.SignData(ctx.Req.Context(), r.Data, data)
+	if err != nil {
+		return nil, err
+	}
+	return
+}

@@ -1,4 +1,5 @@
-import { createApp } from 'vue';
+import PrimeVue from 'primevue/config';
+import { App, createApp } from 'vue';
 import draggableWindowWiget from './draggableWindowWiget';
 import parseAndAccessRoles from './parseAndAccessRoles';
 import showElementFromRight from './showElementFromRight';
@@ -109,6 +110,7 @@ export class ModalInstance {
         const Component = (await componentLoader()).default;
 
         let app = createApp(Component, this.data);
+        this.applyVue(app)
 
         app.mount(parserDOM.body);
 
@@ -116,7 +118,7 @@ export class ModalInstance {
 
 
         await showElementFromRight(parserDOM.container as HTMLElement, () => {
-            parserDOM.container.style.zIndex = "10000";
+            parserDOM.container.style.zIndex = "200";
         }, async () => {
 
         }, 500);
@@ -129,6 +131,32 @@ export class ModalInstance {
                 parserDOM.container.remove();
             }
         }
+    }
+    applyVue(app: App<Element>) {
+        app.use(PrimeVue, {
+            ripple: true,
+            locale: {
+                startsWith: 'Starts with',
+                contains: 'Contains',
+                notContains: 'Not contains',
+                endsWith: 'Ends with',
+                equals: 'Equals',
+                notEquals: 'Not equals',
+                noFilter: 'No Filter',
+                aria: {
+                    trueLabel: 'True',
+                    falseLabel: 'False'
+                },
+                firstDayOfWeek: 1,
+            },
+            theme: {
+
+                options: {
+                    darkModeSelector: null,
+                    cssLayer: false
+                }
+            }
+        });
     }
     private _applySize(ele: Element): HTMLElement {
         let w = this.width;
