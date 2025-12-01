@@ -7,7 +7,7 @@ type Pager struct {
 	Size  int `json:"size" check:"[1:50]"`
 }
 
-func (u *Users) List(h wx.Handler, page Pager) (any, error) {
+func (u *Users) List(h wx.Handler) (any, error) {
 	db, err := u.Svc.TenantSvc.GetDb(u.Data.Tenant)
 	if err != nil {
 		return nil, err
@@ -23,6 +23,7 @@ func (u *Users) List(h wx.Handler, page Pager) (any, error) {
 	}
 	return ret, nil
 }
+
 /*
 //C:\Users\MSI CYBORG\AppData\Local\Temp
 $SourcePath = "C:\Users\MSI CYBORG\AppData\Local\JetBrains\Fleet\cache"

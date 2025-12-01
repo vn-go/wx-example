@@ -7,5 +7,5 @@ func (u *Users) Roles(h wx.Handler) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	return db.DslToArray("sysRoles(id,code,name)")
+	return db.DslToArray("sysRoles(id,code,name),sort(name asc)")
 }

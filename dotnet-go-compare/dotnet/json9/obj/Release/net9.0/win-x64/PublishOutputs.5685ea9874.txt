@@ -1,1 +1,0 @@
-D:\code\go\wx-example\wx-example\dotnet-go-compare\dotnet\json9\aot\json9.exe

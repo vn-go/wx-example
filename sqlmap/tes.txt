@@ -1,1 +1,0 @@
-sqlmap -r ds.txt -p index --batch -v 3

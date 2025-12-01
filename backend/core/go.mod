@@ -9,7 +9,7 @@ require (
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
 	github.com/vn-go/bx v1.0.40
-	github.com/vn-go/dx v1.0.98
+	github.com/vn-go/dx v1.0.100
 	golang.org/x/crypto v0.39.0
 )
 

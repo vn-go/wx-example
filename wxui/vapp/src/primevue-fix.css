@@ -1,7 +1,0 @@
-@import "tailwindcss";
-
-:root,
-:host {
-    color-scheme: light !important;
-}
-

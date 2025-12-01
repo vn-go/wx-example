@@ -51,7 +51,7 @@ tenant:
 default-auth:
   user: "admin"
   pwd: "/\\dmin123451212"
-debug: true
+debug: false
 bind:
   host: 0.0.0.0
   port: 8080

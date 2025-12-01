@@ -15,6 +15,7 @@ func InitRoutes() {
 		&users.Users{},
 		&app.App{},
 		&roles.Roles{},
+		&users.UserPortal{},
 	)
 	if err != nil {
 		panic(err)

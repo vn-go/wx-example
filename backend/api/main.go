@@ -1,24 +1,58 @@
 package main
 
 import (
+	"apicore/controller"
+	"apicore/middleware"
 	"core"
 	_ "core"
+	"expvar"
 	"fmt"
 	"log"
 	"net/http"
+	"runtime"
 	"time"
-
-	"apicore/controller"
-	"apicore/middleware"
-
+	_ "net/http/pprof"   // ← thiếu dòng này = 404 100%
 	"github.com/vn-go/dx"
 	"github.com/vn-go/wx"
 )
 
+var (
+	cpuUsage   = expvar.NewFloat("cpu_usage_percent")
+	memUsage   = expvar.NewFloat("memory_usage_mb")
+	goroutines = expvar.NewInt("goroutines")
+)
+
+func init() {
+	go func() {
+		for {
+			var m runtime.MemStats
+			runtime.ReadMemStats(&m)
+			memUsage.Set(float64(m.Alloc) / 1024 / 1024)
+			goroutines.Set(int64(runtime.NumGoroutine()))
+
+			// Đo CPU (ước lượng)
+			cpuUsage.Set(estimateCPUUsage())
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
+}
+
+func estimateCPUUsage() float64 {
+	// Đo chính xác hơn bằng runtime/pprof, nhưng cách nhanh:
+	var prev, now runtime.MemStats
+	runtime.ReadMemStats(&prev)
+	time.Sleep(100 * time.Millisecond)
+	runtime.ReadMemStats(&now)
+	return float64(now.TotalAlloc-prev.TotalAlloc) / 1e8 // heuristic
+}
 func main() {
 	go func() {
-		fmt.Println("pprof running at :6060")
-		log.Println(http.ListenAndServe("localhost:6060", nil))
+		log.Println("pprof đang chạy tại http://localhost:6060/debug/pprof/")
+		log.Println("Truy cập: http://localhost:6060/debug/pprof/")
+		if err := http.ListenAndServe("localhost:6060", nil); err != nil {
+			log.Fatalf("pprof server chết: %v", err) // bắt lỗi ngay
+		}
 	}()
 	core.Start("./config.yaml")
 	defer core.Services.Close()

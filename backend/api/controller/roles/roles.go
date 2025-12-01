@@ -27,7 +27,7 @@ func (r *Roles) List(h wx.Handler) (data any, err error) {
 							createdBy,
 							modifiedOn,
 							modifiedBy),
-					SysUsers( count(id) TotlaUsers),
+					SysUsers( count(id) TotalUsers),
 							from(SysRoles r, SysUsers u,left(r.Id=u.RoleId)), // left join SysUsers on SysRoles.Id=SysUsers.RoleId
 							sort(createdOn desc)`)
 	return

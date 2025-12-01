@@ -88,27 +88,6 @@ func (s *DataSignService) getKeyFieldNoCache(typ reflect.Type) (*getKeyFieldResu
 	return ret, nil
 }
 
-// func (s *DataSignService) getFieldIndexByFieldName(typeOfDataField reflect.StructField, fieldName string) ([]int, error) {
-// 	ret, ok := typeOfDataField.Type.FieldByNameFunc(func(name string) bool {
-// 		return strings.EqualFold(name, fieldName)
-// 	})
-// 	if ok {
-// 		return ret.Index, nil
-// 	} else {
-// 		for i := 0; i < typeOfDataField.Type.NumField(); i++ {
-// 			fmt.Println(typeOfDataField.Type.Field(i).Name)
-// 			if typeOfDataField.Type.Field(i).Anonymous {
-// 				innerField, err := s.getFieldIndexByFieldName(typeOfDataField.Type.Field(i), fieldName)
-// 				if err != nil {
-// 					return nil, err
-// 				}
-// 				return append(typeOfDataField.Index, innerField...), nil
-// 			}
-// 		}
-// 	}
-// 	return nil, fmt.Errorf("%s was not found in %T", fieldName, typeOfDataField.Type)
-// }
-
 type initGetKeyField struct {
 	val  *getKeyFieldResult
 	err  error

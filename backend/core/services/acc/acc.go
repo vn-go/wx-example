@@ -46,6 +46,7 @@ func (acc *AccService) ValidateToken(context context.Context, authorization stri
 	if err != nil {
 		return nil, acc.errSvc.Unauthenticate()
 	}
+
 	tenant := tokenClaims.Data.Tenant
 	secret, err := acc.tenantSvc.GetSecret(tenant)
 	if err != nil {

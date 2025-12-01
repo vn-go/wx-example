@@ -1,8 +1,0 @@
-POST /api/accounts/get-list-of-roles HTTP/1.1
-Host: localhost:8080
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhOTQ3YWQzYy1lNzQ3LTQ3YzctODc4ZS02YWIyMjlmNjQyNjIiLCJleHAiOjE3NTk5OTkyMzQsImlhdCI6MTc1OTk4NDgzNCwicm9sZSI6IiIsImVtYWlsIjoiIn0.pEM7jlezGfVeoQzLzt-Tx1Y3kznTrlpbPgNBs9EpkUM
-User-Agent: sqlmap
-Accept: */*
-
-{"index":"0","size":"10"}

@@ -19,9 +19,14 @@ func (u *Users) Me(h wx.Handler) (any, error) {
 	return u.Svc.AccSvc.CurrentUserProfile(req.Context(), u.Authenticate.Data)
 }
 
-func (u *Users) GetItem(h wx.Handler, data struct {
-	UserId string `json:"userId"`
-}) (*editUser, error) {
+func (u *Users) GetItem(h wx.Handler, UserId string,
+
+/*
+	data struct {
+		UserId string `json:"userId"`
+	}
+*/
+) (any, error) {
 	db, err := u.Svc.TenantSvc.GetDb(u.Authenticate.Data.Tenant)
 	if err != nil {
 		return nil, err
@@ -29,10 +34,30 @@ func (u *Users) GetItem(h wx.Handler, data struct {
 	ret := &editUser{
 		Data: models.SysUsers{},
 	}
-	err = db.First(&ret.Data, "id = ?", data.UserId)
+	// user := models.SysUsers{}
+	err = db.First(&ret.Data, "id = ?", UserId)
 	if err != nil {
 		return nil, u.ParseError(err)
 	}
+	// dataContact := security.NewDataContract(user, struct {
+	// 	Id           string     // can not modify by client
+	// 	Username     string     // can not modify by client
+	// 	CreatedBy    string     // can not modify by client
+	// 	CreatedOn    time.Time  // can not modify by client
+	// 	ModifiedBy   *string    // can not modify by client
+	// 	ModifiedOn   *time.Time // can not modify by client
+	// 	HashPassword string     // can not modify by client
+	// }{
+	// 	Id:           user.Id,
+	// 	Username:     user.Username,
+	// 	CreatedBy:    user.CreatedBy,
+	// 	CreatedOn:    user.CreatedOn,
+	// 	ModifiedBy:   nil,
+	// 	ModifiedOn:   nil,
+	// 	HashPassword: user.HashPassword,
+	// })
+	// dataContact.Status = "edit"
+	// err = security.SignData(dataContact, u.Authenticate.Data.UserId)
 	err = u.Svc.DataSvc.SignData(h().Req.Context(), u.Authenticate.Data, ret)
 	if err != nil {
 		return nil, u.ParseError(err)

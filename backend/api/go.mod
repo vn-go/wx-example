@@ -6,7 +6,7 @@ replace core => ./../core
 
 require (
 	core v0.0.0-00010101000000-000000000000
-	github.com/vn-go/dx v1.0.98
+	github.com/vn-go/dx v1.0.100
 	github.com/vn-go/wx v0.2.12
 )
 

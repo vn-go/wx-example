@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+div.p-datepicker-panel.p-component {
+    @apply bg-white border-b border-gray-200 px-2 p-2 text-gray-600;
+
+    span.p-datepicker-day {
+        @apply text-gray-900;
+    }
+
+    span.p-datepicker-day.p-disabled {
+        @apply text-gray-900;
+    }
+
+    span[data-p="today"] {
+        @apply text-white
+    }
+
+    div.p-datepicker-header {
+        @apply m-0 p-0 flex flex-row justify-center;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    table.p-datepicker-day-view {
+        thead[data-pc-section="tableheader"] {
+            tr[data-pc-section="tableheaderrow"] {
+                th.p-datepicker-weekday-cell {
+                    span.p-datepicker-weekday {
+                        @apply text-gray-900;
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+span.p-datepicker.p-component.p-inputwrapper {
+    @apply px-2 py-1 text-gray-900 bg-white rounded-sm border border-gray-300;
+
+
+    input.p-inputtext.p-component.p-datepicker-input {
+        @apply border-none m-0 p-0 w-full;
+        background-color: unset;
+    }
+}
+
+span.p-datepicker.p-component.p-inputwrapper.p-inputwrapper-filled {
+    @apply px-2 py-1 text-gray-900 bg-white rounded-sm border border-gray-300 m-0 p-0;
+
+    input.p-inputtext.p-component.p-filled.p-datepicker-input {
+        @apply border-none m-0 p-0 w-full;
+        background-color: unset;
+    }
+}

@@ -60,17 +60,27 @@ func (auth *AuthBase) verifyToken(ctx context.Context, authorization string) (*j
 func (auth AuthBase) GetUserDb() (*dx.DB, error) {
 	return auth.Svc.TenantSvc.GetDb(auth.Data.Tenant)
 }
+
+/*
+This function is used to initialize the AuthBase object.
+It is called by the framework when the object is created.
+Setup authentication and authorization rules.
+All controller in GO need embed AuthBase to use authentication and authorization.
+*/
 func (auth *AuthBase) New() error {
 	auth.Svc = core.Services
+	// add Verify token
 	auth.Authenticate.Verify(func(ctx wx.Handler) (*jwt.Indentifier, error) {
 		wxCtx := ctx()
 		req := wxCtx.Req
 		fmt.Println(wxCtx.Req.URL.Path)
 		authorization := req.Header.Get("authorization")
-		user, err := auth.verifyToken(ctx().Req.Context(), authorization)
+		// verify token and get user
+		user, err := auth.Svc.AccSvc.ValidateToken(ctx().Req.Context(), authorization)
 		if err != nil {
-			return nil, err
+			return nil, auth.ParseError(err)
 		}
+		// get view path form header
 		viewPath := req.Header.Get("view-path")
 		if viewPath == "" && !user.IsSysAdmin {
 			return nil, wx.Errors.NewForbidenError(struct {
@@ -79,7 +89,7 @@ func (auth *AuthBase) New() error {
 				Msg: "forbidden",
 			})
 		}
-
+		// return user for  controller where embed AuthBase
 		return user, nil
 
 	})
