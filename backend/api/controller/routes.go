@@ -3,6 +3,7 @@ package controller
 import (
 	"apicore/controller/app"
 	"apicore/controller/auth"
+	"apicore/controller/media"
 	"apicore/controller/roles"
 	"apicore/controller/users"
 
@@ -16,6 +17,7 @@ func InitRoutes() {
 		&app.App{},
 		&roles.Roles{},
 		&users.UserPortal{},
+		&media.Media{},
 	)
 	if err != nil {
 		panic(err)
